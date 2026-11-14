@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: woman
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: 4b06ef2d-37f8-4073-90c9-931282a2fe25
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 40, y: 40}
+  - guid: 9403c33b-018e-44b4-aa38-793d24589a62
+    kind: 0
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 432, y: 40}
+  - guid: 6da1c97a-95e8-4b14-98b4-063a79d93e55
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 600, y: 180}
+  edges: []

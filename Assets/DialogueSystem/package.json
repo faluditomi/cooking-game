@@ -1,0 +1,9 @@
+{
+    "name": "com.dialoguekit.dialogue-system",
+    "displayName": "Dialogue Kit",
+    "version": "0.1.0",
+    "unity": "6000.0",
+    "description": "Event-driven dialogue system: NPC-grouped dialogue catalog with play-once-then-random selection, trigger-event entry points, automatic conversation-graph playback, GraphView graph authoring, and a dedicated catalog inspector. Ships with runtime + editor assemblies and no dependencies beyond Unity.",
+    "keywords": ["dialogue", "conversation", "graph", "narrative", "event"],
+    "author": { "name": "Internal" }
+}
