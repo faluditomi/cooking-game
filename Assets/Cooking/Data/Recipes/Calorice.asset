@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9dbf973f6ffa355418567f4b61dcc68e, type: 3}
+  m_Name: Calorice
+  m_EditorClassIdentifier: Cooking.Runtime::Cooking.RecipeDefinition
+  displayName: Calorice
+  origin: Erlin's Eye street food
+  description: 
+  portions:
+  - ingredient: {fileID: 11400000, guid: fc4d9c7d893d459888f20847bba96260, type: 2}
+    quantity: 2
+    prep: 0
+    cooking: 2
+    doneness: 0
+  - ingredient: {fileID: 11400000, guid: 202598e8be2b42358f82d7e82864cb10, type: 2}
+    quantity: 3
+    prep: 2
+    cooking: 2
+    doneness: 0
+  - ingredient: {fileID: 11400000, guid: b118d6e11507461fb2d0389b6146edfb, type: 2}
+    quantity: 1
+    prep: 2
+    cooking: 2
+    doneness: 0
+  - ingredient: {fileID: 11400000, guid: eb3d40915f454fccb82e85854aae70e3, type: 2}
+    quantity: 1
+    prep: 0
+    cooking: 2
+    doneness: 0
+  - ingredient: {fileID: 11400000, guid: 3e30b972fe0043b981e4906d33a2fc46, type: 2}
+    quantity: 1
+    prep: 0
+    cooking: 2
+    doneness: 0

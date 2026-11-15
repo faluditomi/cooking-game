@@ -1,0 +1,143 @@
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace Cooking.Prototype
+{
+    /// <summary>
+    /// A wok or a pot. Load it with prepped portions, start it, and take everything off at once.
+    /// Where the progress bar is when you take it off decides the doneness of the whole batch.
+    /// </summary>
+    /// <remarks>
+    /// Progress runs 0..1 over <see cref="Duration"/> seconds.
+    /// Below <see cref="PerfectStart"/> the food is undercooked. Up to <see cref="PerfectEnd"/> it is perfect.
+    /// After that a burning station (wok) stays perfect until progress hits 1 and burns, while a
+    /// non-burning station (pot) overcooks. In a wok's danger area (<see cref="DangerStart"/> and up)
+    /// shaking knocks progress back, which is the "wok magic" from the design doc.
+    /// </remarks>
+    public class CookingStation
+    {
+        public readonly string Name;
+        public readonly CookMethods Method;
+        public readonly float Duration;
+        public readonly float PerfectStart;
+        public readonly float PerfectEnd;
+        public readonly float DangerStart;
+        public readonly bool Burns;
+        public readonly float ShakeKnockback;
+
+        private readonly List<IngredientPortion> contents = new List<IngredientPortion>();
+
+        public IReadOnlyList<IngredientPortion> Contents => contents;
+        public bool IsEmpty => contents.Count == 0;
+        public bool IsCooking { get; private set; }
+        public float Progress { get; private set; }
+
+        public CookingStation(string name, CookMethods method, float duration, float perfectStart, float perfectEnd,
+            float dangerStart, bool burns, float shakeKnockback = 0.15f)
+        {
+            Name = name;
+            Method = method;
+            Duration = Mathf.Max(0.1f, duration);
+            PerfectStart = perfectStart;
+            PerfectEnd = perfectEnd;
+            DangerStart = dangerStart;
+            Burns = burns;
+            ShakeKnockback = shakeKnockback;
+        }
+
+        /// <summary>A wok: perfect from halfway, danger from 80%, burnt at the end.</summary>
+        public static CookingStation CreateWok(float duration = 8f)
+        {
+            return new CookingStation("Wok", CookMethods.Fried, duration, 0.5f, 1f, 0.8f, burns: true);
+        }
+
+        /// <summary>A pot: a narrow perfect band in the middle, overcooked after it.</summary>
+        public static CookingStation CreatePot(float duration = 10f)
+        {
+            return new CookingStation("Pot", CookMethods.Boiled, duration, 0.45f, 0.62f, 0.62f, burns: false);
+        }
+
+        public bool IsInDanger => IsCooking && Progress >= DangerStart;
+        public Doneness CurrentDoneness => Evaluate(Progress);
+
+        public Doneness Evaluate(float progress)
+        {
+            if(progress < PerfectStart) return Doneness.Undercooked;
+            if(Burns && progress >= 1f) return Doneness.Burnt;
+            if(progress <= PerfectEnd) return Doneness.Perfect;
+            return Burns ? Doneness.Burnt : Doneness.Overcooked;
+        }
+
+        /// <summary>Adds one portion. Same ingredient with the same prep stacks. Fails while cooking.</summary>
+        public bool Add(IngredientPortion portion)
+        {
+            if(IsCooking || portion == null || !portion.IsValid) return false;
+
+            foreach(IngredientPortion existing in contents)
+            {
+                if(existing.ingredient == portion.ingredient && existing.prep == portion.prep
+                   && existing.cooking == portion.cooking && existing.doneness == portion.doneness)
+                {
+                    existing.quantity += portion.quantity;
+                    return true;
+                }
+            }
+
+            contents.Add(new IngredientPortion(portion.ingredient, portion.quantity, portion.prep, portion.cooking, portion.doneness));
+            return true;
+        }
+
+        public bool StartCooking()
+        {
+            if(IsEmpty || IsCooking) return false;
+
+            IsCooking = true;
+            Progress = 0f;
+            return true;
+        }
+
+        public void Tick(float deltaTime)
+        {
+            if(!IsCooking) return;
+            Progress = Mathf.Min(1f, Progress + deltaTime / Duration);
+        }
+
+        /// <summary>Wok only: in the danger area, knocks progress back so the food survives longer.</summary>
+        public bool Shake()
+        {
+            if(!Burns || !IsInDanger || Progress >= 1f) return false;
+
+            Progress = Mathf.Max(PerfectStart, Progress - ShakeKnockback);
+            return true;
+        }
+
+        /// <summary>Takes everything off the heat with the current doneness applied.</summary>
+        public List<IngredientPortion> TakeOff()
+        {
+            List<IngredientPortion> result = new List<IngredientPortion>();
+            if(!IsCooking) return result;
+
+            Doneness doneness = CurrentDoneness;
+
+            foreach(IngredientPortion portion in contents)
+            {
+                // Something cooked twice keeps the worst result.
+                Doneness worst = portion.IsRaw || doneness > portion.doneness ? doneness : portion.doneness;
+                result.Add(new IngredientPortion(portion.ingredient, portion.quantity, portion.prep, portion.cooking | Method, worst));
+            }
+
+            contents.Clear();
+            IsCooking = false;
+            Progress = 0f;
+            return result;
+        }
+
+        /// <summary>Bins the contents.</summary>
+        public void Clear()
+        {
+            contents.Clear();
+            IsCooking = false;
+            Progress = 0f;
+        }
+    }
+}

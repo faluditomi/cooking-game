@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9dbf973f6ffa355418567f4b61dcc68e, type: 3}
+  m_Name: Synthetic soup
+  m_EditorClassIdentifier: Cooking.Runtime::Cooking.RecipeDefinition
+  displayName: Synthetic soup
+  origin: Erlin's Eye street food
+  description: 
+  portions:
+  - ingredient: {fileID: 11400000, guid: 4055757ba0454535ad6cd5f5753cedbd, type: 2}
+    quantity: 1
+    prep: 0
+    cooking: 1
+    doneness: 0
+  - ingredient: {fileID: 11400000, guid: 39a8192f178849dea224e9f34f562f68, type: 2}
+    quantity: 1
+    prep: 0
+    cooking: 1
+    doneness: 0
+  - ingredient: {fileID: 11400000, guid: 5035d26bc0f24b75a77290d61af78064, type: 2}
+    quantity: 1
+    prep: 2
+    cooking: 1
+    doneness: 0
+  - ingredient: {fileID: 11400000, guid: e15d7792cf294d49a5eb817bfd4c6af4, type: 2}
+    quantity: 1
+    prep: 4
+    cooking: 1
+    doneness: 0
+  - ingredient: {fileID: 11400000, guid: 892dbf12e0a14f60aef17f90847bc1d7, type: 2}
+    quantity: 2
+    prep: 0
+    cooking: 1
+    doneness: 0
+  - ingredient: {fileID: 11400000, guid: eb3d40915f454fccb82e85854aae70e3, type: 2}
+    quantity: 1
+    prep: 0
+    cooking: 1
+    doneness: 0

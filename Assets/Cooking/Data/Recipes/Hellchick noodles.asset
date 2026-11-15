@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9dbf973f6ffa355418567f4b61dcc68e, type: 3}
+  m_Name: Hellchick noodles
+  m_EditorClassIdentifier: Cooking.Runtime::Cooking.RecipeDefinition
+  displayName: Hellchick noodles
+  origin: Erlin's Eye street food
+  description: 
+  portions:
+  - ingredient: {fileID: 11400000, guid: 39a8192f178849dea224e9f34f562f68, type: 2}
+    quantity: 1
+    prep: 0
+    cooking: 2
+    doneness: 0
+  - ingredient: {fileID: 11400000, guid: 5035d26bc0f24b75a77290d61af78064, type: 2}
+    quantity: 1
+    prep: 2
+    cooking: 2
+    doneness: 0
+  - ingredient: {fileID: 11400000, guid: 19883b7fd2bc4104919d0e27c792668e, type: 2}
+    quantity: 2
+    prep: 3
+    cooking: 2
+    doneness: 0
+  - ingredient: {fileID: 11400000, guid: b9352196cd404ec5aa02fb3209064ec2, type: 2}
+    quantity: 3
+    prep: 4
+    cooking: 2
+    doneness: 0
+  - ingredient: {fileID: 11400000, guid: e15d7792cf294d49a5eb817bfd4c6af4, type: 2}
+    quantity: 2
+    prep: 4
+    cooking: 2
+    doneness: 0
+  - ingredient: {fileID: 11400000, guid: 87c42bb69b65492898283d0dd8889f78, type: 2}
+    quantity: 2
+    prep: 0
+    cooking: 2
+    doneness: 0

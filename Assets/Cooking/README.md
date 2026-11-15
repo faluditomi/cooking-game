@@ -13,6 +13,7 @@ section of the design doc (Notion: The Washerwoman Potlatch → Mechanics → Fl
 | `IngredientPortion` | data | Ingredient × quantity + prep (`Peeled`/`Sliced`/`Grated`, stackable) + cooking (`Boiled`/`Fried`, none = raw) + doneness. A dish is a list of these. |
 | `FlavourRules` | asset | Global tuning: what each prep step, cooking method and doneness does, plus zone falloff. |
 | `FlavourZone` | asset | A desirable region: min/max per axis. Drawn as a shaded band on the radar. |
+| `RecipeDefinition` | asset | A menu dish: its portions (with prep and cooking), origin, perfect-cook profile, cost, and `Matches(plate)` for "is this exactly what they ordered". |
 | `FlavourCalculator` | static | Portions → dish `FlavourProfile`, and ingredient cost. |
 | `FlavourEvaluator` | static | Profile vs zones: score, best zone, shared zone. |
 
@@ -85,11 +86,49 @@ All values are **placeholders** tuned so the Notion recipes behave sensibly:
 | Sweet & sour tofu soup (the woman's dream meal) | Sweet & Sour only |
 | Burnt or raw dishes | no zone |
 
+## Cooking prototype (`Prototype/`)
+
+A playable loop to try the flavour system with. **Custom Tools → Cooking Prototype → Build Scene**
+creates `Prototype/CookingPrototype.unity` and the design-doc recipes in `Data/Recipes/`. It keeps
+recipe assets that already exist, so hand tuning survives a rebuild. Then press Play.
+
+1. A customer orders a dish. The order card shows the recipe, its menu price and which zone it tastes like.
+2. **Pantry**: each click buys one unit onto the prep board. Click again for more of the same thing.
+3. **Prep board**: Peel / Slice / Grate (they stack), then send the stack to the wok, the pot, or
+   straight to the plate raw.
+4. **Wok**: Start, then take it off in the green. In the red, **Shake!** knocks the bar back. If it
+   reaches the end, it's burnt. **Pot**: take it off on the narrow green line, or it overcooks.
+   Everything in a station comes off at once with the same doneness.
+5. **Serve**: the dish is judged (`DishJudge`) and its flavour is revealed on the radar next to the order.
+
+| Verdict | When | Pay |
+|---|---|---|
+| Dream meal | inside the customer's secret desire zone | price + 100% tip |
+| Ordered | `RecipeDefinition.Matches`: same portions, prep and cooking, nothing badly cooked | price |
+| Liked substitute | shares a zone with the order, score ≥ `likeThreshold` | price, +25% tip if fully inside |
+| Refused | contains something they won't eat | nothing |
+| Disliked | anything else | nothing |
+
+Price is the **ordered** dish's ingredient cost × `margin`. Customers come from the design doc's NPC notes:
+
+- **The Woman**: refuses beef, secretly craves Sweet & Sour.
+- **The Man**: refuses synthetic chicken, craves Hearty Broth.
+- **The Sleeper**: orders boiled synthetic chicken, craves Fire Bowl.
+- **A generic Eyesider**: orders anything on the menu.
+
+Customer lines and other settings (margin, station speed, live preview) are on the
+`Cooking Prototype` object in the scene. The live flavour preview is a tuning aid. The design
+reveals the flavour only after serving.
+
+The UI is built in code at startup (`CookingPrototype.BuildUI`), uses uGUI with the built-in font,
+and needs the Input System UI module (the setup adds one). `FlavourRadarGraphic` is the runtime radar chart.
+
 ## Tests
 
-EditMode tests live in `Tests/Editor` (Window → General → Test Runner → EditMode).
+EditMode tests live in `Tests/Editor` (Window → General → Test Runner → EditMode). They cover the
+calculator, evaluator, recipe matching, stations and dish judging.
 
 ## Not here yet
 
-Recipe assets and the menu, cooking stations and their minigames, customer judging, and a
-runtime (in-game) radar chart. The editor radar in `Editor/FlavourRadarGUI.cs` is a reference for that.
+The real stall: art and plating visuals, the prep and wok minigames as mouse gestures, saving new
+recipes to the menu, cooking history, day cycles and rent, and the conversation system hookup.
