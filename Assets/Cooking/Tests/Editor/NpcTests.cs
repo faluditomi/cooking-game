@@ -39,7 +39,7 @@ namespace Cooking.Tests
 
         private static JudgeResult Result(Verdict verdict, bool late = false)
         {
-            bool paid = verdict == Verdict.Ordered || verdict == Verdict.LikedSubstitute || verdict == Verdict.DreamMeal;
+            bool paid = verdict == Verdict.Ordered || verdict == Verdict.VeryClose || verdict == Verdict.CloseEnough || verdict == Verdict.DreamMeal;
             return new JudgeResult { Verdict = verdict, Payment = paid ? 5f : 0f, Late = late };
         }
 
@@ -68,6 +68,7 @@ namespace Cooking.Tests
             CustomerRelationship relationship = new CustomerRelationship(customer);
 
             relationship.Record(Result(Verdict.Disliked), new List<IngredientPortion>());
+            relationship.Record(Result(Verdict.CloseEnough), new List<IngredientPortion>());
             relationship.Record(Result(Verdict.Ordered, late: true), new List<IngredientPortion>());
             relationship.Record(Result(Verdict.Refused), new List<IngredientPortion>());
 
@@ -97,16 +98,16 @@ namespace Cooking.Tests
         }
 
         [Test]
-        public void LikedSubstitute_IsAddedToWhatTheyOrder_Once()
+        public void VeryCloseDish_IsAddedToWhatTheyOrder_Once()
         {
             RecipeDefinition usual = Recipe("Usual", new IngredientPortion(Ingredient("Rice"), 1, cooking: CookMethods.Fried));
             Customer customer = new Customer { name = "The Sleeper", orders = new List<RecipeDefinition> { usual } };
             CustomerRelationship relationship = new CustomerRelationship(customer);
             List<IngredientPortion> served = new List<IngredientPortion> { new IngredientPortion(Ingredient("Chilli"), 3, PrepSteps.Grated, CookMethods.Fried) };
 
-            RelationshipChange first = relationship.Record(Result(Verdict.LikedSubstitute), served);
+            RelationshipChange first = relationship.Record(Result(Verdict.VeryClose), served);
             created.Add(first.NewLikedMeal);
-            RelationshipChange again = relationship.Record(Result(Verdict.LikedSubstitute), served);
+            RelationshipChange again = relationship.Record(Result(Verdict.VeryClose), served);
 
             Assert.IsNotNull(first.NewLikedMeal);
             Assert.AreEqual("Emphis's special for The Sleeper", first.NewLikedMeal.DisplayName);
@@ -129,7 +130,8 @@ namespace Cooking.Tests
         public void DishOutcome_MapsToDialogueEvent()
         {
             Assert.AreEqual(DialogueEventType.GoodDish, CustomerDialogue.EventFor(Result(Verdict.Ordered)));
-            Assert.AreEqual(DialogueEventType.GoodDish, CustomerDialogue.EventFor(Result(Verdict.LikedSubstitute)));
+            Assert.AreEqual(DialogueEventType.GoodDish, CustomerDialogue.EventFor(Result(Verdict.VeryClose)));
+            Assert.AreEqual(DialogueEventType.OkDish, CustomerDialogue.EventFor(Result(Verdict.CloseEnough)));
             Assert.AreEqual(DialogueEventType.BadDish, CustomerDialogue.EventFor(Result(Verdict.Disliked)));
             Assert.AreEqual(DialogueEventType.Refused, CustomerDialogue.EventFor(Result(Verdict.Refused)));
             Assert.AreEqual(DialogueEventType.LateDish, CustomerDialogue.EventFor(Result(Verdict.Ordered, late: true)));

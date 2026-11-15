@@ -45,6 +45,9 @@ MonoBehaviour:
     - graph: {fileID: 11400000, guid: 9467eb47eca518b408ae973369de5744, type: 2}
       eventType: 6
       npcState: 0
+    - graph: {fileID: 11400000, guid: 5ed85bca2b62cf943a0b838807dbeb32, type: 2}
+      eventType: 8
+      npcState: 0
   - npcId: 2
     entries:
     - graph: {fileID: 11400000, guid: 308502d6114192b4d8c59baee830eb6a, type: 2}
@@ -74,6 +77,9 @@ MonoBehaviour:
     - graph: {fileID: 11400000, guid: 1d4dd035d51198a4db0eaa95cfab2a0b, type: 2}
       eventType: 6
       npcState: 0
+    - graph: {fileID: 11400000, guid: 93ca6a9f34d297746b9365f78fac2f36, type: 2}
+      eventType: 8
+      npcState: 0
   - npcId: 3
     entries:
     - graph: {fileID: 11400000, guid: f2f7a07ed49f83048b2420357ad7dc73, type: 2}
@@ -100,6 +106,9 @@ MonoBehaviour:
     - graph: {fileID: 11400000, guid: 7a21fb97507096442acb86975f7c3416, type: 2}
       eventType: 6
       npcState: 0
+    - graph: {fileID: 11400000, guid: 5e97af069636acd4191ddca602016ad1, type: 2}
+      eventType: 8
+      npcState: 0
   - npcId: 4
     entries:
     - graph: {fileID: 11400000, guid: 2f087dc143b45a8438ce1a574e95de8f, type: 2}
@@ -113,4 +122,7 @@ MonoBehaviour:
       npcState: 0
     - graph: {fileID: 11400000, guid: 295e5b9e6406556419fcf6f449d1e16b, type: 2}
       eventType: 6
+      npcState: 0
+    - graph: {fileID: 11400000, guid: 452cf152fe54e604bb31822e2b48314c, type: 2}
+      eventType: 8
       npcState: 0

@@ -83,7 +83,8 @@ namespace Cooking.Prototype
             {
                 HappyMeals++;
 
-                if(result.Verdict == Verdict.LikedSubstitute && !AlreadyLiked(served))
+                // Very close but not the order: they liked it, so they'll ask for it again.
+                if(result.Verdict == Verdict.VeryClose && !AlreadyLiked(served))
                 {
                     int specials = CountSpecials();
                     change.NewLikedMeal = CreateMeal("Emphis's special for " + Customer.name + (specials > 0 ? " #" + (specials + 1) : ""), served);

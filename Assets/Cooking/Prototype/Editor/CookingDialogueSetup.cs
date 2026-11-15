@@ -66,6 +66,7 @@ namespace Cooking.Prototype.EditorTools
                 new Spec(woman, DialogueEventType.GoodDish, Any, "Fine. That's fine."),
                 new Spec(woman, DialogueEventType.GoodDish, Warm, "Not bad. Not bad at all.", "Greasy, salty. Nothing to think about. Good."),
                 new Spec(woman, DialogueEventType.BadDish, Any, "Is this what passes for food now?"),
+                new Spec(woman, DialogueEventType.OkDish, Any, "It'll do. Don't expect a thank-you."),
                 new Spec(woman, DialogueEventType.Refused, Any, "I said no beef. Are you deaf?"),
                 new Spec(woman, DialogueEventType.LateDish, Any, "Took you long enough."),
                 new Spec(woman, DialogueEventType.Hurry, Any, "Any day now."),
@@ -83,6 +84,7 @@ namespace Cooking.Prototype.EditorTools
                 new Spec(man, DialogueEventType.Order, Eureka, "I made it for the kids three times this week. They asked for it again."),
                 new Spec(man, DialogueEventType.GoodDish, Any, "That's... decent. Thank you."),
                 new Spec(man, DialogueEventType.BadDish, Any, "Healthy, I suppose. Joyless."),
+                new Spec(man, DialogueEventType.OkDish, Any, "It's... not quite what I asked for. It's fine."),
                 new Spec(man, DialogueEventType.Refused, Any, "Don't even get me started on the synthetic chicken."),
                 new Spec(man, DialogueEventType.LateDish, Any, "The kids are waiting, you know."),
                 new Spec(man, DialogueEventType.Hurry, Any, "I really need to get back."),
@@ -99,6 +101,7 @@ namespace Cooking.Prototype.EditorTools
                 new Spec(sleeper, DialogueEventType.Order, Eureka, "I found her. She cooks like you do. Hotter, actually."),
                 new Spec(sleeper, DialogueEventType.GoodDish, Any, "Wow! That kinda tastes.", "So that's why people stuff their face?"),
                 new Spec(sleeper, DialogueEventType.BadDish, Any, "Uhh... thanks?"),
+                new Spec(sleeper, DialogueEventType.OkDish, Any, "Is it supposed to be like this? I honestly can't tell."),
                 new Spec(sleeper, DialogueEventType.LateDish, Any, "Was I supposed to be waiting?"),
                 new Spec(sleeper, DialogueEventType.Hurry, Any, "Is it supposed to take this long? I don't know how food works."),
                 new Spec(sleeper, DialogueEventType.DreamMeal, Any,
@@ -109,6 +112,7 @@ namespace Cooking.Prototype.EditorTools
                 // Generic Eyesiders: they give nothing.
                 new Spec(eyesider, DialogueEventType.GoodDish, Any, "..."),
                 new Spec(eyesider, DialogueEventType.BadDish, Any, "Tch."),
+                new Spec(eyesider, DialogueEventType.OkDish, Any, "Mm."),
                 new Spec(eyesider, DialogueEventType.LateDish, Any, "Tch. Slow."),
                 new Spec(eyesider, DialogueEventType.DreamMeal, Any, "...huh."),
             };

@@ -24,6 +24,7 @@ namespace Cooking.Prototype
             if(result.Verdict == Verdict.Refused) return DialogueEventType.Refused;
             if(result.Verdict == Verdict.DreamMeal) return DialogueEventType.DreamMeal;
             if(result.Late && result.IsPaid) return DialogueEventType.LateDish;
+            if(result.Verdict == Verdict.CloseEnough) return DialogueEventType.OkDish;
             return result.IsHappy ? DialogueEventType.GoodDish : DialogueEventType.BadDish;
         }
 

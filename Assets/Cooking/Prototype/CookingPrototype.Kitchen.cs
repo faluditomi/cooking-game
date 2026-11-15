@@ -260,12 +260,20 @@ namespace Cooking.Prototype
                 return;
             }
 
+            JudgeResult result = DishJudge.Judge(order, plate, customer, zones, rules, JudgeSettings(), late: timedOrders && orderTimeLeft < 0f);
+            FinishOrder(result);
+        }
+
+        private DishJudge.Settings JudgeSettings()
+        {
             DishJudge.Settings settings = DishJudge.Settings.Default;
             settings.Margin = margin;
-            settings.LikeThreshold = likeThreshold;
-
-            JudgeResult result = DishJudge.Judge(order, plate, customer, zones, rules, settings, late: timedOrders && orderTimeLeft < 0f);
-            FinishOrder(result);
+            settings.Similarity = new DishSimilarity.Settings { FlavourWeight = flavourWeight, FlavourRange = flavourRange };
+            settings.VeryCloseAt = veryCloseAt;
+            settings.VeryClosePay = veryClosePay;
+            settings.CloseEnoughAt = closeEnoughAt;
+            settings.CloseEnoughPay = closeEnoughPay;
+            return settings;
         }
 
         // ------------------------------------------------------------------ Wok shaking

@@ -25,6 +25,8 @@ namespace DialogueSystem
         DreamMeal = 6,
         /// <summary>The order timer is running low.</summary>
         Hurry = 7,
+        /// <summary>Close enough to pay for, but not what they wanted. Lukewarm.</summary>
+        OkDish = 8,
     }
 
     // Game developer: extend this enum with the real NPC states your game uses. The package

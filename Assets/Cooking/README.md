@@ -146,13 +146,23 @@ on Soup Cube).
 The code is split by area: `CookingPrototype.cs` (day loop, top bar, ticket, overlays) and
 `CookingPrototype.Store.cs`, `.Prep.cs`, `.Kitchen.cs`.
 
-| Verdict | When | Pay |
-|---|---|---|
-| Dream meal | inside the customer's secret desire zone | price + 100% tip |
-| Ordered | `RecipeDefinition.Matches`: same portions, prep and cooking, nothing badly cooked | price |
-| Liked substitute | shares a zone with the order, score ≥ `likeThreshold` | price, +25% tip if fully inside |
-| Refused | contains something they won't eat | nothing |
-| Disliked | anything else | nothing |
+| Verdict | When | Pay | Happy? |
+|---|---|---|---|
+| Dream meal | inside the customer's secret desire zone | price + 100% tip | yes |
+| Ordered | `RecipeDefinition.Matches`: same portions, prep and cooking, nothing badly cooked | 100% | yes |
+| Very close | similarity ≥ `veryCloseAt` (80%) | `veryClosePay` (80%) | yes |
+| Close enough | similarity ≥ `closeEnoughAt` (55%) | `closeEnoughPay` (60%) | no, lukewarm |
+| Refused | contains something they won't eat | nothing | no |
+| Too different | anything else | nothing | no |
+
+**Similarity** (`DishSimilarity`) blends flavour and ingredients, weighted by `flavourWeight` (50/50):
+flavour is 1 at the same point on the radar and 0 at `flavourRange` (6) apart; ingredients counts
+units that went in as written (right ingredient with the wrong prep, cooking or doneness counts
+half), over the larger of ordered and served units, so missing and extra units both cost. As a
+guide with the placeholder data: forgetting the pepper or not grating the MSG2 is very close;
+1 mushroom instead of 3, overcooking or leaving out the tofu is close enough; a burnt fried rice,
+Hellchick without chilli, or a different dish is refused. Late dishes pay the same but never tip
+and aren't happy; a very close dish they didn't order is added to what they like.
 
 Price is the **ordered** dish's ingredient cost × `margin`. Customers come from the design doc's NPC notes:
 

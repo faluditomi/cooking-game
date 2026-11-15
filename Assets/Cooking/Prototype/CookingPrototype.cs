@@ -37,8 +37,18 @@ namespace Cooking.Prototype
         [Header("Orders")]
         [Tooltip("Menu price = ingredient cost × margin.")]
         [SerializeField, Min(0f)] private float margin = 1.6f;
-        [Tooltip("How well an unordered dish must share a zone with the order to be accepted.")]
-        [SerializeField, Range(0f, 1f)] private float likeThreshold = 0.5f;
+        [Header("Good enough (how close a dish must be to the order)")]
+        [Tooltip("Share of similarity that comes from flavour (radar distance); the rest comes from ingredients, prep and cooking.")]
+        [SerializeField, Range(0f, 1f)] private float flavourWeight = 0.5f;
+        [Tooltip("Radar distance at which flavour similarity drops to 0.")]
+        [SerializeField, Min(0.5f)] private float flavourRange = 6f;
+        [SerializeField, Range(0f, 1f)] private float veryCloseAt = 0.8f;
+        [Tooltip("Share of the price paid for a very close dish.")]
+        [SerializeField, Range(0f, 1f)] private float veryClosePay = 0.8f;
+        [Tooltip("Below this similarity they refuse to pay.")]
+        [SerializeField, Range(0f, 1f)] private float closeEnoughAt = 0.55f;
+        [Tooltip("Share of the price paid for a close-enough dish.")]
+        [SerializeField, Range(0f, 1f)] private float closeEnoughPay = 0.6f;
         [Tooltip("Off: orders have no timer and nothing is ever late (the calmer 'social kitchen' version). Can also be switched in game each morning.")]
         [SerializeField] private bool timedOrders = true;
         [Tooltip("Order timer = base + per unit of ingredient + per prep step the recipe needs.")]
@@ -611,6 +621,26 @@ namespace Cooking.Prototype
             messageText.color = color ?? UIFactory.TextColor;
         }
 
+        /// <summary>"Similar to the order: 76% (flavour 82%, ingredients 70%) → Close enough".</summary>
+        private string DescribeSimilarity(JudgeResult result)
+        {
+            if(result.ExactMatch) return "Similar to the order: <color=#73cc73>exact</color>";
+
+            Similarity s = result.Similarity;
+            string tier = s.Combined >= veryCloseAt ? "<color=#73cc73>very close</color>"
+                : s.Combined >= closeEnoughAt ? "<color=#f28c33>close enough</color>"
+                : "<color=#e5594d>too different</color>";
+
+            return "Similar to the order: <b>" + Percent(s.Combined) + "</b> " + tier
+                   + "\n<color=#a6a199>  flavour " + Percent(s.Flavour) + ", ingredients " + Percent(s.Ingredients)
+                   + ". Very close from " + Percent(veryCloseAt) + ", close enough from " + Percent(closeEnoughAt) + ".</color>";
+        }
+
+        private static string Percent(float value)
+        {
+            return (value * 100f).ToString("0") + "%";
+        }
+
         private static string ZoneText(FlavourZoneMatch match)
         {
             if(!match.IsMatch) return "<color=#a6a199>none</color>";
@@ -635,12 +665,14 @@ namespace Cooking.Prototype
                     title = "Dream meal!"; line = customer.dreamLine; color = UIFactory.Accent; break;
                 case Verdict.Ordered:
                     title = "Just what they ordered"; line = customer.likedLine; color = UIFactory.Good; break;
-                case Verdict.LikedSubstitute:
-                    title = "Not what they ordered, but they like it"; line = customer.likedLine; color = UIFactory.Good; break;
+                case Verdict.VeryClose:
+                    title = "Very close. They're happy with it"; line = customer.likedLine; color = UIFactory.Good; break;
+                case Verdict.CloseEnough:
+                    title = "Close enough. They pay, but not all of it"; line = "It's... fine."; color = UIFactory.Accent; break;
                 case Verdict.Refused:
                     title = "Refused"; line = customer.refusedLine; color = UIFactory.Bad; break;
                 default:
-                    title = "They didn't like it"; line = customer.dislikedLine; color = UIFactory.Bad; break;
+                    title = "Too different. They won't pay"; line = customer.dislikedLine; color = UIFactory.Bad; break;
             }
 
             if(result.Late && result.IsPaid && result.Verdict != Verdict.DreamMeal)
@@ -667,21 +699,20 @@ namespace Cooking.Prototype
             else if(timedOrders) sb.Append("\n<color=#73cc73>On time, with ").Append(FormatTime(orderTimeLeft)).Append(" to spare.</color>\n");
 
             sb.Append("\n<b>Flavour</b>\n<size=17>").Append(result.Dish.ToString()).Append("</size>\n\n");
-            sb.Append("Exact order: ").Append(result.ExactMatch ? "<color=#73cc73>yes</color>" : "no").Append('\n');
+            sb.Append(DescribeSimilarity(result)).Append('\n');
             sb.Append("Best zone: ").Append(ZoneText(result.BestZone)).Append('\n');
-            sb.Append("Same zone as the order: ").Append(ZoneText(result.SharedZone)).Append('\n');
             if(result.RefusedIngredient != null) sb.Append("Won't eat: <color=#e5594d>").Append(result.RefusedIngredient.DisplayName).Append("</color>\n");
             if(result.DesireScore >= 0f) sb.Append("<color=#a6a199>Secret desire (debug): ").Append((result.DesireScore * 100f).ToString("0")).Append("%</color>\n");
 
             float profit = result.Payment + result.Tip - dishCost;
             sb.Append("\nPaid <b>$").Append(result.Payment.ToString("0.00")).Append("</b>");
+            if(result.IsPaid && result.PayShare < 1f) sb.Append("  <color=#a6a199>(").Append((result.PayShare * 100f).ToString("0")).Append("% of $").Append(result.Price.ToString("0.00")).Append(")</color>");
             if(result.Tip > 0f) sb.Append("  + tip <b>$").Append(result.Tip.ToString("0.00")).Append("</b>");
             sb.Append("\nIngredients used $").Append(dishCost.ToString("0.00"));
             sb.Append("\nProfit <b><color=#").Append(profit >= 0f ? "73cc73" : "e5594d").Append(">$").Append(profit.ToString("0.00")).Append("</color></b>");
             resultBody.text = sb.ToString();
 
-            FlavourZone highlight = result.SharedZone.Zone != null ? result.SharedZone.Zone : result.BestZone.Zone;
-            resultRadar.SetHighlight(highlight);
+            resultRadar.SetHighlight(result.BestZone.Zone);
             resultRadar.ClearProfiles();
             resultRadar.AddProfile(result.Ordered, new Color(0.85f, 0.85f, 0.85f, 0.7f), false);
             resultRadar.AddProfile(result.Dish, UIFactory.Accent, true);

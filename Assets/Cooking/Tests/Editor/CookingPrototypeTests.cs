@@ -194,7 +194,15 @@ namespace Cooking.Tests
             return f;
         }
 
-        private static DishJudge.Settings Settings => new DishJudge.Settings { Margin = 2f, LikeThreshold = 0.5f, SubstituteTip = 0.25f, DreamTip = 1f };
+        private static DishJudge.Settings Settings
+        {
+            get
+            {
+                DishJudge.Settings settings = DishJudge.Settings.Default;
+                settings.Margin = 2f;
+                return settings;
+            }
+        }
 
         [Test]
         public void Judge_ExactOrder_IsPaidMenuPrice()
@@ -208,18 +216,70 @@ namespace Cooking.Tests
         }
 
         [Test]
-        public void Judge_SubstituteInSameZone_IsPaidAndTipped()
+        public void Judge_RightIngredientCookedDifferently_IsCloseEnough()
         {
             JudgeFixture f = Fixture();
-            // Different cooking, so not an exact match, but it tastes just as salty.
+            // Tastes the same (no rules), but raw instead of boiled: flavour 100%, ingredients 50% → 75%.
             List<IngredientPortion> dish = new List<IngredientPortion> { new IngredientPortion(f.Salty, 1) };
 
             JudgeResult result = DishJudge.Judge(f.Order, dish, new Customer(), f.Zones, null, Settings);
 
-            Assert.AreEqual(Verdict.LikedSubstitute, result.Verdict);
-            Assert.AreSame(f.SaltyZone, result.SharedZone.Zone);
-            Assert.AreEqual(4f, result.Payment, 0.0001f);
-            Assert.AreEqual(1f, result.Tip, 0.0001f);
+            Assert.AreEqual(Verdict.CloseEnough, result.Verdict);
+            Assert.AreEqual(0.75f, result.Similarity.Combined, 0.0001f);
+            Assert.AreEqual(0.6f, result.PayShare, 0.0001f);
+            Assert.AreEqual(2.4f, result.Payment, 0.0001f);
+            Assert.AreEqual(0f, result.Tip);
+            Assert.IsTrue(result.IsPaid);
+            Assert.IsFalse(result.IsHappy, "close enough is paid but lukewarm");
+        }
+
+        [Test]
+        public void Judge_MostlyRight_IsVeryClose_AndHappy()
+        {
+            JudgeFixture f = Fixture();
+            RecipeDefinition order = Recipe(new IngredientPortion(f.Salty, 4, cooking: CookMethods.Boiled));
+            // One of four units raw: flavour 100%, ingredients (3 + 0.5) / 4 = 87.5% → 93.75%.
+            List<IngredientPortion> dish = new List<IngredientPortion>
+            {
+                new IngredientPortion(f.Salty, 3, cooking: CookMethods.Boiled),
+                new IngredientPortion(f.Salty, 1),
+            };
+
+            JudgeResult result = DishJudge.Judge(order, dish, new Customer(), f.Zones, null, Settings);
+
+            Assert.AreEqual(Verdict.VeryClose, result.Verdict);
+            Assert.AreEqual(16f * 0.8f, result.Payment, 0.0001f);
+            Assert.IsTrue(result.IsHappy);
+        }
+
+        [Test]
+        public void Judge_BurntOrder_IsNoLongerExact_ButCanStillBePaid()
+        {
+            JudgeFixture f = Fixture();
+            RecipeDefinition order = Recipe(new IngredientPortion(f.Salty, 4, cooking: CookMethods.Fried));
+            List<IngredientPortion> dish = new List<IngredientPortion> { new IngredientPortion(f.Salty, 4, cooking: CookMethods.Fried, doneness: Doneness.Burnt) };
+
+            JudgeResult result = DishJudge.Judge(order, dish, new Customer(), f.Zones, null, Settings);
+
+            Assert.IsFalse(result.ExactMatch);
+            Assert.AreEqual(0.5f, result.Similarity.Ingredients, 0.0001f, "badly cooked units count half");
+            Assert.AreEqual(Verdict.CloseEnough, result.Verdict);
+        }
+
+        [Test]
+        public void Similarity_ExtraAndMissingUnits_PullTheScoreDown()
+        {
+            JudgeFixture f = Fixture();
+            IngredientPortion[] ordered = { new IngredientPortion(f.Salty, 2, cooking: CookMethods.Boiled) };
+
+            Assert.AreEqual(1f, DishSimilarity.IngredientMatch(ordered, new[] { new IngredientPortion(f.Salty, 2, cooking: CookMethods.Boiled) }), 0.0001f);
+            Assert.AreEqual(0.5f, DishSimilarity.IngredientMatch(ordered, new[] { new IngredientPortion(f.Salty, 1, cooking: CookMethods.Boiled) }), 0.0001f, "missing one");
+            Assert.AreEqual(0.5f, DishSimilarity.IngredientMatch(ordered, new[]
+            {
+                new IngredientPortion(f.Salty, 2, cooking: CookMethods.Boiled),
+                new IngredientPortion(f.Sweet, 2, cooking: CookMethods.Boiled),
+            }), 0.0001f, "two extra");
+            Assert.AreEqual(0f, DishSimilarity.IngredientMatch(ordered, new[] { new IngredientPortion(f.Sweet, 2, cooking: CookMethods.Boiled) }), 0.0001f);
         }
 
         [Test]
