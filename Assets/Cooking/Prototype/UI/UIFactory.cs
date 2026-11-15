@@ -136,6 +136,49 @@ namespace Cooking.Prototype
             return element;
         }
 
+        /// <summary>
+        /// A vertically scrolling list that fills the remaining height of a vertical layout.
+        /// Returns the content transform to add rows to.
+        /// </summary>
+        public static RectTransform ScrollList(Transform parent, float spacing = 6f)
+        {
+            RectTransform scroll = Rect(parent, "Scroll List");
+            Size(scroll, 60f, 1f);
+            // Clear graphic so the mouse wheel scrolls anywhere over the list.
+            scroll.gameObject.AddComponent<Image>().color = Color.clear;
+            ScrollRect scrollRect = scroll.gameObject.AddComponent<ScrollRect>();
+            scrollRect.horizontal = false;
+            scrollRect.movementType = ScrollRect.MovementType.Clamped;
+            scrollRect.scrollSensitivity = 30f;
+
+            RectTransform viewport = Rect(scroll, "Viewport");
+            Stretch(viewport);
+            viewport.gameObject.AddComponent<RectMask2D>();
+
+            RectTransform content = Rect(viewport, "Content");
+            content.anchorMin = new Vector2(0f, 1f);
+            content.anchorMax = Vector2.one;
+            content.pivot = new Vector2(0.5f, 1f);
+            content.sizeDelta = Vector2.zero;
+            Vertical(content.gameObject, spacing, 0);
+            content.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+            scrollRect.viewport = viewport;
+            scrollRect.content = content;
+            return content;
+        }
+
+        /// <summary>Destroys every child, for rebuilding a dynamic list.</summary>
+        public static void ClearChildren(Transform parent)
+        {
+            for(int i = parent.childCount - 1; i >= 0; i--)
+            {
+                GameObject child = parent.GetChild(i).gameObject;
+                child.SetActive(false);
+                Object.Destroy(child);
+            }
+        }
+
         /// <summary>A row container for buttons inside a vertical layout.</summary>
         public static RectTransform Row(Transform parent, float height, float spacing = 8f)
         {

@@ -92,16 +92,32 @@ A playable loop to try the flavour system with. **Custom Tools → Cooking Proto
 creates `Prototype/CookingPrototype.unity` and the design-doc recipes in `Data/Recipes/`. It keeps
 recipe assets that already exist, so hand tuning survives a rebuild. Then press Play.
 
-1. A customer orders a dish. The order card shows the recipe, its menu price and which zone it tastes like.
-2. **Pantry**: each click buys one unit onto the prep board. Click again for more of the same thing.
-3. **Prep board**: pick up a tool, then hold the mouse button and work the pad (minigames below).
-   The bar fills as you go; prep steps stack. Then send the stack to the wok, the pot, or
-   straight to the plate raw.
-4. **Wok**: Start, then take it off in the green. In the red, shake it on the shake pad. If it
-   reaches the end, it's burnt. **Pot**: take it off on the narrow green line, or it overcooks.
-   Without a stock cube the pot boils one ingredient at a time; with one, it's a soup and takes
-   anything. Everything in a station comes off at once with the same doneness.
-5. **Serve**: the dish is judged (`DishJudge`) and its flavour is revealed on the radar next to the order.
+### The day
+
+The game runs in days, and there are three areas you switch between with the tabs at the top:
+**Store**, **Prep** and **Kitchen**. Everything you buy goes into your stock (`Inventory`), which
+tracks units per prep state ("3× Onion raw", "1× Onion peeled, sliced").
+
+1. **Morning** (untimed). The **Store** is open: buy what you think the day needs. The menu panel
+   shows each dish's ingredients as have/need, and who tends to order what. On the **Prep** board, prep
+   stock one unit at a time (as in the design doc): put a unit on the board, pick up a tool, do its
+   gesture, then put it back. It goes back into stock prepped. The Kitchen is locked.
+2. **Open the stall** (top bar). The Store closes until tomorrow.
+3. **Service**, `customersPerDay` customers (5). A customer comes to the counter, and **Take order**
+   starts the timer: `orderBaseSeconds` + per unit + per prep step the recipe needs. The ticket
+   (on the Prep and Kitchen areas) shows the recipe with each ingredient marked ready / needs
+   prep / short. In the **Kitchen**, pick a destination (→ Wok, → Pot, → Plate) and click stock to
+   move one unit there, cook, and serve. You can still prep, but that time comes off the timer, and
+   the wok and pot keep cooking while you're away.
+   - **Wok**: Start, then take it off in the green. In the red, shake it on the shake pad. If it
+     reaches the end, it's burnt.
+   - **Pot**: take it off on the narrow green line, or it overcooks. Without a stock cube it boils
+     one ingredient at a time; with one, it's a soup and takes anything.
+   - Everything in a station comes off at once with the same doneness.
+   - **Serve**: the dish is judged (`DishJudge`) and its flavour is revealed on the radar next to
+     the order. **Late** (timer at zero) still pays, but never tips, and the customer isn't happy.
+4. **End of day**: a summary of what you earned and spent, and who left happy. Anything left in
+   the stations or on the board is binned. **Prepped stock spoils; raw stock carries over.**
 
 ### Minigames (`Prototype/Minigames/`)
 
@@ -115,9 +131,12 @@ that feeds a `Gesture`. The pad draws a guide for the current tool and a fading 
 | Grater → grated | `SwipeRightGesture` | 110 px to the right. Going back left earns nothing | 5 |
 | Wok shake | `BackAndForthGesture` (horizontal) | each change of direction after 45 px. Only works in the red, and knocks the bar back by `shakeKnockback` | n/a |
 
-Each extra unit on the board adds `extraUnitWork` (50%) to the strokes. Stroke counts, knockback and
-station speeds are on the `Cooking Prototype` object. Stock is a flag on the ingredient
-(`IngredientDefinition.IsStock`, set on Soup Cube).
+Stroke counts, knockback, station speeds, customers per day and the order timer are on the
+`Cooking Prototype` object. Stock is a flag on the ingredient (`IngredientDefinition.IsStock`, set
+on Soup Cube).
+
+The code is split by area: `CookingPrototype.cs` (day loop, top bar, ticket, overlays) and
+`CookingPrototype.Store.cs`, `.Prep.cs`, `.Kitchen.cs`.
 
 | Verdict | When | Pay |
 |---|---|---|

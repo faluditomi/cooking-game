@@ -31,8 +31,11 @@ namespace Cooking.Prototype
         public float Price;
         public float Payment;
         public float Tip;
+        /// <summary>Served after the order timer ran out: they still pay, but never tip and aren't happy.</summary>
+        public bool Late;
 
         public bool IsPaid => Payment > 0f;
+        public bool IsHappy => IsPaid && !Late;
     }
 
     /// <summary>
@@ -61,7 +64,17 @@ namespace Cooking.Prototype
             return recipe != null ? recipe.CalculateIngredientCost() * margin : 0f;
         }
 
+        /// <param name="late">Served after the order timer ran out. Payment is unchanged, but there is no tip.</param>
         public static JudgeResult Judge(RecipeDefinition order, IReadOnlyList<IngredientPortion> dish, Customer customer,
+            IReadOnlyList<FlavourZone> zones, FlavourRules rules, Settings settings, bool late = false)
+        {
+            JudgeResult result = JudgeFood(order, dish, customer, zones, rules, settings);
+            result.Late = late;
+            if(late) result.Tip = 0f;
+            return result;
+        }
+
+        private static JudgeResult JudgeFood(RecipeDefinition order, IReadOnlyList<IngredientPortion> dish, Customer customer,
             IReadOnlyList<FlavourZone> zones, FlavourRules rules, Settings settings)
         {
             float falloff = rules != null ? rules.zoneFalloff : FlavourRules.DefaultZoneFalloff;
