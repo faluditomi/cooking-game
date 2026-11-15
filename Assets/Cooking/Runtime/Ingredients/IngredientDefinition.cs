@@ -27,6 +27,10 @@ namespace Cooking
         [Tooltip("Added per unit when the ingredient is served without cooking. Use it for things that are bad raw (rice, chicken).")]
         [SerializeField] private FlavourProfile rawDelta;
 
+        [Header("Cooking")]
+        [Tooltip("Stock (the soup cube): in the pot it turns everything into one soup, so several ingredients can boil together.")]
+        [SerializeField] private bool isStock;
+
         [TextArea] [SerializeField] private string notes;
 
         public string DisplayName => string.IsNullOrEmpty(displayName) ? name : displayName;
@@ -35,13 +39,15 @@ namespace Cooking
         public float Bulk => bulk;
         public FlavourProfile Flavour => flavour;
         public FlavourProfile RawDelta => rawDelta;
+        public bool IsStock => isStock;
         public string Notes => notes;
 
         /// <summary>Sets the data in code. Intended for tests and editor tooling.</summary>
         public void Configure(string newDisplayName, FlavourProfile newFlavour, float newBulk = 1f,
-            FlavourProfile newRawDelta = default, float newPrice = 1f)
+            FlavourProfile newRawDelta = default, float newPrice = 1f, bool newIsStock = false)
         {
             displayName = newDisplayName;
+            isStock = newIsStock;
             flavour = newFlavour;
             bulk = Mathf.Max(0.01f, newBulk);
             rawDelta = newRawDelta;

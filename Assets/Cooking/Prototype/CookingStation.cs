@@ -25,6 +25,12 @@ namespace Cooking.Prototype
         public readonly bool Burns;
         public readonly float ShakeKnockback;
 
+        /// <summary>
+        /// When true (the pot), the station takes one kind of ingredient at a time unless a stock
+        /// ingredient (<see cref="IngredientDefinition.IsStock"/>) is in it, which turns it into a soup.
+        /// </summary>
+        public bool OneIngredientWithoutStock;
+
         private readonly List<IngredientPortion> contents = new List<IngredientPortion>();
 
         public IReadOnlyList<IngredientPortion> Contents => contents;
@@ -46,15 +52,67 @@ namespace Cooking.Prototype
         }
 
         /// <summary>A wok: perfect from halfway, danger from 80%, burnt at the end.</summary>
-        public static CookingStation CreateWok(float duration = 8f)
+        public static CookingStation CreateWok(float duration = 8f, float shakeKnockback = 0.15f)
         {
-            return new CookingStation("Wok", CookMethods.Fried, duration, 0.5f, 1f, 0.8f, burns: true);
+            return new CookingStation("Wok", CookMethods.Fried, duration, 0.5f, 1f, 0.8f, burns: true, shakeKnockback);
         }
 
-        /// <summary>A pot: a narrow perfect band in the middle, overcooked after it.</summary>
+        /// <summary>
+        /// A pot: a narrow perfect band in the middle, overcooked after it. One ingredient at a time
+        /// unless there is stock in it.
+        /// </summary>
         public static CookingStation CreatePot(float duration = 10f)
         {
-            return new CookingStation("Pot", CookMethods.Boiled, duration, 0.45f, 0.62f, 0.62f, burns: false);
+            return new CookingStation("Pot", CookMethods.Boiled, duration, 0.45f, 0.62f, 0.62f, burns: false)
+            {
+                OneIngredientWithoutStock = true,
+            };
+        }
+
+        /// <summary>True when stock is in the station, which makes it a soup.</summary>
+        public bool IsSoup
+        {
+            get
+            {
+                foreach(IngredientPortion portion in contents)
+                {
+                    if(portion.ingredient.IsStock) return true;
+                }
+
+                return false;
+            }
+        }
+
+        /// <summary>Whether <paramref name="portion"/> can go in now, and why not.</summary>
+        public bool CanAdd(IngredientPortion portion, out string reason)
+        {
+            reason = null;
+
+            if(portion == null || !portion.IsValid)
+            {
+                reason = "Nothing to add.";
+                return false;
+            }
+
+            if(IsCooking)
+            {
+                reason = "The " + Name.ToLowerInvariant() + " is cooking. Wait or take it off first.";
+                return false;
+            }
+
+            if(OneIngredientWithoutStock && !IsSoup && !portion.ingredient.IsStock)
+            {
+                foreach(IngredientPortion existing in contents)
+                {
+                    if(existing.ingredient != portion.ingredient)
+                    {
+                        reason = "Without a stock cube the " + Name.ToLowerInvariant() + " takes one ingredient at a time.";
+                        return false;
+                    }
+                }
+            }
+
+            return true;
         }
 
         public bool IsInDanger => IsCooking && Progress >= DangerStart;
@@ -68,10 +126,10 @@ namespace Cooking.Prototype
             return Burns ? Doneness.Burnt : Doneness.Overcooked;
         }
 
-        /// <summary>Adds one portion. Same ingredient with the same prep stacks. Fails while cooking.</summary>
+        /// <summary>Adds one portion. Same ingredient with the same prep stacks. See <see cref="CanAdd"/>.</summary>
         public bool Add(IngredientPortion portion)
         {
-            if(IsCooking || portion == null || !portion.IsValid) return false;
+            if(!CanAdd(portion, out _)) return false;
 
             foreach(IngredientPortion existing in contents)
             {

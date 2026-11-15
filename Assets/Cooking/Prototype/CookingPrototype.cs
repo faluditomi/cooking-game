@@ -33,6 +33,15 @@ namespace Cooking.Prototype
         [Header("Stations")]
         [SerializeField, Min(1f)] private float wokSeconds = 8f;
         [SerializeField, Min(1f)] private float potSeconds = 10f;
+        [Tooltip("How far each wok shake (one change of direction) knocks the bar back.")]
+        [SerializeField, Range(0.01f, 0.3f)] private float shakeKnockback = 0.06f;
+
+        [Header("Prep minigames (strokes for one unit)")]
+        [SerializeField, Min(1)] private int sliceStrokes = 6;
+        [SerializeField, Min(1)] private int peelStrokes = 3;
+        [SerializeField, Min(1)] private int grateStrokes = 5;
+        [Tooltip("Extra work per additional unit on the board, as a share of the base strokes.")]
+        [SerializeField, Min(0f)] private float extraUnitWork = 0.5f;
 
         [Header("Debug")]
         [Tooltip("Show the plate's flavour on the radar while cooking. The design reveals it only after serving; this is for tuning.")]
@@ -48,8 +57,9 @@ namespace Cooking.Prototype
             public TimingBar Bar;
             public Button StartButton;
             public Button TakeOffButton;
-            public Button ShakeButton;
             public Button BinButton;
+            public Text PadHint;
+            public bool? WasInDanger;
         }
 
         // Game state
@@ -68,6 +78,9 @@ namespace Cooking.Prototype
         private CookingStation pot;
         private readonly List<IngredientPortion> plate = new List<IngredientPortion>();
         private bool showingResult;
+        private PrepSteps activeTool;
+        private Gesture prepGesture;
+        private Gesture shakeGesture;
 
         // UI
         private Text moneyText;
@@ -78,6 +91,11 @@ namespace Cooking.Prototype
         private Text recipeText;
         private Text boardText;
         private readonly List<Button> boardButtons = new List<Button>();
+        private readonly Dictionary<PrepSteps, Button> toolButtons = new Dictionary<PrepSteps, Button>();
+        private GesturePadGraphic prepPad;
+        private Text prepHint;
+        private RectTransform prepProgressFill;
+        private GesturePadGraphic wokPad;
         private Button sendWokButton;
         private Button sendPotButton;
         private StationView wokView;
@@ -110,8 +128,9 @@ namespace Cooking.Prototype
         {
             random = randomSeed != 0 ? new System.Random(randomSeed) : new System.Random();
             money = startingMoney;
-            wok = CookingStation.CreateWok(wokSeconds);
+            wok = CookingStation.CreateWok(wokSeconds, shakeKnockback);
             pot = CookingStation.CreatePot(potSeconds);
+            shakeGesture = new BackAndForthGesture(vertical: false, requiredStrokes: int.MaxValue, minTravel: 45f);
 
             if(customers.Count == 0) customers.Add(new Customer());
 
@@ -175,6 +194,9 @@ namespace Cooking.Prototype
             if(board == null) board = new IngredientPortion(ingredient, 1);
             else board.quantity++;
 
+            // More on the board means more work; a half-done tool stroke count no longer fits.
+            PutDownTool();
+
             Say(previous != null
                 ? "Put the " + previous + " back. Picked " + ingredient.DisplayName + " instead."
                 : "Bought " + ingredient.DisplayName + " for $" + ingredient.Price.ToString("0.00") + ".");
@@ -188,7 +210,50 @@ namespace Cooking.Prototype
             return swaps ? money + board.ingredient.Price * board.quantity : money;
         }
 
-        private void Prep(PrepSteps step)
+        // ------------------------------------------------------------------ Prep minigames
+
+        private static string ToolName(PrepSteps step)
+        {
+            switch(step)
+            {
+                case PrepSteps.Sliced: return "knife";
+                case PrepSteps.Peeled: return "peeler";
+                case PrepSteps.Grated: return "grater";
+                default: return "hands";
+            }
+        }
+
+        private static string ToolInstruction(PrepSteps step)
+        {
+            switch(step)
+            {
+                case PrepSteps.Sliced: return "Hold and drag up and down to slice.";
+                case PrepSteps.Peeled: return "Hold and drag a half circle from the top down to peel. Bottom to top doesn't count.";
+                case PrepSteps.Grated: return "Hold and drag left to right to grate. Going back doesn't count.";
+                default: return "";
+            }
+        }
+
+        private static GestureGuide ToolGuide(PrepSteps step)
+        {
+            switch(step)
+            {
+                case PrepSteps.Sliced: return GestureGuide.UpAndDown;
+                case PrepSteps.Peeled: return GestureGuide.HalfCircleDown;
+                case PrepSteps.Grated: return GestureGuide.LeftToRight;
+                default: return GestureGuide.None;
+            }
+        }
+
+        /// <summary>Strokes needed for <paramref name="step"/> on the current board stack.</summary>
+        private int RequiredStrokes(PrepSteps step)
+        {
+            int baseStrokes = step == PrepSteps.Sliced ? sliceStrokes : step == PrepSteps.Peeled ? peelStrokes : grateStrokes;
+            int extraUnits = board != null ? Mathf.Max(0, board.quantity - 1) : 0;
+            return Mathf.Max(1, Mathf.CeilToInt(baseStrokes * (1f + extraUnitWork * extraUnits)));
+        }
+
+        private void PickUpTool(PrepSteps step)
         {
             if(board == null) return;
 
@@ -198,24 +263,116 @@ namespace Cooking.Prototype
                 return;
             }
 
-            board.prep |= step;
-            Say(step + " " + board.ingredient.DisplayName + ".");
+            if(activeTool == step)
+            {
+                PutDownTool();
+                Say("Put the " + ToolName(step) + " down.");
+                Refresh();
+                return;
+            }
+
+            activeTool = step;
+            int strokes = RequiredStrokes(step);
+
+            switch(step)
+            {
+                case PrepSteps.Sliced: prepGesture = new BackAndForthGesture(true, strokes); break;
+                case PrepSteps.Peeled: prepGesture = new HalfCircleDownGesture(strokes); break;
+                default: prepGesture = new SwipeRightGesture(strokes); break;
+            }
+
+            Say("Picked up the " + ToolName(step) + ". " + ToolInstruction(step));
             Refresh();
         }
+
+        private void PutDownTool()
+        {
+            activeTool = PrepSteps.None;
+            prepGesture = null;
+        }
+
+        private void OnPrepPressed(Vector2 position)
+        {
+            prepPad.AddTrailPoint(position, newStroke: true);
+
+            if(board == null)
+            {
+                Say("Nothing on the board. Pick something from the pantry.");
+                return;
+            }
+
+            if(prepGesture == null)
+            {
+                Say("Pick up a tool first: knife, peeler or grater.");
+                return;
+            }
+
+            prepGesture.Begin(position);
+        }
+
+        private void OnPrepMoved(Vector2 position)
+        {
+            prepPad.AddTrailPoint(position);
+            if(prepGesture == null || !prepGesture.Move(position)) return;
+
+            UpdatePrepProgress();
+            if(!prepGesture.IsComplete) return;
+
+            PrepSteps done = activeTool;
+            board.prep |= done;
+            PutDownTool();
+            Say(done + " " + board.ingredient.DisplayName + ".", UIFactory.Good);
+            Refresh();
+        }
+
+        private void OnPrepReleased()
+        {
+            prepGesture?.End();
+        }
+
+        private void UpdatePrepProgress()
+        {
+            float progress = prepGesture != null ? prepGesture.Progress : 0f;
+            prepProgressFill.anchorMax = new Vector2(progress, 1f);
+        }
+
+        // ------------------------------------------------------------------ Wok shaking
+
+        private void OnWokPressed(Vector2 position)
+        {
+            wokPad.AddTrailPoint(position, newStroke: true);
+            shakeGesture.Begin(position);
+        }
+
+        private void OnWokMoved(Vector2 position)
+        {
+            wokPad.AddTrailPoint(position);
+            if(!shakeGesture.Move(position)) return;
+
+            if(wok.Shake()) Say("Wok magic!", UIFactory.Accent);
+            else if(wok.IsCooking && wok.Progress < wok.DangerStart - 0.1f) Say("No need to shake yet. Wait for the red.");
+        }
+
+        private void OnWokReleased()
+        {
+            shakeGesture.End();
+        }
+
+        // ------------------------------------------------------------------ Board
 
         private void SendToStation(CookingStation station)
         {
             if(board == null) return;
 
-            if(!station.Add(board))
+            if(!station.CanAdd(board, out string reason))
             {
-                Say("The " + station.Name.ToLowerInvariant() + " is cooking. Wait or take it off first.", UIFactory.Bad);
+                Say(reason, UIFactory.Bad);
                 return;
             }
 
-            Say(Describe(board) + " → " + station.Name + ".");
-            board = null;
-            Refresh();
+            station.Add(board);
+            Say(Describe(board) + " → " + station.Name + (station.IsSoup ? " (soup)." : "."));
+            ClearBoard();
         }
 
         private void SendToPlateRaw()
@@ -224,15 +381,20 @@ namespace Cooking.Prototype
 
             AddToPlate(board);
             Say(Describe(board) + " → plate, raw.");
-            board = null;
-            Refresh();
+            ClearBoard();
         }
 
         private void BinBoard()
         {
             if(board == null) return;
             Say("Binned " + Describe(board) + ".");
+            ClearBoard();
+        }
+
+        private void ClearBoard()
+        {
             board = null;
+            PutDownTool();
             Refresh();
         }
 
@@ -252,11 +414,6 @@ namespace Cooking.Prototype
 
             Say(view.Station.Name + " → plate: " + DonenessLabel(doneness) + ".", doneness == Doneness.Perfect ? UIFactory.Good : UIFactory.Bad);
             Refresh();
-        }
-
-        private void Shake(StationView view)
-        {
-            if(view.Station.Shake()) Say("Wok magic.");
         }
 
         private void BinStation(StationView view)
@@ -434,6 +591,7 @@ namespace Cooking.Prototype
             foreach(Button button in boardButtons) button.interactable = board != null;
             sendWokButton.interactable = board != null && !wok.IsCooking;
             sendPotButton.interactable = board != null && !pot.IsCooking;
+            RefreshPrep();
 
             foreach(KeyValuePair<Button, IngredientDefinition> pair in pantryButtons)
             {
@@ -465,15 +623,46 @@ namespace Cooking.Prototype
             if(livePreview && plate.Count > 0) plateRadar.AddProfile(FlavourCalculator.Calculate(plate, rules), UIFactory.Accent, true);
         }
 
+        private void RefreshPrep()
+        {
+            foreach(KeyValuePair<PrepSteps, Button> pair in toolButtons)
+            {
+                bool done = board != null && (board.prep & pair.Key) != 0;
+                pair.Value.interactable = board != null && !done;
+                pair.Value.GetComponent<Image>().color = activeTool == pair.Key ? new Color(0.75f, 0.42f, 0.15f, 1f) : UIFactory.ButtonColor;
+            }
+
+            prepPad.SetDisc(board != null, board != null ? IngredientColor(board.ingredient) : Color.clear);
+            prepPad.SetGuide(ToolGuide(activeTool), new Color(1f, 0.85f, 0.6f, 0.6f));
+
+            if(board == null) prepHint.text = "<color=#a6a199>Pick something from the pantry, then pick up a tool.</color>";
+            else if(prepGesture == null) prepHint.text = "<color=#a6a199>Pick up a tool to prep it, or send it on as it is.</color>";
+            else prepHint.text = ToolInstruction(activeTool) + "  <color=#a6a199>(" + prepGesture.Strokes + "/" + prepGesture.RequiredStrokes + ")</color>";
+
+            UpdatePrepProgress();
+        }
+
+        private static Color IngredientColor(IngredientDefinition ingredient)
+        {
+            // Stable, readable colour per ingredient until there are sprites.
+            float hue = (ingredient.DisplayName.GetHashCode() & 0xFFFF) / 65535f;
+            Color color = Color.HSVToRGB(hue, 0.45f, 0.75f);
+            color.a = 0.9f;
+            return color;
+        }
+
         private void RefreshStationContents(StationView view)
         {
             if(view.Station.IsEmpty)
             {
-                view.Contents.text = "<color=#a6a199>Empty.</color>";
+                view.Contents.text = view.Station.OneIngredientWithoutStock
+                    ? "<color=#a6a199>Empty. Without a stock cube it boils one ingredient at a time.</color>"
+                    : "<color=#a6a199>Empty.</color>";
                 return;
             }
 
             StringBuilder sb = new StringBuilder();
+            if(view.Station.IsSoup) sb.Append("<color=#f28c33>Soup:</color> ");
             foreach(IngredientPortion portion in view.Station.Contents) sb.Append(Describe(portion)).Append("   ");
             view.Contents.text = sb.ToString();
         }
@@ -500,8 +689,21 @@ namespace Cooking.Prototype
 
             view.StartButton.interactable = !station.IsCooking && !station.IsEmpty;
             view.TakeOffButton.interactable = station.IsCooking;
-            if(view.ShakeButton != null) view.ShakeButton.interactable = station.IsInDanger && station.Progress < 1f;
             view.BinButton.interactable = !station.IsEmpty;
+
+            if(view.PadHint != null)
+            {
+                bool danger = station.IsInDanger && station.Progress < 1f;
+
+                if(view.WasInDanger != danger)
+                {
+                    view.WasInDanger = danger;
+                    // In the red the pad shows the side-to-side guide; otherwise just how to use it.
+                    wokPad.SetGuide(danger ? GestureGuide.SideToSide : GestureGuide.None, UIFactory.Accent);
+                    view.PadHint.text = danger ? "" : "Shake pad: when the bar hits red, hold and drag side to side here.";
+                    view.PadHint.color = UIFactory.MutedText;
+                }
+            }
         }
 
         private void ShowResult(JudgeResult result)
@@ -676,29 +878,59 @@ namespace Cooking.Prototype
 
         private void BuildKitchenColumn(RectTransform column)
         {
-            VerticalLayoutGroup layout = UIFactory.Vertical(column.gameObject, 12f, 0);
-            layout.childForceExpandHeight = true;
+            VerticalLayoutGroup layout = UIFactory.Vertical(column.gameObject, 10f, 0);
+            layout.childForceExpandHeight = false;
 
-            // Prep board
+            // Prep board: pick up a tool, then do its gesture on the pad.
             RectTransform boardPanel = UIFactory.Panel(column, "Prep Board", UIFactory.PanelColor).rectTransform;
-            UIFactory.Vertical(boardPanel.gameObject, 8f, 14);
-            Header(boardPanel, "PREP BOARD");
+            UIFactory.Size(boardPanel, -1f, 1.6f);
+            UIFactory.Vertical(boardPanel.gameObject, 6f, 12);
+            Header(boardPanel, "PREP BOARD  <color=#77736d>pick up a tool, then work the pad</color>");
             boardText = UIFactory.Label(boardPanel, "", 20);
-            UIFactory.Size(boardText, 54f);
+            UIFactory.Size(boardText, 28f);
 
-            RectTransform prepRow = UIFactory.Row(boardPanel, 44f);
-            boardButtons.Add(UIFactory.Button(prepRow, "Peel", () => Prep(PrepSteps.Peeled)));
-            boardButtons.Add(UIFactory.Button(prepRow, "Slice", () => Prep(PrepSteps.Sliced)));
-            boardButtons.Add(UIFactory.Button(prepRow, "Grate", () => Prep(PrepSteps.Grated)));
+            RectTransform toolRow = UIFactory.Row(boardPanel, 40f);
+            toolButtons[PrepSteps.Sliced] = UIFactory.Button(toolRow, "Knife (slice)", () => PickUpTool(PrepSteps.Sliced));
+            toolButtons[PrepSteps.Peeled] = UIFactory.Button(toolRow, "Peeler (peel)", () => PickUpTool(PrepSteps.Peeled));
+            toolButtons[PrepSteps.Grated] = UIFactory.Button(toolRow, "Grater (grate)", () => PickUpTool(PrepSteps.Grated));
 
-            RectTransform sendRow = UIFactory.Row(boardPanel, 44f);
+            prepPad = BuildPad(boardPanel, "Prep Pad", 150f, 1f, OnPrepPressed, OnPrepMoved, OnPrepReleased);
+
+            Image progressBack = UIFactory.Panel(boardPanel, "Prep Progress", new Color(0.08f, 0.08f, 0.09f, 1f));
+            UIFactory.Size(progressBack, 10f, 0f);
+            prepProgressFill = UIFactory.Panel(progressBack.transform, "Fill", UIFactory.Good).rectTransform;
+            UIFactory.Place(prepProgressFill, 0f, 0f, 0f, 1f);
+
+            prepHint = UIFactory.Label(boardPanel, "", 15);
+            UIFactory.Size(prepHint, 38f, 0f);
+
+            RectTransform sendRow = UIFactory.Row(boardPanel, 40f);
             sendWokButton = UIFactory.Button(sendRow, "→ Wok", () => SendToStation(wok));
             sendPotButton = UIFactory.Button(sendRow, "→ Pot", () => SendToStation(pot));
             boardButtons.Add(UIFactory.Button(sendRow, "→ Plate (raw)", SendToPlateRaw));
             boardButtons.Add(UIFactory.Button(sendRow, "Bin", BinBoard, new Color(0.35f, 0.2f, 0.2f, 1f)));
 
-            wokView = BuildStation(column, wok, "WOK  <color=#77736d>frying: take it off in the green, shake in the red</color>");
-            potView = BuildStation(column, pot, "POT  <color=#77736d>boiling: take it off on the green line</color>");
+            wokView = BuildStation(column, wok, "WOK  <color=#77736d>take it off in the green, shake in the red</color>");
+            potView = BuildStation(column, pot, "POT  <color=#77736d>take it off on the green line</color>");
+        }
+
+        /// <summary>A dark pad that feeds pointer gestures to the given callbacks and draws guides and a trail.</summary>
+        private static GesturePadGraphic BuildPad(Transform parent, string name, float minHeight, float flexibleHeight,
+            System.Action<Vector2> pressed, System.Action<Vector2> moved, System.Action released)
+        {
+            Image background = UIFactory.Panel(parent, name, new Color(0.09f, 0.085f, 0.1f, 1f));
+            UIFactory.Size(background, minHeight, flexibleHeight);
+            background.raycastTarget = false;
+
+            RectTransform padRect = UIFactory.Rect(background.transform, "Pad");
+            UIFactory.Stretch(padRect);
+            GesturePadGraphic graphic = padRect.gameObject.AddComponent<GesturePadGraphic>();
+            graphic.raycastTarget = true;
+            GesturePad pad = padRect.gameObject.AddComponent<GesturePad>();
+            pad.Pressed += pressed;
+            pad.Moved += moved;
+            pad.Released += released;
+            return graphic;
         }
 
         private StationView BuildStation(RectTransform parent, CookingStation station, string title)
@@ -706,18 +938,26 @@ namespace Cooking.Prototype
             StationView view = new StationView { Station = station };
 
             RectTransform panel = UIFactory.Panel(parent, station.Name, UIFactory.PanelColor).rectTransform;
-            UIFactory.Vertical(panel.gameObject, 8f, 14);
+            UIFactory.Size(panel, -1f, 1f);
+            UIFactory.Vertical(panel.gameObject, 6f, 12);
             Header(panel, title);
             view.Contents = UIFactory.Label(panel, "", 18);
-            UIFactory.Size(view.Contents, 48f);
+            UIFactory.Size(view.Contents, 40f, 0f);
             view.Bar = new TimingBar(panel, station);
             view.Status = UIFactory.Label(panel, "", 20, TextAnchor.MiddleLeft, FontStyle.Bold);
-            UIFactory.Size(view.Status, 26f);
+            UIFactory.Size(view.Status, 26f, 0f);
 
-            RectTransform row = UIFactory.Row(panel, 44f);
+            if(station.Burns)
+            {
+                wokPad = BuildPad(panel, "Shake Pad", 56f, 1f, OnWokPressed, OnWokMoved, OnWokReleased);
+                wokPad.SetTrailColor(UIFactory.Accent);
+                view.PadHint = UIFactory.Label(wokPad.transform, "", 16, TextAnchor.MiddleCenter);
+                UIFactory.Stretch(view.PadHint.rectTransform);
+            }
+
+            RectTransform row = UIFactory.Row(panel, 40f);
             view.StartButton = UIFactory.Button(row, "Start", () => StartStation(view));
             view.TakeOffButton = UIFactory.Button(row, "Take off → plate", () => TakeOff(view), new Color(0.25f, 0.4f, 0.25f, 1f));
-            if(station.Burns) view.ShakeButton = UIFactory.Button(row, "Shake!", () => Shake(view), new Color(0.55f, 0.3f, 0.12f, 1f));
             view.BinButton = UIFactory.Button(row, "Bin", () => BinStation(view), new Color(0.35f, 0.2f, 0.2f, 1f));
 
             UpdateStationView(view);

@@ -94,12 +94,30 @@ recipe assets that already exist, so hand tuning survives a rebuild. Then press 
 
 1. A customer orders a dish. The order card shows the recipe, its menu price and which zone it tastes like.
 2. **Pantry**: each click buys one unit onto the prep board. Click again for more of the same thing.
-3. **Prep board**: Peel / Slice / Grate (they stack), then send the stack to the wok, the pot, or
+3. **Prep board**: pick up a tool, then hold the mouse button and work the pad (minigames below).
+   The bar fills as you go; prep steps stack. Then send the stack to the wok, the pot, or
    straight to the plate raw.
-4. **Wok**: Start, then take it off in the green. In the red, **Shake!** knocks the bar back. If it
+4. **Wok**: Start, then take it off in the green. In the red, shake it on the shake pad. If it
    reaches the end, it's burnt. **Pot**: take it off on the narrow green line, or it overcooks.
-   Everything in a station comes off at once with the same doneness.
+   Without a stock cube the pot boils one ingredient at a time; with one, it's a soup and takes
+   anything. Everything in a station comes off at once with the same doneness.
 5. **Serve**: the dish is judged (`DishJudge`) and its flavour is revealed on the radar next to the order.
+
+### Minigames (`Prototype/Minigames/`)
+
+From the design doc's cooking section. All of them are a held mouse drag on a pad (`GesturePad`)
+that feeds a `Gesture`. The pad draws a guide for the current tool and a fading trail of the pointer.
+
+| Tool | Gesture | Counts as a stroke | Strokes (1 unit) |
+|---|---|---|---|
+| Knife → sliced | `BackAndForthGesture` (vertical) | each change of direction after 70 px | 6 |
+| Peeler → peeled | `HalfCircleDownGesture` | a half circle from the top down to the bottom, either side. Bottom to top, straight lines and reversals don't count | 3 |
+| Grater → grated | `SwipeRightGesture` | 110 px to the right. Going back left earns nothing | 5 |
+| Wok shake | `BackAndForthGesture` (horizontal) | each change of direction after 45 px. Only works in the red, and knocks the bar back by `shakeKnockback` | n/a |
+
+Each extra unit on the board adds `extraUnitWork` (50%) to the strokes. Stroke counts, knockback and
+station speeds are on the `Cooking Prototype` object. Stock is a flag on the ingredient
+(`IngredientDefinition.IsStock`, set on Soup Cube).
 
 | Verdict | When | Pay |
 |---|---|---|
@@ -126,9 +144,10 @@ and needs the Input System UI module (the setup adds one). `FlavourRadarGraphic`
 ## Tests
 
 EditMode tests live in `Tests/Editor` (Window → General → Test Runner → EditMode). They cover the
-calculator, evaluator, recipe matching, stations and dish judging.
+calculator, evaluator, recipe matching, stations, dish judging, the minigame gestures and the pot rule.
 
 ## Not here yet
 
-The real stall: art and plating visuals, the prep and wok minigames as mouse gestures, saving new
-recipes to the menu, cooking history, day cycles and rent, and the conversation system hookup.
+The real stall: art and plating visuals, tool sprites that follow the cursor, oil options for the
+wok, plates piling up, saving new recipes to the menu, cooking history, day cycles and rent, and the
+conversation system hookup.
