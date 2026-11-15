@@ -34,4 +34,5 @@ MonoBehaviour:
     pain: 0
     nutrition: 0
     texture: 0
+  isStock: 1
   notes: Placeholder values. Tune in the Flavour Lab.
