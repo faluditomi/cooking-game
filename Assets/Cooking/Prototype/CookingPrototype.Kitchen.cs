@@ -35,10 +35,13 @@ namespace Cooking.Prototype
         private CookingStation pot;
         private Gesture shakeGesture;
         private readonly List<IngredientPortion> plate = new List<IngredientPortion>();
-        private Destination destination = Destination.Wok;
+        /// <summary>Units picked in the kitchen stock list, waiting to be sent somewhere together.</summary>
+        private readonly Dictionary<(IngredientDefinition, PrepSteps), int> selection = new Dictionary<(IngredientDefinition, PrepSteps), int>();
 
         private RectTransform kitchenStockContent;
-        private readonly Dictionary<Destination, Button> destinationButtons = new Dictionary<Destination, Button>();
+        private readonly Dictionary<Destination, Button> sendButtons = new Dictionary<Destination, Button>();
+        private Text selectionText;
+        private Button clearSelectionButton;
         private StationView wokView;
         private StationView potView;
         private GesturePadGraphic wokPad;
@@ -67,6 +70,7 @@ namespace Cooking.Prototype
         {
             wok.Clear();
             pot.Clear();
+            selection.Clear();
             ClearPlate();
         }
 
@@ -77,41 +81,115 @@ namespace Cooking.Prototype
 
         // ------------------------------------------------------------------ Actions
 
-        private void SetDestination(Destination target)
+        private int Selected(IngredientDefinition ingredient, PrepSteps prep)
         {
-            destination = target;
-            RefreshAll();
+            return selection.TryGetValue((ingredient, prep), out int count) ? count : 0;
         }
 
-        /// <summary>Moves one unit of <paramref name="entry"/> from stock to the chosen destination.</summary>
-        private void UseStock(Inventory.Entry entry)
+        private int SelectedTotal
+        {
+            get
+            {
+                int total = 0;
+                foreach(int count in selection.Values) total += count;
+                return total;
+            }
+        }
+
+        /// <summary>Adds one more unit of <paramref name="entry"/> to the selection, up to what's in stock.</summary>
+        private void SelectMore(Inventory.Entry entry)
         {
             if(phase != Phase.Service) return;
 
-            IngredientPortion unit = new IngredientPortion(entry.Ingredient, 1, entry.Prep);
+            int selected = Selected(entry.Ingredient, entry.Prep);
 
-            if(destination != Destination.Plate)
+            if(selected >= inventory.Count(entry.Ingredient, entry.Prep))
             {
-                CookingStation station = destination == Destination.Wok ? wok : pot;
+                Say("That's all the " + entry.Ingredient.DisplayName + " like that in stock.");
+                return;
+            }
 
-                if(!station.CanAdd(unit, out string reason))
-                {
-                    Say(reason, UIFactory.Bad);
-                    return;
-                }
+            selection[(entry.Ingredient, entry.Prep)] = selected + 1;
+            RefreshAll();
+        }
 
-                if(!inventory.Take(entry.Ingredient, entry.Prep)) return;
-                station.Add(unit);
-                Say(Describe(unit, true) + " → " + station.Name + (station.IsSoup ? " (soup)." : "."));
+        private void SelectLess(Inventory.Entry entry)
+        {
+            int selected = Selected(entry.Ingredient, entry.Prep);
+            if(selected <= 1) selection.Remove((entry.Ingredient, entry.Prep));
+            else selection[(entry.Ingredient, entry.Prep)] = selected - 1;
+            RefreshAll();
+        }
+
+        private void ClearSelection()
+        {
+            selection.Clear();
+            RefreshAll();
+        }
+
+        /// <summary>Drops selected units that are no longer in stock (prepped or used meanwhile).</summary>
+        private void ClampSelection()
+        {
+            List<(IngredientDefinition, PrepSteps)> keys = new List<(IngredientDefinition, PrepSteps)>(selection.Keys);
+
+            foreach((IngredientDefinition ingredient, PrepSteps prep) key in keys)
+            {
+                int available = inventory.Count(key.ingredient, key.prep);
+                if(available <= 0) selection.Remove(key);
+                else if(selection[key] > available) selection[key] = available;
+            }
+        }
+
+        /// <summary>Moves everything selected to <paramref name="target"/> in one go.</summary>
+        private void SendSelection(Destination target)
+        {
+            if(phase != Phase.Service) return;
+
+            ClampSelection();
+            List<IngredientPortion> batch = new List<IngredientPortion>();
+
+            foreach(KeyValuePair<(IngredientDefinition, PrepSteps), int> pair in selection)
+            {
+                batch.Add(new IngredientPortion(pair.Key.Item1, pair.Value, pair.Key.Item2));
+            }
+
+            if(batch.Count == 0)
+            {
+                Say("Select some stock first: click a row once per unit.", UIFactory.Bad);
+                return;
+            }
+
+            CookingStation station = target == Destination.Wok ? wok : target == Destination.Pot ? pot : null;
+
+            if(station != null && !station.CanAddAll(batch, out string reason))
+            {
+                Say(reason, UIFactory.Bad);
+                return;
+            }
+
+            float cost = 0f;
+            int units = 0;
+
+            foreach(IngredientPortion portion in batch)
+            {
+                inventory.Take(portion.ingredient, portion.prep, portion.quantity);
+                cost += portion.ingredient.Price * portion.quantity;
+                units += portion.quantity;
+            }
+
+            if(station != null)
+            {
+                station.AddAll(batch);
+                Say(units + (units == 1 ? " unit" : " units") + " → " + station.Name + (station.IsSoup ? " (soup)." : ".") + " Press Start when it's all in.");
             }
             else
             {
-                if(!inventory.Take(entry.Ingredient, entry.Prep)) return;
-                AddToPlate(unit);
-                Say(Describe(unit, true) + " → plate, raw.");
+                foreach(IngredientPortion portion in batch) AddToPlate(portion);
+                Say(units + (units == 1 ? " unit" : " units") + " → plate, raw.");
             }
 
-            dishCost += entry.Ingredient.Price;
+            dishCost += cost;
+            selection.Clear();
             RefreshAll();
         }
 
@@ -221,12 +299,17 @@ namespace Cooking.Prototype
             RectTransform stock = Column(root, "Stock", 0.2f, 0.37f);
             VerticalLayoutGroup stockLayout = UIFactory.Vertical(stock.gameObject, 8f, 14);
             stockLayout.childForceExpandHeight = false;
-            Header(stock, "STOCK  <color=#77736d>click to move one</color>");
-            RectTransform destinationRow = UIFactory.Row(stock, 40f, 6f);
-            destinationButtons[Destination.Wok] = UIFactory.Button(destinationRow, "→ Wok", () => SetDestination(Destination.Wok), null, 17);
-            destinationButtons[Destination.Pot] = UIFactory.Button(destinationRow, "→ Pot", () => SetDestination(Destination.Pot), null, 17);
-            destinationButtons[Destination.Plate] = UIFactory.Button(destinationRow, "→ Plate", () => SetDestination(Destination.Plate), null, 17);
+            Header(stock, "STOCK  <color=#77736d>click once per unit to select</color>");
             kitchenStockContent = UIFactory.ScrollList(stock);
+
+            selectionText = UIFactory.Label(stock, "", 17);
+            UIFactory.Size(selectionText, 24f, 0f);
+            RectTransform sendRow = UIFactory.Row(stock, 44f, 6f);
+            sendButtons[Destination.Wok] = UIFactory.Button(sendRow, "→ Wok", () => SendSelection(Destination.Wok), new Color(0.75f, 0.42f, 0.15f, 1f), 18);
+            sendButtons[Destination.Pot] = UIFactory.Button(sendRow, "→ Pot", () => SendSelection(Destination.Pot), new Color(0.75f, 0.42f, 0.15f, 1f), 18);
+            sendButtons[Destination.Plate] = UIFactory.Button(sendRow, "→ Plate", () => SendSelection(Destination.Plate), null, 18);
+            RectTransform clearRow = UIFactory.Row(stock, 34f, 6f);
+            clearSelectionButton = UIFactory.Button(clearRow, "Clear selection", ClearSelection, null, 16);
 
             RectTransform stations = Column(root, "Stations", 0.37f, 0.65f, false);
             VerticalLayoutGroup layout = UIFactory.Vertical(stations.gameObject, 10f, 0);
@@ -312,12 +395,17 @@ namespace Cooking.Prototype
         {
             if(plateText == null) return;
 
-            if(area == Area.Kitchen) RebuildStockList(kitchenStockContent, UseStock, phase == Phase.Service);
+            ClampSelection();
+            if(area == Area.Kitchen) RebuildKitchenStock();
 
-            foreach(KeyValuePair<Destination, Button> pair in destinationButtons)
-            {
-                pair.Value.GetComponent<Image>().color = destination == pair.Key ? new Color(0.75f, 0.42f, 0.15f, 1f) : UIFactory.ButtonColor;
-            }
+            int selected = SelectedTotal;
+            selectionText.text = selected == 0
+                ? "<color=#a6a199>Nothing selected.</color>"
+                : "<b>" + selected + (selected == 1 ? " unit" : " units") + "</b> selected. Send them to:";
+            foreach(Button button in sendButtons.Values) button.interactable = selected > 0 && phase == Phase.Service;
+            sendButtons[Destination.Wok].interactable &= !wok.IsCooking;
+            sendButtons[Destination.Pot].interactable &= !pot.IsCooking;
+            clearSelectionButton.interactable = selected > 0;
 
             RefreshStationContents(wokView);
             RefreshStationContents(potView);
@@ -344,6 +432,47 @@ namespace Cooking.Prototype
             plateRadar.ClearProfiles();
             if(orderTaken) plateRadar.AddProfile(orderProfile, new Color(0.85f, 0.85f, 0.85f, 0.7f), false);
             if(livePreview && plate.Count > 0) plateRadar.AddProfile(FlavourCalculator.Calculate(plate, rules), UIFactory.Accent, true);
+        }
+
+        /// <summary>Kitchen stock rows: click adds a unit to the selection, − takes one back.</summary>
+        private void RebuildKitchenStock()
+        {
+            UIFactory.ClearChildren(kitchenStockContent);
+            List<Inventory.Entry> entries = inventory.Entries();
+
+            if(entries.Count == 0)
+            {
+                Text empty = UIFactory.Label(kitchenStockContent, "<color=#a6a199>Out of stock. The store reopens tomorrow morning.</color>", 17);
+                UIFactory.Size(empty, 50f, 0f);
+                return;
+            }
+
+            Color selectedColor = new Color(0.55f, 0.33f, 0.14f, 1f);
+
+            foreach(Inventory.Entry entry in entries)
+            {
+                Inventory.Entry captured = entry;
+                int selected = Selected(entry.Ingredient, entry.Prep);
+
+                RectTransform row = UIFactory.Row(kitchenStockContent, 38f, 4f);
+                HorizontalLayoutGroup rowLayout = row.GetComponent<HorizontalLayoutGroup>();
+                rowLayout.childForceExpandWidth = false;
+
+                string label = Describe(new IngredientPortion(entry.Ingredient, entry.Quantity, entry.Prep), true);
+                if(selected > 0) label = "<b>" + selected + "/</b>" + label;
+                Color color = selected > 0 ? selectedColor : entry.Prep == PrepSteps.None ? UIFactory.ButtonColor : new Color(0.24f, 0.3f, 0.24f, 1f);
+
+                Button pick = UIFactory.Button(row, label, () => SelectMore(captured), color, 17);
+                Text text = pick.GetComponentInChildren<Text>();
+                text.alignment = TextAnchor.MiddleLeft;
+                text.rectTransform.offsetMin = new Vector2(12f, 0f);
+                pick.interactable = phase == Phase.Service;
+                UIFactory.Size(pick, 38f, 0f, -1f, 1f);
+
+                Button less = UIFactory.Button(row, "−", () => SelectLess(captured), null, 20);
+                less.interactable = selected > 0;
+                UIFactory.Size(less, 38f, 0f, 38f, 0f);
+            }
         }
 
         private void RefreshStationContents(StationView view)

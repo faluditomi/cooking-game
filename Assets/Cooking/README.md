@@ -106,8 +106,9 @@ tracks units per prep state ("3× Onion raw", "1× Onion peeled, sliced").
 3. **Service**, `customersPerDay` customers (5). A customer comes to the counter, and **Take order**
    starts the timer: `orderBaseSeconds` + per unit + per prep step the recipe needs. The ticket
    (on the Prep and Kitchen areas) shows the recipe with each ingredient marked ready / needs
-   prep / short. In the **Kitchen**, pick a destination (→ Wok, → Pot, → Plate) and click stock to
-   move one unit there, cook, and serve. You can still prep, but that time comes off the timer, and
+   prep / short. In the **Kitchen**, select stock (each click on a row adds one unit, − takes one
+   back), then send the whole selection at once with → Wok, → Pot or → Plate. Cook and serve.
+   A batch for the pot can include the soup cube; it goes in first, so the rest joins the soup. You can still prep, but that time comes off the timer, and
    the wok and pot keep cooking while you're away.
    - **Wok**: Start, then take it off in the green. In the red, shake it on the shake pad. If it
      reaches the end, it's burnt.

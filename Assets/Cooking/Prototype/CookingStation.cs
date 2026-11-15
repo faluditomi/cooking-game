@@ -115,6 +115,74 @@ namespace Cooking.Prototype
             return true;
         }
 
+        /// <summary>
+        /// Whether a whole batch can go in together. Stock anywhere in the batch (or already in the
+        /// station) makes it a soup, so a pot can take several ingredients at once with a stock cube.
+        /// </summary>
+        public bool CanAddAll(IReadOnlyList<IngredientPortion> batch, out string reason)
+        {
+            reason = null;
+
+            if(batch == null || batch.Count == 0)
+            {
+                reason = "Nothing selected.";
+                return false;
+            }
+
+            if(IsCooking)
+            {
+                reason = "The " + Name.ToLowerInvariant() + " is cooking. Wait or take it off first.";
+                return false;
+            }
+
+            if(!OneIngredientWithoutStock || IsSoup) return true;
+
+            IngredientDefinition only = null;
+
+            foreach(IngredientPortion portion in batch)
+            {
+                if(portion == null || !portion.IsValid) continue;
+                if(portion.ingredient.IsStock) return true;
+            }
+
+            foreach(IngredientPortion portion in contents)
+            {
+                only = portion.ingredient;
+            }
+
+            foreach(IngredientPortion portion in batch)
+            {
+                if(portion == null || !portion.IsValid) continue;
+                if(only == null) only = portion.ingredient;
+
+                if(portion.ingredient != only)
+                {
+                    reason = "Without a stock cube the " + Name.ToLowerInvariant() + " takes one ingredient at a time. Add a soup cube to the batch.";
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>Adds a batch checked with <see cref="CanAddAll"/>; stock goes in first so the rest joins the soup.</summary>
+        public bool AddAll(IReadOnlyList<IngredientPortion> batch)
+        {
+            if(!CanAddAll(batch, out _)) return false;
+
+            foreach(IngredientPortion portion in batch)
+            {
+                if(portion != null && portion.IsValid && portion.ingredient.IsStock) Add(portion);
+            }
+
+            foreach(IngredientPortion portion in batch)
+            {
+                if(portion != null && portion.IsValid && !portion.ingredient.IsStock) Add(portion);
+            }
+
+            return true;
+        }
+
         public bool IsInDanger => IsCooking && Progress >= DangerStart;
         public Doneness CurrentDoneness => Evaluate(Progress);
 
