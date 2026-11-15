@@ -1,0 +1,203 @@
+using System.Collections.Generic;
+using System.Text;
+using DialogueSystem;
+using UnityEngine;
+
+namespace Cooking.Prototype
+{
+    /// <summary>
+    /// Regulars getting to know you: each customer's stage (Dejected → Warmed up → Eureka), the
+    /// dishes they like and order, and what they say. Lines come from the DialogueSystem catalog,
+    /// triggered as (NPC, event, stage); when the catalog has nothing, the customer's fallback
+    /// lines are used.
+    /// </summary>
+    public partial class CookingPrototype
+    {
+        [Header("Dialogue")]
+        [Tooltip("Catalog the prototype checks for lines. Use the same one as the scene's DialogueDirector. Built by Custom Tools → Cooking Prototype → Build Dialogue.")]
+        [SerializeField] private DialogueCatalog dialogueCatalog;
+        [Tooltip("Share of the order timer left when the customer starts hurrying you.")]
+        [SerializeField, Range(0f, 1f)] private float hurryAt = 0.25f;
+
+        private const int SpeechLines = 4;
+
+        private readonly Dictionary<Customer, CustomerRelationship> relationships = new Dictionary<Customer, CustomerRelationship>();
+        private readonly List<string> speech = new List<string>();
+        private readonly List<string> progressToday = new List<string>();
+        private bool hurried;
+        private UnityEngine.UI.Text resultSpeech;
+
+        private void InitNpcs()
+        {
+            foreach(Customer regular in customers) Relationship(regular);
+
+            // Play-once bags are session state on the catalog asset; start every session fresh.
+            if(dialogueCatalog != null) dialogueCatalog.ResetPlayed();
+        }
+
+        private void OnEnable()
+        {
+            Dialogue.LineReceived += HandleDialogueLine;
+        }
+
+        private void OnDisable()
+        {
+            Dialogue.LineReceived -= HandleDialogueLine;
+        }
+
+        private CustomerRelationship Relationship(Customer regular)
+        {
+            if(regular == null) return null;
+
+            if(!relationships.TryGetValue(regular, out CustomerRelationship relationship))
+            {
+                relationship = new CustomerRelationship(regular);
+                relationships[regular] = relationship;
+            }
+
+            return relationship;
+        }
+
+        private static string StageLabel(NpcStage stage)
+        {
+            switch(stage)
+            {
+                case NpcStage.WarmedUp: return "warmed up";
+                case NpcStage.Eureka: return "eureka";
+                default: return "dejected";
+            }
+        }
+
+        // ------------------------------------------------------------------ Speaking
+
+        /// <summary>
+        /// Has the current customer say something about <paramref name="eventType"/>: catalog lines
+        /// for their stage, or any-stage lines, or <paramref name="fallback"/> if there are none.
+        /// </summary>
+        private void Speak(DialogueEventType eventType, string fallback)
+        {
+            if(customer == null) return;
+
+            NpcStage stage = Relationship(customer).Stage;
+            DialogueNpcState state = DialogueNpcState.None;
+            bool canPlay = DialogueDirector.Instance != null
+                           && CustomerDialogue.TryResolve(dialogueCatalog, customer.dialogueId, eventType, stage, out state);
+
+            if(canPlay)
+            {
+                Dialogue.Trigger(customer.dialogueId, eventType, state);
+            }
+            else if(!string.IsNullOrEmpty(fallback))
+            {
+                AddSpeech(fallback);
+            }
+        }
+
+        private void HandleDialogueLine(DialogueLineEventArgs line)
+        {
+            // Lines from a customer who already left (aborted by Replace) don't belong to this visit.
+            if(customer == null || line.TriggerNpc != customer.dialogueId) return;
+            AddSpeech(line.Text);
+        }
+
+        private void AddSpeech(string text)
+        {
+            speech.Add(text);
+            while(speech.Count > SpeechLines) speech.RemoveAt(0);
+            RefreshSpeech();
+        }
+
+        private void ClearSpeech()
+        {
+            speech.Clear();
+            RefreshSpeech();
+        }
+
+        private void RefreshSpeech()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            for(int i = 0; i < speech.Count; i++)
+            {
+                // Older lines fade so the newest reads first.
+                bool newest = i == speech.Count - 1;
+                sb.Append(newest ? "<color=#ebe6db>\"" : "<color=#8f8a83>\"").Append(speech[i]).Append("\"</color>\n");
+            }
+
+            string text = sb.ToString();
+            foreach(TicketView ticket in tickets) ticket.Speech.text = text;
+            if(resultSpeech != null) resultSpeech.text = text;
+        }
+
+        /// <summary>Per frame during an order: the customer hurries you once when time runs low.</summary>
+        private void CheckHurry()
+        {
+            if(hurried || !timedOrders || !orderTaken || orderDuration <= 0f) return;
+            if(orderTimeLeft > orderDuration * hurryAt) return;
+
+            hurried = true;
+            Speak(DialogueEventType.Hurry, null);
+        }
+
+        // ------------------------------------------------------------------ Visits
+
+        private void BeginVisit()
+        {
+            hurried = false;
+            ClearSpeech();
+        }
+
+        /// <summary>Records the served dish with the customer and has them react. Call before the plate is cleared.</summary>
+        private RelationshipChange RecordServe(JudgeResult result)
+        {
+            CustomerRelationship relationship = Relationship(customer);
+            RelationshipChange change = relationship.Record(result, plate);
+
+            if(change.StageChanged)
+            {
+                progressToday.Add(change.After == NpcStage.Eureka
+                    ? customer.name + " had their dream meal. They'll order it from now on."
+                    : customer.name + " warmed up to you.");
+            }
+
+            if(change.NewLikedMeal != null) progressToday.Add(customer.name + " liked something new: " + change.NewLikedMeal.DisplayName + ".");
+            return change;
+        }
+
+        /// <summary>Lines for the result screen about how the relationship moved.</summary>
+        private string DescribeChange(RelationshipChange change)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            if(change.StageChanged)
+            {
+                sb.Append("<color=#f28c33><b>")
+                  .Append(change.After == NpcStage.Eureka ? "Eureka! " + customer.name + " found their dream meal." : customer.name + " is warming up to you.")
+                  .Append("</b></color>\n");
+            }
+
+            if(change.NewLikedMeal != null)
+            {
+                sb.Append("<color=#73cc73>They'll order this again as \"").Append(change.NewLikedMeal.DisplayName).Append("\".</color>\n");
+            }
+
+            CustomerRelationship relationship = Relationship(customer);
+            if(relationship.Stage == NpcStage.Dejected)
+            {
+                int left = Mathf.Max(0, customer.happyMealsToWarmUp - relationship.HappyMeals);
+                sb.Append("<color=#a6a199>").Append(left).Append(left == 1 ? " more happy meal" : " more happy meals").Append(" until they open up.</color>\n");
+            }
+
+            return sb.ToString();
+        }
+
+        private string DescribeProgressToday()
+        {
+            if(progressToday.Count == 0) return "";
+
+            StringBuilder sb = new StringBuilder("<b>Regulars</b>\n");
+            foreach(string note in progressToday) sb.Append("  <color=#f28c33>").Append(note).Append("</color>\n");
+            return sb.Append('\n').ToString();
+        }
+    }
+}

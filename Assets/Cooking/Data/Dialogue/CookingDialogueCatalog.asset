@@ -1,0 +1,116 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4f7a507fc689434791c0e0b6dfa392f, type: 3}
+  m_Name: CookingDialogueCatalog
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueCatalog
+  groups:
+  - npcId: 1
+    entries:
+    - graph: {fileID: 11400000, guid: fc4881d18a634974397a5a226d34379d, type: 2}
+      eventType: 1
+      npcState: 1
+    - graph: {fileID: 11400000, guid: 89c9dce473ceac445ac965d031d44a44, type: 2}
+      eventType: 1
+      npcState: 2
+    - graph: {fileID: 11400000, guid: f8b952fc20e0b2c4db5328bb9d5d4309, type: 2}
+      eventType: 1
+      npcState: 3
+    - graph: {fileID: 11400000, guid: 500d8aa2334b3c044a2e693423d8b1b7, type: 2}
+      eventType: 2
+      npcState: 0
+    - graph: {fileID: 11400000, guid: 0a22f9a602bed2644a40bb29a9905ae0, type: 2}
+      eventType: 2
+      npcState: 2
+    - graph: {fileID: 11400000, guid: 53512ed5eab938f4db20b08672d9e1d0, type: 2}
+      eventType: 3
+      npcState: 0
+    - graph: {fileID: 11400000, guid: 6002f06321d4a3b40975e2425a98a1cd, type: 2}
+      eventType: 4
+      npcState: 0
+    - graph: {fileID: 11400000, guid: ef143f28604338e4990ac0ba21a5a128, type: 2}
+      eventType: 5
+      npcState: 0
+    - graph: {fileID: 11400000, guid: e31f28c589bc50b409b781376c54c659, type: 2}
+      eventType: 7
+      npcState: 0
+    - graph: {fileID: 11400000, guid: 9467eb47eca518b408ae973369de5744, type: 2}
+      eventType: 6
+      npcState: 0
+  - npcId: 2
+    entries:
+    - graph: {fileID: 11400000, guid: 308502d6114192b4d8c59baee830eb6a, type: 2}
+      eventType: 1
+      npcState: 1
+    - graph: {fileID: 11400000, guid: 02669c582d52dcc4f896d612d9d79096, type: 2}
+      eventType: 1
+      npcState: 2
+    - graph: {fileID: 11400000, guid: 08d37ded999ccb8449295eeb89df14ba, type: 2}
+      eventType: 1
+      npcState: 3
+    - graph: {fileID: 11400000, guid: c391c99d2f0ceea4a892b7d0a933ab8e, type: 2}
+      eventType: 2
+      npcState: 0
+    - graph: {fileID: 11400000, guid: 7e71a84116e100541bf66e935b3c3501, type: 2}
+      eventType: 3
+      npcState: 0
+    - graph: {fileID: 11400000, guid: 58d29efd8491c89479634ef14b6ac19a, type: 2}
+      eventType: 4
+      npcState: 0
+    - graph: {fileID: 11400000, guid: ddcf1edfc1dbca247b212b4c9cb454f4, type: 2}
+      eventType: 5
+      npcState: 0
+    - graph: {fileID: 11400000, guid: d7fd526cdb5bc614bbf4c2fdb5f32dd2, type: 2}
+      eventType: 7
+      npcState: 0
+    - graph: {fileID: 11400000, guid: 1d4dd035d51198a4db0eaa95cfab2a0b, type: 2}
+      eventType: 6
+      npcState: 0
+  - npcId: 3
+    entries:
+    - graph: {fileID: 11400000, guid: f2f7a07ed49f83048b2420357ad7dc73, type: 2}
+      eventType: 1
+      npcState: 1
+    - graph: {fileID: 11400000, guid: fa0f7096a83b6254ba330c77d0ac44e2, type: 2}
+      eventType: 1
+      npcState: 2
+    - graph: {fileID: 11400000, guid: 8f9d009ad68e528408f045b8418b8619, type: 2}
+      eventType: 1
+      npcState: 3
+    - graph: {fileID: 11400000, guid: d167f097b121e9f4aa8fa75a1d6ad578, type: 2}
+      eventType: 2
+      npcState: 0
+    - graph: {fileID: 11400000, guid: abd2cf2b763ce4448bc5f95c20e8871c, type: 2}
+      eventType: 3
+      npcState: 0
+    - graph: {fileID: 11400000, guid: 1f91af3a66a6cca47a8b9e0bca0c43bf, type: 2}
+      eventType: 5
+      npcState: 0
+    - graph: {fileID: 11400000, guid: d32f47594a9cd3d41acf958f6026a507, type: 2}
+      eventType: 7
+      npcState: 0
+    - graph: {fileID: 11400000, guid: 7a21fb97507096442acb86975f7c3416, type: 2}
+      eventType: 6
+      npcState: 0
+  - npcId: 4
+    entries:
+    - graph: {fileID: 11400000, guid: 2f087dc143b45a8438ce1a574e95de8f, type: 2}
+      eventType: 2
+      npcState: 0
+    - graph: {fileID: 11400000, guid: 8ff5814cef491c04c8ec6983ba3eef26, type: 2}
+      eventType: 3
+      npcState: 0
+    - graph: {fileID: 11400000, guid: 815bfed929a73b34999c14b428914d66, type: 2}
+      eventType: 5
+      npcState: 0
+    - graph: {fileID: 11400000, guid: 295e5b9e6406556419fcf6f449d1e16b, type: 2}
+      eventType: 6
+      npcState: 0

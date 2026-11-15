@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Eyesider - LateDish - Any
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: 448ff3f4-dc68-4cba-b4e1-d0714d51bca1
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: 7dd21bb0-80c1-49bc-8c4f-727ac32f6973
+    kind: 0
+    line:
+      text: Tch. Slow.
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: 3bc243ce-0da5-4878-9750-0b9b72d741d1
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 520, y: 0}
+  edges:
+  - fromNodeGuid: 448ff3f4-dc68-4cba-b4e1-d0714d51bca1
+    fromOptionGuid: 
+    toNodeGuid: 7dd21bb0-80c1-49bc-8c4f-727ac32f6973
+  - fromNodeGuid: 7dd21bb0-80c1-49bc-8c4f-727ac32f6973
+    fromOptionGuid: 
+    toNodeGuid: 3bc243ce-0da5-4878-9750-0b9b72d741d1

@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Sleeper - Order - Eureka
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: 6334cdda-aeea-48e9-bed3-982639847912
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: 20a0be6d-fef1-46db-b3a3-10c35926e8b8
+    kind: 0
+    line:
+      text: I found her. She cooks like you do. Hotter, actually.
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: ef8dcc33-dee5-4b3e-acfd-0d8c7bfaf53b
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 520, y: 0}
+  edges:
+  - fromNodeGuid: 6334cdda-aeea-48e9-bed3-982639847912
+    fromOptionGuid: 
+    toNodeGuid: 20a0be6d-fef1-46db-b3a3-10c35926e8b8
+  - fromNodeGuid: 20a0be6d-fef1-46db-b3a3-10c35926e8b8
+    fromOptionGuid: 
+    toNodeGuid: ef8dcc33-dee5-4b3e-acfd-0d8c7bfaf53b

@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Woman - LateDish - Any
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: 02c0059e-1bee-42f1-aabf-f5fbc4e6f6a8
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: 6711abfb-3584-4143-8d05-ed0fcc396e67
+    kind: 0
+    line:
+      text: Took you long enough.
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: f9a51992-28c1-46b3-b823-cdf664d2a636
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 520, y: 0}
+  edges:
+  - fromNodeGuid: 02c0059e-1bee-42f1-aabf-f5fbc4e6f6a8
+    fromOptionGuid: 
+    toNodeGuid: 6711abfb-3584-4143-8d05-ed0fcc396e67
+  - fromNodeGuid: 6711abfb-3584-4143-8d05-ed0fcc396e67
+    fromOptionGuid: 
+    toNodeGuid: f9a51992-28c1-46b3-b823-cdf664d2a636

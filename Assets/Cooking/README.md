@@ -169,6 +169,35 @@ reveals the flavour only after serving.
 The UI is built in code at startup (`CookingPrototype.BuildUI`), uses uGUI with the built-in font,
 and needs the Input System UI module (the setup adds one). `FlavourRadarGraphic` is the runtime radar chart.
 
+### Regulars and dialogue (`Prototype/Npc/`, `CookingPrototype.Npcs.cs`)
+
+From the design doc's Conversation section. Each regular has a `CustomerRelationship` for the session:
+
+| Stage | How they get there | What changes |
+|---|---|---|
+| Dejected | where everyone starts | terse lines, no thank-yous |
+| Warmed up | `happyMealsToWarmUp` happy meals (2; late or disliked dishes don't count) | they start dropping clues about their secret desire |
+| Eureka | their dream meal (secret desire zone hit, even if late) | they always order that dish from now on |
+
+- **Liked meals:** what a regular orders. It starts with their usual orders; a dish they didn't
+  order but liked is added as "Emphis's special for …" (origin Emphis), so they can ask for it back
+  and it's judged as an exact order when you recreate it.
+- **Dialogue:** lines come from your DialogueSystem. The prototype triggers
+  `(NPC, event, stage)` at each moment of a visit: `Order` (taking the order), `GoodDish`, `BadDish`,
+  `Refused`, `LateDish`, `DreamMeal` (serving) and `Hurry` (25% of the timer left, timed orders
+  only). It prefers lines authored for the current stage and falls back to entries with state
+  `None`. If neither exists, the customer's fallback line on the `Cooking Prototype` object is used.
+  Lines stream into the ticket and the result screen.
+- **Content:** **Custom Tools → Cooking Prototype → Build Dialogue** generates one placeholder graph
+  per (NPC, event, stage) in `Data/Dialogue/Graphs/` and the catalog
+  `Data/Dialogue/CookingDialogueCatalog.asset` through the DialogueSystem's editor API, then wires
+  the open prototype scene: the catalog, each regular's `dialogueId`, and a `DialogueDirector` with
+  the Replace policy (a new trigger cuts off the last one). Existing graphs are kept, so rewrite the
+  text in **Custom Tools → Dialogue Graph Editor**; rerunning only adds what's missing. Build Scene
+  runs it too.
+- The day summary lists who warmed up or had their dream meal; the morning ticket shows each
+  regular's stage and what they order now.
+
 ## Tests
 
 EditMode tests live in `Tests/Editor` (Window → General → Test Runner → EditMode). They cover the

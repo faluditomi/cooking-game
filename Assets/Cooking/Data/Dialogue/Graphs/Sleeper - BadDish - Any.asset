@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Sleeper - BadDish - Any
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: 2335b364-f5d1-48a6-8a61-0701c58cfb20
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: 65ee80d7-5527-4f07-911d-29bb9e425e35
+    kind: 0
+    line:
+      text: Uhh... thanks?
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: e3d52aab-33ad-4bb7-9c3e-cdf862492817
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 520, y: 0}
+  edges:
+  - fromNodeGuid: 2335b364-f5d1-48a6-8a61-0701c58cfb20
+    fromOptionGuid: 
+    toNodeGuid: 65ee80d7-5527-4f07-911d-29bb9e425e35
+  - fromNodeGuid: 65ee80d7-5527-4f07-911d-29bb9e425e35
+    fromOptionGuid: 
+    toNodeGuid: e3d52aab-33ad-4bb7-9c3e-cdf862492817

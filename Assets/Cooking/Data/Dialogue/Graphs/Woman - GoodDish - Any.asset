@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Woman - GoodDish - Any
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: c3ff3094-f37f-4f8b-92a5-cdf9c7c3da91
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: 53cc4da9-fe2d-460d-846e-f8623a6dd301
+    kind: 0
+    line:
+      text: Fine. That's fine.
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: 71f4e5d3-a3b1-4142-8719-1d874016bd45
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 520, y: 0}
+  edges:
+  - fromNodeGuid: c3ff3094-f37f-4f8b-92a5-cdf9c7c3da91
+    fromOptionGuid: 
+    toNodeGuid: 53cc4da9-fe2d-460d-846e-f8623a6dd301
+  - fromNodeGuid: 53cc4da9-fe2d-460d-846e-f8623a6dd301
+    fromOptionGuid: 
+    toNodeGuid: 71f4e5d3-a3b1-4142-8719-1d874016bd45

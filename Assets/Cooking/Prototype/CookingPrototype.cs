@@ -82,6 +82,7 @@ namespace Cooking.Prototype
         {
             public Text Customer;
             public Text Line;
+            public Text Speech;
             public Text Order;
             public Text Timer;
             public GameObject TimerBar;
@@ -157,6 +158,7 @@ namespace Cooking.Prototype
             CreateKitchenState();
             EnsureEventSystem();
             BuildUI();
+            InitNpcs();
             StartDay();
         }
 
@@ -168,6 +170,7 @@ namespace Cooking.Prototype
             TickKitchen(Time.deltaTime);
             if(orderTaken && timedOrders) orderTimeLeft -= Time.deltaTime;
             UpdateTicketTimers();
+            CheckHurry();
         }
 
         // ------------------------------------------------------------------ Day flow
@@ -179,6 +182,7 @@ namespace Cooking.Prototype
             happyToday = 0;
             spentToday = 0f;
             earnedToday = 0f;
+            progressToday.Clear();
             customer = null;
             order = null;
             orderTaken = false;
@@ -231,8 +235,9 @@ namespace Cooking.Prototype
             }
 
             customer = customers[customerIndex];
-            List<RecipeDefinition> options = customer.orders != null && customer.orders.Count > 0 ? customer.orders : menu;
-            order = options.Count > 0 ? options[random.Next(options.Count)] : null;
+            // What they order grows as they like things; after their dream meal, it's always that.
+            order = Relationship(customer).PickOrder(random, menu);
+            BeginVisit();
             orderProfile = order != null ? order.CalculateProfile(rules) : FlavourProfile.Zero;
             orderZone = FlavourEvaluator.FindBestZone(orderProfile, zones, Falloff).Zone;
             orderLine = customer.GetOrderLine(order, random);
@@ -250,6 +255,7 @@ namespace Cooking.Prototype
             orderDuration = OrderSeconds(order);
             orderTimeLeft = orderDuration;
             Say(customer.name + ": \"" + orderLine + "\"" + (timedOrders ? "  You have " + FormatTime(orderDuration) + "." : ""));
+            Speak(DialogueSystem.DialogueEventType.Order, null);
             RefreshAll();
         }
 
@@ -300,7 +306,8 @@ namespace Cooking.Prototype
             servedToday++;
             if(result.IsHappy) happyToday++;
 
-            ShowResult(result);
+            RelationshipChange change = RecordServe(result);
+            ShowResult(result, change);
             ClearPlate();
         }
 
@@ -327,6 +334,7 @@ namespace Cooking.Prototype
             sb.Append("Spent at the store <b>$").Append(spentToday.ToString("0.00")).Append("</b>\n");
             float net = earnedToday - spentToday;
             sb.Append("Net <b><color=#").Append(net >= 0f ? "73cc73" : "e5594d").Append(">$").Append(net.ToString("0.00")).Append("</color></b>\n\n");
+            sb.Append(DescribeProgressToday());
 
             if(spoiled.Count > 0)
             {
@@ -441,7 +449,7 @@ namespace Cooking.Prototype
                 }
                 else if(phase == Phase.Service && customer != null)
                 {
-                    ticket.Customer.text = customer.name;
+                    ticket.Customer.text = customer.name + "  <size=17><color=#a6a199>" + StageLabel(Relationship(customer).Stage) + "</color></size>";
 
                     if(orderTaken)
                     {
@@ -495,18 +503,26 @@ namespace Cooking.Prototype
 
             foreach(Customer regular in customers)
             {
-                sb.Append("<color=#f28c33>").Append(regular.name).Append("</color>: ");
+                CustomerRelationship relationship = Relationship(regular);
+                sb.Append("<color=#f28c33>").Append(regular.name).Append("</color> <color=#77736d>(")
+                  .Append(StageLabel(relationship.Stage)).Append(")</color>: ");
 
-                if(regular.orders == null || regular.orders.Count == 0)
+                if(relationship.DreamMeal != null)
+                {
+                    sb.Append("always ").Append(relationship.DreamMeal.DisplayName).Append('\n');
+                    continue;
+                }
+
+                if(relationship.LikedMeals.Count == 0)
                 {
                     sb.Append("anything on the menu\n");
                     continue;
                 }
 
-                for(int i = 0; i < regular.orders.Count; i++)
+                for(int i = 0; i < relationship.LikedMeals.Count; i++)
                 {
                     if(i > 0) sb.Append(", ");
-                    sb.Append(regular.orders[i] != null ? regular.orders[i].DisplayName : "?");
+                    sb.Append(relationship.LikedMeals[i].DisplayName);
                 }
 
                 sb.Append('\n');
@@ -601,7 +617,7 @@ namespace Cooking.Prototype
 
         // ------------------------------------------------------------------ Result
 
-        private void ShowResult(JudgeResult result)
+        private void ShowResult(JudgeResult result, RelationshipChange change)
         {
             overlayOpen = true;
             resultOverlay.SetActive(true);
@@ -624,17 +640,22 @@ namespace Cooking.Prototype
                     title = "They didn't like it"; line = customer.dislikedLine; color = UIFactory.Bad; break;
             }
 
-            if(result.Late && result.IsPaid)
+            if(result.Late && result.IsPaid && result.Verdict != Verdict.DreamMeal)
             {
                 title = "Late. They paid, but they're not happy";
                 line = "Took you long enough.";
                 color = UIFactory.Accent;
             }
 
-            resultTitle.text = title + "\n<size=22><i>" + customer.name + ": \"" + line + "\"</i></size>";
+            resultTitle.text = title;
             resultTitle.color = color;
 
+            // What they say comes from the dialogue catalog (lines stream in below the title),
+            // or the customer's fallback line when the catalog has nothing for this moment.
+            Speak(CustomerDialogue.EventFor(result), line);
+
             StringBuilder sb = new StringBuilder();
+            sb.Append(DescribeChange(change));
             sb.Append("<b>Ordered</b>  ").Append(order != null ? order.DisplayName : "-").Append('\n');
             sb.Append("<b>Served</b>\n");
             foreach(IngredientPortion portion in plate) sb.Append("  ").Append(Describe(portion, true)).Append('\n');
@@ -774,6 +795,7 @@ namespace Cooking.Prototype
             Header(column, "CUSTOMER");
             ticket.Customer = UIFactory.Label(column, "", 30, TextAnchor.UpperLeft, FontStyle.Bold, UIFactory.Accent);
             ticket.Line = UIFactory.Label(column, "", 19, TextAnchor.UpperLeft, FontStyle.Italic);
+            ticket.Speech = UIFactory.Label(column, "", 18, TextAnchor.UpperLeft, FontStyle.Italic);
 
             RectTransform row = UIFactory.Row(column, 50f);
             ticket.TakeOrder = UIFactory.Button(row, "Take order", TakeOrder, new Color(0.75f, 0.42f, 0.15f, 1f), 22);
@@ -863,6 +885,7 @@ namespace Cooking.Prototype
             layout.childForceExpandHeight = false;
 
             resultTitle = UIFactory.Label(right, "", 34, TextAnchor.UpperLeft, FontStyle.Bold);
+            resultSpeech = UIFactory.Label(right, "", 21, TextAnchor.UpperLeft, FontStyle.Italic);
             resultBody = UIFactory.Label(right, "", 19);
             UIFactory.Size(resultBody, -1f, 1f);
             RectTransform row = UIFactory.Row(right, 56f);

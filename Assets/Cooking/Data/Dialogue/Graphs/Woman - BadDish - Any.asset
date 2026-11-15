@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Woman - BadDish - Any
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: adfdfe85-ffb2-4e42-9465-d2979aaaf62e
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: 467c53de-50aa-423e-995b-1b302f732f6d
+    kind: 0
+    line:
+      text: Is this what passes for food now?
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: 45d7f738-49ad-415d-9cb6-b705775e65be
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 520, y: 0}
+  edges:
+  - fromNodeGuid: adfdfe85-ffb2-4e42-9465-d2979aaaf62e
+    fromOptionGuid: 
+    toNodeGuid: 467c53de-50aa-423e-995b-1b302f732f6d
+  - fromNodeGuid: 467c53de-50aa-423e-995b-1b302f732f6d
+    fromOptionGuid: 
+    toNodeGuid: 45d7f738-49ad-415d-9cb6-b705775e65be

@@ -50,6 +50,10 @@ namespace Cooking.Prototype.EditorTools
             EditorUtility.SetDirty(prototype);
 
             EditorSceneManager.SaveScene(scene, ScenePath);
+
+            // Dialogue graphs, catalog, director and the regulars' dialogue ids.
+            CookingDialogueSetup.BuildDialogue();
+
             Selection.activeGameObject = root;
             Debug.Log("[Cooking] Built " + ScenePath + ". Press Play to cook.");
         }
