@@ -7,7 +7,7 @@ namespace Cooking.Prototype
 {
     /// <summary>
     /// The Store area (mornings only). Pick ingredients into a cart, one by one from the shelf or by
-    /// dish from the menu, then pay for the whole cart at checkout. Nothing is bought until then.
+    /// dish from the recipe book, then pay for the whole cart at checkout. Nothing is bought until then.
     /// </summary>
     public partial class CookingPrototype
     {
@@ -20,18 +20,8 @@ namespace Cooking.Prototype
             public Button MoreFive;
         }
 
-        private class MenuCard
-        {
-            public RecipeDefinition Recipe;
-            public Text Text;
-            public Button AddServing;
-            public Button AddMissing;
-        }
-
         private readonly ShoppingCart cart = new ShoppingCart();
         private readonly List<ShelfCard> shelfCards = new List<ShelfCard>();
-        private readonly List<MenuCard> menuCards = new List<MenuCard>();
-        private Text regularsText;
         private RectTransform cartContent;
         private Text cartTotalText;
         private Button checkoutButton;
@@ -107,9 +97,8 @@ namespace Cooking.Prototype
 
         private GameObject BuildStoreArea(RectTransform root)
         {
-            BuildShelf(Column(root, "Shelf", 0f, 0.47f));
-            BuildMenu(Column(root, "Menu", 0.47f, 0.75f));
-            BuildCart(Column(root, "Cart", 0.75f, 1f));
+            BuildShelf(Column(root, "Shelf", 0f, 0.66f));
+            BuildCart(Column(root, "Cart", 0.66f, 1f));
             return root.gameObject;
         }
 
@@ -117,14 +106,14 @@ namespace Cooking.Prototype
         {
             VerticalLayoutGroup layout = UIFactory.Vertical(shelf.gameObject, 12f, 16);
             layout.childForceExpandHeight = false;
-            Header(shelf, "SHELF  <color=#77736d>pick ingredients into the cart</color>");
+            Header(shelf, "SHELF  <color=#77736d>pick ingredients into the cart, or shop by dish from the Recipe book</color>");
 
             RectTransform grid = UIFactory.Rect(shelf, "Grid");
             GridLayoutGroup gridLayout = grid.gameObject.AddComponent<GridLayoutGroup>();
-            gridLayout.cellSize = new Vector2(278f, 96f);
+            gridLayout.cellSize = new Vector2(292f, 100f);
             gridLayout.spacing = new Vector2(9f, 9f);
             gridLayout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
-            gridLayout.constraintCount = 3;
+            gridLayout.constraintCount = 4;
             UIFactory.Size(grid, -1f, 1f);
 
             foreach(IngredientDefinition ingredient in pantry)
@@ -152,32 +141,6 @@ namespace Cooking.Prototype
 
                 shelfCards.Add(card);
             }
-        }
-
-        private void BuildMenu(RectTransform column)
-        {
-            VerticalLayoutGroup layout = UIFactory.Vertical(column.gameObject, 10f, 16);
-            layout.childForceExpandHeight = false;
-            Header(column, "MENU  <color=#77736d>shop by the dishes you know</color>");
-            RectTransform list = UIFactory.ScrollList(column, 10f);
-
-            foreach(RecipeDefinition recipe in menu)
-            {
-                if(recipe == null) continue;
-
-                RecipeDefinition captured = recipe;
-                MenuCard card = new MenuCard { Recipe = recipe };
-                RectTransform panel = UIFactory.Panel(list, recipe.DisplayName, UIFactory.PanelDark).rectTransform;
-                UIFactory.Vertical(panel.gameObject, 6f, 10);
-                card.Text = UIFactory.Label(panel, "", 16);
-
-                RectTransform row = UIFactory.Row(panel, 36f, 6f);
-                card.AddServing = UIFactory.Button(row, "+ One serving", () => AddServingToCart(captured), null, 16);
-                card.AddMissing = UIFactory.Button(row, "+ What's missing", () => AddMissingToCart(captured), new Color(0.25f, 0.4f, 0.25f, 1f), 16);
-                menuCards.Add(card);
-            }
-
-            regularsText = UIFactory.Label(list, "", 16);
         }
 
         private void BuildCart(RectTransform column)
@@ -212,15 +175,6 @@ namespace Cooking.Prototype
                 card.MoreFive.interactable = open;
             }
 
-            foreach(MenuCard card in menuCards)
-            {
-                card.Text.text = DescribeRecipeNeeds(card.Recipe);
-                card.AddServing.interactable = open;
-                card.AddMissing.interactable = open;
-            }
-
-            regularsText.text = DescribeRegulars();
-
             if(area == Area.Store) RebuildCartList();
 
             float total = cart.TotalCost;
@@ -254,25 +208,6 @@ namespace Cooking.Prototype
                 Button more = UIFactory.Button(row, "+", () => AddToCart(ingredient, 1), null, 18);
                 UIFactory.Size(more, 34f, 0f, 36f, 0f);
             }
-        }
-
-        /// <summary>One menu card: price, and have/need per ingredient (stock + cart).</summary>
-        private string DescribeRecipeNeeds(RecipeDefinition recipe)
-        {
-            StringBuilder line = new StringBuilder();
-            bool covered = true;
-
-            foreach(KeyValuePair<IngredientDefinition, int> need in ShoppingCart.Needs(recipe))
-            {
-                int have = inventory.Total(need.Key) + cart.Count(need.Key);
-                if(have < need.Value) covered = false;
-                if(line.Length > 0) line.Append(",  ");
-                line.Append("<color=#").Append(have >= need.Value ? "73cc73" : "a6a199").Append(">")
-                    .Append(need.Key.DisplayName).Append(' ').Append(have).Append('/').Append(need.Value).Append("</color>");
-            }
-
-            return "<b>" + recipe.DisplayName + "</b>  <color=#77736d>$" + DishJudge.MenuPrice(recipe, margin).ToString("0.00") + "</color>"
-                   + (covered ? "  <color=#73cc73>covered</color>" : "") + "\n" + line;
         }
     }
 }

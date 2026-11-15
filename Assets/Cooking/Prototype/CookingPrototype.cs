@@ -397,6 +397,7 @@ namespace Cooking.Prototype
             }
 
             area = target;
+            if(recipeBookOverlay != null) recipeBookOverlay.SetActive(false);
             foreach(KeyValuePair<Area, GameObject> pair in areaRoots) pair.Value.SetActive(pair.Key == target);
             RefreshAll();
         }
@@ -426,6 +427,7 @@ namespace Cooking.Prototype
             RefreshPrep();
             RefreshKitchen();
             RefreshTickets();
+            RefreshRecipeBook();
         }
 
         // ------------------------------------------------------------------ Ticket
@@ -590,6 +592,7 @@ namespace Cooking.Prototype
                 sb.Append("• ").Append(Describe(portion, true)).Append("  ").Append(readiness).Append('\n');
             }
 
+            sb.Append("<color=#a6a199>Steps are in the Recipe book.</color>\n");
             sb.Append("\nMenu price <b>$").Append(DishJudge.MenuPrice(recipe, margin).ToString("0.00")).Append("</b>");
 
             if(orderZone != null)
@@ -730,6 +733,8 @@ namespace Cooking.Prototype
             areaRoots[Area.Prep] = BuildPrepArea(AreaRoot(content, "Prep Area"));
             areaRoots[Area.Kitchen] = BuildKitchenArea(AreaRoot(content, "Kitchen Area"));
 
+            // The book sits over the areas; result and summary screens go on top of it.
+            BuildRecipeBook(root);
             BuildResultOverlay(root);
             BuildSummaryOverlay(root);
         }
@@ -753,17 +758,21 @@ namespace Cooking.Prototype
             UIFactory.Place(title.rectTransform, 0f, 0f, 0.17f, 1f).offsetMin = new Vector2(20f, 0f);
 
             RectTransform tabRow = UIFactory.Rect(top, "Tabs");
-            UIFactory.Place(tabRow, 0.17f, 0f, 0.52f, 1f, 8f);
+            UIFactory.Place(tabRow, 0.17f, 0f, 0.47f, 1f, 8f);
             UIFactory.Horizontal(tabRow.gameObject, 8f);
             tabs[Area.Store] = UIFactory.Button(tabRow, "Store", () => ShowArea(Area.Store), null, 20);
             tabs[Area.Prep] = UIFactory.Button(tabRow, "Prep", () => ShowArea(Area.Prep), null, 20);
             tabs[Area.Kitchen] = UIFactory.Button(tabRow, "Kitchen", () => ShowArea(Area.Kitchen), null, 20);
 
+            // Always available, whichever area you're in.
+            recipeBookButton = UIFactory.Button(top, "Recipe book", ToggleRecipeBook, new Color(0.3f, 0.36f, 0.5f, 1f), 20);
+            UIFactory.Place((RectTransform)recipeBookButton.transform, 0.47f, 0f, 0.59f, 1f, 8f);
+
             dayText = UIFactory.Label(top, "", 22, TextAnchor.MiddleCenter);
-            UIFactory.Place(dayText.rectTransform, 0.52f, 0f, 0.7f, 1f);
+            UIFactory.Place(dayText.rectTransform, 0.59f, 0f, 0.72f, 1f);
 
             phaseButton = UIFactory.Button(top, "Open the stall →", OpenStall, new Color(0.75f, 0.42f, 0.15f, 1f), 20);
-            UIFactory.Place((RectTransform)phaseButton.transform, 0.7f, 0f, 0.86f, 1f, 8f);
+            UIFactory.Place((RectTransform)phaseButton.transform, 0.72f, 0f, 0.86f, 1f, 8f);
 
             moneyText = UIFactory.Label(top, "", 30, TextAnchor.MiddleRight, FontStyle.Bold, UIFactory.Good);
             UIFactory.Place(moneyText.rectTransform, 0.86f, 0f, 1f, 1f).offsetMax = new Vector2(-20f, 0f);

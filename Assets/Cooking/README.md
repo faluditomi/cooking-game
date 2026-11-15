@@ -100,10 +100,9 @@ tracks units per prep state ("3× Onion raw", "1× Onion peeled, sliced").
 
 1. **Morning** (untimed). The **Store** is open. Fill a cart (`ShoppingCart`) and pay for it all
    at once with **Buy everything**; nothing is bought before that. Add ingredients one at a time
-   from the shelf (−, +1, +5), or by dish from the menu: **+ One serving** adds a full set of that
-   dish's ingredients, and **+ What's missing** adds only what your stock plus cart doesn't already
-   cover for one serving. The menu shows have/need per ingredient (stock + cart) and who tends to
-   order what. You can't open the stall with an unpaid cart. On the **Prep** board, prep
+   from the shelf (−, +1, +5), or by dish from the **Recipe book**: **+ One serving** adds a full
+   set of that dish's ingredients, and **+ What's missing** adds only what your stock plus cart
+   doesn't already cover for one serving. You can't open the stall with an unpaid cart. On the **Prep** board, prep
    stock one unit at a time (as in the design doc): put a unit on the board, pick up a tool, do its
    gesture, then put it back. It goes back into stock prepped. The Kitchen is locked.
 2. **Open the stall** (top bar). The Store closes until tomorrow.
@@ -168,6 +167,21 @@ reveals the flavour only after serving.
 
 The UI is built in code at startup (`CookingPrototype.BuildUI`), uses uGUI with the built-in font,
 and needs the Input System UI module (the setup adds one). `FlavourRadarGraphic` is the runtime radar chart.
+
+### Recipe book (`CookingPrototype.RecipeBook.cs`, `RecipeGuide.cs`)
+
+The **Recipe book** button in the top bar opens it from any area, any time. It lists the menu plus
+dishes learned from customers (their specials and dream meals). For the selected dish it shows:
+
+- **Steps** (`RecipeGuide`): what to buy (with how many you have), what to prep with which tool
+  ("peel (peeler), then slice (knife)"), which station cooks what and how (pot: the soup cube
+  makes it a soup; wok: take it off in the green, shake in the red; raw straight to the plate), and serving.
+- **Flavour**: the dish on the radar against the zones, and which zone it tastes like.
+- **Shopping**: have/need per ingredient (stock + cart), with **+ One serving** and **+ What's
+  missing** to fill the store cart. These only work in the morning.
+
+During service it opens on the dish being ordered. The kitchen keeps running while it's open, so
+looking something up costs time. Switching tabs closes it.
 
 ### Regulars and dialogue (`Prototype/Npc/`, `CookingPrototype.Npcs.cs`)
 
