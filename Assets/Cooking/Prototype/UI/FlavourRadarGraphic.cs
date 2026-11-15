@@ -146,17 +146,45 @@ namespace Cooking.Prototype
             Color line = zone.Color;
             line.a = highlighted == null || isHighlighted ? 0.85f : 0.2f;
 
+            // The area inside the zone's minimums is "not enough of this": shaded faintly and
+            // edged with a dashed line, so it reads as a boundary instead of a hole.
+            Color shortfall = zone.Color;
+            shortfall.a = fill.a * 0.45f;
+            Color innerLine = line;
+            innerLine.a *= 0.75f;
+
             FlavourProfile min = zone.Min;
             FlavourProfile max = zone.Max;
 
             for(int i = 0; i < count; i++)
             {
-                Vector2 innerA = Point(i, Mathf.Min(Value(min, i), Value(max, i)));
+                float loA = Mathf.Min(Value(min, i), Value(max, i));
+                float loB = Mathf.Min(Value(min, i + 1), Value(max, i + 1));
+                Vector2 innerA = Point(i, loA);
                 Vector2 outerA = Point(i, Mathf.Max(Value(min, i), Value(max, i)));
-                Vector2 innerB = Point(i + 1, Mathf.Min(Value(min, i + 1), Value(max, i + 1)));
+                Vector2 innerB = Point(i + 1, loB);
                 Vector2 outerB = Point(i + 1, Mathf.Max(Value(min, i + 1), Value(max, i + 1)));
                 AddQuad(vh, innerA, outerA, outerB, innerB, fill);
                 AddLine(vh, outerA, outerB, isHighlighted ? 3f : 2f, line);
+
+                if(loA > 0f || loB > 0f)
+                {
+                    AddTriangle(vh, Center, innerA, innerB, shortfall);
+                    AddDashedLine(vh, innerA, innerB, isHighlighted ? 2f : 1.5f, innerLine);
+                }
+            }
+        }
+
+        private static void AddDashedLine(VertexHelper vh, Vector2 a, Vector2 b, float width, Color lineColor, float dash = 7f, float gap = 5f)
+        {
+            float length = Vector2.Distance(a, b);
+            if(length < 0.01f) return;
+
+            Vector2 dir = (b - a) / length;
+
+            for(float d = 0f; d < length; d += dash + gap)
+            {
+                AddLine(vh, a + dir * d, a + dir * Mathf.Min(d + dash, length), width, lineColor);
             }
         }
 
