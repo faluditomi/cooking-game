@@ -106,6 +106,30 @@ namespace Cooking.EditorTools
                 Handles.DrawAAConvexPolygon(innerA, outerB, innerB);
             }
 
+            // The area inside the minimums is "not enough of this": a faint fill and a dashed edge,
+            // so it reads as a boundary instead of a hole.
+            Color shortfall = zone.Color;
+            shortfall.a = 0.1f;
+            Color innerLine = zone.Color;
+            innerLine.a = 0.6f;
+
+            for(int i = 0; i < FlavourAxes.Count; i++)
+            {
+                int j = (i + 1) % FlavourAxes.Count;
+                FlavourAxis a = FlavourAxes.All[i];
+                FlavourAxis b = FlavourAxes.All[j];
+                float loA = Mathf.Min(min[a], max[a]);
+                float loB = Mathf.Min(min[b], max[b]);
+                if(loA <= 0f && loB <= 0f) continue;
+
+                Vector3 innerA = Point(center, radius, i, loA);
+                Vector3 innerB = Point(center, radius, j, loB);
+                Handles.color = shortfall;
+                Handles.DrawAAConvexPolygon(new Vector3(center.x, center.y, 0f), innerA, innerB);
+                Handles.color = innerLine;
+                Handles.DrawDottedLine(innerA, innerB, 4f);
+            }
+
             Color line = zone.Color;
             line.a = 0.8f;
             Handles.color = line;

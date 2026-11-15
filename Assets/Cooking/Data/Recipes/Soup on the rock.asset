@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9dbf973f6ffa355418567f4b61dcc68e, type: 3}
+  m_Name: Soup on the rock
+  m_EditorClassIdentifier: Cooking.Runtime::Cooking.RecipeDefinition
+  displayName: Soup on the rock
+  origin: Erlin's Eye street food
+  description: 
+  portions:
+  - ingredient: {fileID: 11400000, guid: 4055757ba0454535ad6cd5f5753cedbd, type: 2}
+    quantity: 1
+    prep: 0
+    cooking: 1
+    doneness: 0
+  - ingredient: {fileID: 11400000, guid: a17ebd6c95bc47e7b2820c71af85a57e, type: 2}
+    quantity: 1
+    prep: 1
+    cooking: 1
+    doneness: 0
+  - ingredient: {fileID: 11400000, guid: 3e30b972fe0043b981e4906d33a2fc46, type: 2}
+    quantity: 2
+    prep: 0
+    cooking: 1
+    doneness: 0
