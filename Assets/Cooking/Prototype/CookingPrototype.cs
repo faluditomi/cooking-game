@@ -134,16 +134,39 @@ namespace Cooking.Prototype
 
         private void BuyIngredient(IngredientDefinition ingredient)
         {
-            if(board != null && (board.ingredient != ingredient || board.prep != PrepSteps.None))
+            if(board != null && board.prep != PrepSteps.None && board.ingredient != ingredient)
             {
-                Say("The board is busy. Send " + board.ingredient.DisplayName + " somewhere or bin it first.", UIFactory.Bad);
+                Say(board.ingredient.DisplayName + " is already prepped. Send it somewhere or bin it first.", UIFactory.Bad);
                 return;
             }
 
-            if(money < ingredient.Price)
+            if(board != null && board.prep != PrepSteps.None)
+            {
+                Say("Prepped " + board.ingredient.DisplayName + " is on the board. Send it somewhere before adding more.", UIFactory.Bad);
+                return;
+            }
+
+            // Untouched stock on the board goes back to the pantry, so picking something else just switches.
+            float refund = 0f;
+            string previous = null;
+
+            if(board != null && board.ingredient != ingredient)
+            {
+                refund = board.ingredient.Price * board.quantity;
+                previous = board.ingredient.DisplayName;
+            }
+
+            if(money + refund < ingredient.Price)
             {
                 Say("Can't afford " + ingredient.DisplayName + ".", UIFactory.Bad);
                 return;
+            }
+
+            if(previous != null)
+            {
+                money += refund;
+                spentOnDish -= refund;
+                board = null;
             }
 
             money -= ingredient.Price;
@@ -152,8 +175,17 @@ namespace Cooking.Prototype
             if(board == null) board = new IngredientPortion(ingredient, 1);
             else board.quantity++;
 
-            Say("Bought " + ingredient.DisplayName + " for $" + ingredient.Price.ToString("0.00") + ".");
+            Say(previous != null
+                ? "Put the " + previous + " back. Picked " + ingredient.DisplayName + " instead."
+                : "Bought " + ingredient.DisplayName + " for $" + ingredient.Price.ToString("0.00") + ".");
             Refresh();
+        }
+
+        /// <summary>Money available for buying <paramref name="ingredient"/>, counting untouched board stock that would go back.</summary>
+        private float SpendableFor(IngredientDefinition ingredient)
+        {
+            bool swaps = board != null && board.prep == PrepSteps.None && board.ingredient != ingredient;
+            return swaps ? money + board.ingredient.Price * board.quantity : money;
         }
 
         private void Prep(PrepSteps step)
@@ -397,7 +429,7 @@ namespace Cooking.Prototype
             servedText.text = "Served " + served + "   ·   Happy " + happy;
 
             boardText.text = board == null
-                ? "<color=#a6a199>Empty. Buy something from the pantry. Click it again for more.</color>"
+                ? "<color=#a6a199>Empty. Pick something from the pantry. Click it again for more.</color>"
                 : "<size=22>" + Describe(board, false) + "</size>";
             foreach(Button button in boardButtons) button.interactable = board != null;
             sendWokButton.interactable = board != null && !wok.IsCooking;
@@ -405,7 +437,7 @@ namespace Cooking.Prototype
 
             foreach(KeyValuePair<Button, IngredientDefinition> pair in pantryButtons)
             {
-                pair.Key.interactable = money >= pair.Value.Price;
+                pair.Key.interactable = SpendableFor(pair.Value) >= pair.Value.Price;
             }
 
             RefreshStationContents(wokView);
