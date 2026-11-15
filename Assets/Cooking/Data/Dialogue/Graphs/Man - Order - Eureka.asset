@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Man - Order - Eureka
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: 3e468b1b-6108-4641-b056-617a92bdd207
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: f99f92e5-b2a4-4220-a282-994775603b87
+    kind: 0
+    line:
+      text: I made it for the kids three times this week. They asked for it again.
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: 0893d9a0-6de0-4567-abef-c82dd9244e6e
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 520, y: 0}
+  edges:
+  - fromNodeGuid: 3e468b1b-6108-4641-b056-617a92bdd207
+    fromOptionGuid: 
+    toNodeGuid: f99f92e5-b2a4-4220-a282-994775603b87
+  - fromNodeGuid: f99f92e5-b2a4-4220-a282-994775603b87
+    fromOptionGuid: 
+    toNodeGuid: 0893d9a0-6de0-4567-abef-c82dd9244e6e

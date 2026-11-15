@@ -50,6 +50,10 @@ namespace Cooking.Prototype.EditorTools
             EditorUtility.SetDirty(prototype);
 
             EditorSceneManager.SaveScene(scene, ScenePath);
+
+            // Dialogue graphs, catalog, director and the regulars' dialogue ids.
+            CookingDialogueSetup.BuildDialogue();
+
             Selection.activeGameObject = root;
             Debug.Log("[Cooking] Built " + ScenePath + ". Press Play to cook.");
         }
@@ -184,13 +188,16 @@ namespace Cooking.Prototype.EditorTools
 
         private static List<Customer> CreateCustomers(Dictionary<string, RecipeDefinition> recipes)
         {
+            // Each regular's secret desire: a flavour no menu recipe reaches, to be discovered.
+            Dictionary<string, FlavourZone> desires = CookingDesireSetup.EnsureDesireZones();
+
             return new List<Customer>
             {
                 new Customer
                 {
                     name = "The Woman",
                     orders = new List<RecipeDefinition> { recipes["Calorice"], recipes["Synthetic soup"] },
-                    secretDesire = Zone("Sweet and Sour"),
+                    secretDesire = desires["The Woman"],
                     refuses = new List<IngredientDefinition> { Ingredient("Beef"), Ingredient("Real Beef") },
                     orderLines = new List<string> { "{0}. And hurry, the flux won't wait for anyone.", "{0}. Fried, greasy, salty. You know.", "{0}. No beef. Don't even look at the beef." },
                     likedLine = "Fine. That's fine.",
@@ -202,7 +209,7 @@ namespace Cooking.Prototype.EditorTools
                 {
                     name = "The Man",
                     orders = new List<RecipeDefinition> { recipes["Calorice"], recipes["Soup on the rock"] },
-                    secretDesire = Zone("Hearty Broth"),
+                    secretDesire = desires["The Man"],
                     refuses = new List<IngredientDefinition> { Ingredient("Synthetic Chicken") },
                     orderLines = new List<string> { "{0}. It's the least bad option.", "{0}, please. Nothing synthetic.", "The {0}. The kids need me back soon." },
                     likedLine = "That's... decent. Thank you.",
@@ -214,7 +221,7 @@ namespace Cooking.Prototype.EditorTools
                 {
                     name = "The Sleeper",
                     orders = new List<RecipeDefinition> { recipes["Boiled synthetic chicken"], recipes["Soup on the rock"] },
-                    secretDesire = Zone("Fire Bowl"),
+                    secretDesire = desires["The Sleeper"],
                     orderLines = new List<string> { "Uum... I'd like a {0}?", "{0}. Is that a thing people eat?" },
                     likedLine = "Wow! That kinda tastes. So that's why people stuff their face?",
                     dislikedLine = "Uhh... thanks?",

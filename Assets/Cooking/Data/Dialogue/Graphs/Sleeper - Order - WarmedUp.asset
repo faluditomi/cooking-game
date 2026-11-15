@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Sleeper - Order - WarmedUp
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: c6c2f84a-f062-4b34-be03-7df523c3ba24
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: 35e56834-9d0f-4016-b5c0-b3b5dccb5626
+    kind: 0
+    line:
+      text: This place feels like home. I've never been here.
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: 219c009e-c283-4f91-9dce-75e1678a2ef5
+    kind: 0
+    line:
+      text: I remember heat. A kitchen that made your eyes water.
+      delaySeconds: 1.8
+    editorPosition: {x: 520, y: 0}
+  - guid: 9675a34a-adbb-413c-bff3-04e01276ac58
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 780, y: 0}
+  edges:
+  - fromNodeGuid: c6c2f84a-f062-4b34-be03-7df523c3ba24
+    fromOptionGuid: 
+    toNodeGuid: 35e56834-9d0f-4016-b5c0-b3b5dccb5626
+  - fromNodeGuid: 35e56834-9d0f-4016-b5c0-b3b5dccb5626
+    fromOptionGuid: 
+    toNodeGuid: 219c009e-c283-4f91-9dce-75e1678a2ef5
+  - fromNodeGuid: 219c009e-c283-4f91-9dce-75e1678a2ef5
+    fromOptionGuid: 
+    toNodeGuid: 9675a34a-adbb-413c-bff3-04e01276ac58

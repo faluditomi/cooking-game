@@ -4,14 +4,16 @@ namespace Cooking.Prototype
 {
     public enum Verdict
     {
-        /// <summary>Nothing on the plate, or it tastes nothing like what they wanted. No pay.</summary>
+        /// <summary>Nothing on the plate, or too different from what they ordered. No pay.</summary>
         Disliked,
         /// <summary>Contains something they will not eat. No pay.</summary>
         Refused,
-        /// <summary>Exactly what they ordered, cooked right. Paid.</summary>
+        /// <summary>Exactly what they ordered, cooked right. Full price.</summary>
         Ordered,
-        /// <summary>Not what they ordered, but in the same desirable zone. Paid, maybe tipped.</summary>
-        LikedSubstitute,
+        /// <summary>Not exact, but very close to the order. Most of the price, and they're happy.</summary>
+        VeryClose,
+        /// <summary>Close enough to pay for, but they're lukewarm about it.</summary>
+        CloseEnough,
         /// <summary>Hits their secret desire. Paid and tipped generously.</summary>
         DreamMeal,
     }
@@ -22,26 +24,32 @@ namespace Cooking.Prototype
         public FlavourProfile Dish;
         public FlavourProfile Ordered;
         public bool ExactMatch;
+        /// <summary>How close the plate is to the ordered recipe.</summary>
+        public Similarity Similarity;
         public FlavourZoneMatch BestZone;
-        public FlavourZoneMatch SharedZone;
         /// <summary>Score against the customer's secret desire, or -1 when they have none.</summary>
         public float DesireScore;
         public IngredientDefinition RefusedIngredient;
         /// <summary>Menu price of the ordered dish.</summary>
         public float Price;
+        /// <summary>Share of <see cref="Price"/> they pay for this tier (0..1).</summary>
+        public float PayShare;
         public float Payment;
         public float Tip;
         /// <summary>Served after the order timer ran out: they still pay, but never tip and aren't happy.</summary>
         public bool Late;
 
         public bool IsPaid => Payment > 0f;
-        public bool IsHappy => IsPaid && !Late;
+
+        /// <summary>The top tiers on time: exact, very close, or their dream meal. Counts towards warming up.</summary>
+        public bool IsHappy => IsPaid && !Late && (Verdict == Verdict.Ordered || Verdict == Verdict.VeryClose || Verdict == Verdict.DreamMeal);
     }
 
     /// <summary>
-    /// The design doc's payment rules: an exact order gets paid; an unordered dish still gets paid
-    /// if its flavour sits in the same desirable zone as the order; a dish that hits the customer's
-    /// secret desire gets paid and tipped.
+    /// The payment rules. A dish that hits the customer's secret desire is a dream meal (paid and
+    /// tipped). Otherwise it's judged on how close it is to the order (<see cref="DishSimilarity"/>):
+    /// the exact recipe pays full price, very close and close enough pay part of it, and anything
+    /// further away isn't paid for.
     /// </summary>
     public static class DishJudge
     {
@@ -49,14 +57,28 @@ namespace Cooking.Prototype
         {
             /// <summary>Menu price = ingredient cost × margin.</summary>
             public float Margin;
-            /// <summary>Shared-zone score a substitute needs to be accepted.</summary>
-            public float LikeThreshold;
-            /// <summary>Tip for a substitute that is fully inside the shared zone, as a share of the price.</summary>
-            public float SubstituteTip;
+            public DishSimilarity.Settings Similarity;
+            /// <summary>Combined similarity for "very close".</summary>
+            public float VeryCloseAt;
+            /// <summary>Share of the price paid for "very close".</summary>
+            public float VeryClosePay;
+            /// <summary>Combined similarity for "close enough". Below this they don't pay.</summary>
+            public float CloseEnoughAt;
+            /// <summary>Share of the price paid for "close enough".</summary>
+            public float CloseEnoughPay;
             /// <summary>Tip for a dream meal, as a share of the price.</summary>
             public float DreamTip;
 
-            public static Settings Default => new Settings { Margin = 1.6f, LikeThreshold = 0.5f, SubstituteTip = 0.25f, DreamTip = 1f };
+            public static Settings Default => new Settings
+            {
+                Margin = 1.6f,
+                Similarity = DishSimilarity.Settings.Default,
+                VeryCloseAt = 0.8f,
+                VeryClosePay = 0.8f,
+                CloseEnoughAt = 0.55f,
+                CloseEnoughPay = 0.6f,
+                DreamTip = 1f,
+            };
         }
 
         public static float MenuPrice(RecipeDefinition recipe, float margin)
@@ -89,8 +111,8 @@ namespace Cooking.Prototype
             };
 
             result.ExactMatch = order != null && order.Matches(dish);
+            result.Similarity = DishSimilarity.Compare(order, dish, rules, settings.Similarity);
             result.BestZone = FlavourEvaluator.FindBestZone(result.Dish, zones, falloff);
-            result.SharedZone = FlavourEvaluator.FindSharedZone(result.Ordered, result.Dish, zones, falloff);
 
             if(customer != null && customer.secretDesire != null)
             {
@@ -108,21 +130,26 @@ namespace Cooking.Prototype
             else if(result.DesireScore >= 1f)
             {
                 result.Verdict = Verdict.DreamMeal;
-                result.Payment = result.Price;
+                result.PayShare = 1f;
                 result.Tip = result.Price * settings.DreamTip;
             }
             else if(result.ExactMatch)
             {
                 result.Verdict = Verdict.Ordered;
-                result.Payment = result.Price;
+                result.PayShare = 1f;
             }
-            else if(result.SharedZone.IsMatch && result.SharedZone.Score >= settings.LikeThreshold)
+            else if(result.Similarity.Combined >= settings.VeryCloseAt)
             {
-                result.Verdict = Verdict.LikedSubstitute;
-                result.Payment = result.Price;
-                result.Tip = result.SharedZone.IsInside ? result.Price * settings.SubstituteTip : 0f;
+                result.Verdict = Verdict.VeryClose;
+                result.PayShare = settings.VeryClosePay;
+            }
+            else if(result.Similarity.Combined >= settings.CloseEnoughAt)
+            {
+                result.Verdict = Verdict.CloseEnough;
+                result.PayShare = settings.CloseEnoughPay;
             }
 
+            result.Payment = result.Price * result.PayShare;
             return result;
         }
 

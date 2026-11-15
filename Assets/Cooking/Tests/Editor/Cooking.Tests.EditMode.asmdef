@@ -3,6 +3,7 @@
     "rootNamespace": "Cooking.Tests",
     "references": [
         "Cooking.Runtime",
+        "DialogueSystem.Runtime",
         "Cooking.Prototype",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"

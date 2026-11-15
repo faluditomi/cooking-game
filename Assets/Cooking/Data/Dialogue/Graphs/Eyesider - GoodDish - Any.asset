@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Eyesider - GoodDish - Any
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: 8d9dc540-34fb-42df-95ff-59893dcecd56
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: 959ddc50-505e-4761-99b5-ae2670c82c51
+    kind: 0
+    line:
+      text: ...
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: dce2f04c-2a9a-445f-a1d1-56765730d74c
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 520, y: 0}
+  edges:
+  - fromNodeGuid: 8d9dc540-34fb-42df-95ff-59893dcecd56
+    fromOptionGuid: 
+    toNodeGuid: 959ddc50-505e-4761-99b5-ae2670c82c51
+  - fromNodeGuid: 959ddc50-505e-4761-99b5-ae2670c82c51
+    fromOptionGuid: 
+    toNodeGuid: dce2f04c-2a9a-445f-a1d1-56765730d74c

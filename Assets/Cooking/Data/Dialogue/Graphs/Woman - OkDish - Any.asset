@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Woman - OkDish - Any
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: edff57c2-7963-46cf-9dab-9330512e1d6d
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: af6cdb0d-0f7e-48c3-8ec9-4c8d9bf7fe75
+    kind: 0
+    line:
+      text: It'll do. Don't expect a thank-you.
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: e34d061c-f668-4b0f-8da2-ce7ca784b011
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 520, y: 0}
+  edges:
+  - fromNodeGuid: edff57c2-7963-46cf-9dab-9330512e1d6d
+    fromOptionGuid: 
+    toNodeGuid: af6cdb0d-0f7e-48c3-8ec9-4c8d9bf7fe75
+  - fromNodeGuid: af6cdb0d-0f7e-48c3-8ec9-4c8d9bf7fe75
+    fromOptionGuid: 
+    toNodeGuid: e34d061c-f668-4b0f-8da2-ce7ca784b011

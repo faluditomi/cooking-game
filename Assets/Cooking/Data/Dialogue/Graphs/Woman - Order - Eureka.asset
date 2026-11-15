@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Woman - Order - Eureka
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: 524ca4f7-0dbf-4e88-8842-d263bf7b8903
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: 745e326f-d804-40c3-9f6d-a475592dc654
+    kind: 0
+    line:
+      text: I've been looking at shuttle schedules.
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: f33c8590-7d23-4717-ab64-5017a34ccb85
+    kind: 0
+    line:
+      text: Don't look at me like that. Just cook.
+      delaySeconds: 1.8
+    editorPosition: {x: 520, y: 0}
+  - guid: 835a4f43-2432-4e62-8191-8b0c29525d94
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 780, y: 0}
+  edges:
+  - fromNodeGuid: 524ca4f7-0dbf-4e88-8842-d263bf7b8903
+    fromOptionGuid: 
+    toNodeGuid: 745e326f-d804-40c3-9f6d-a475592dc654
+  - fromNodeGuid: 745e326f-d804-40c3-9f6d-a475592dc654
+    fromOptionGuid: 
+    toNodeGuid: f33c8590-7d23-4717-ab64-5017a34ccb85
+  - fromNodeGuid: f33c8590-7d23-4717-ab64-5017a34ccb85
+    fromOptionGuid: 
+    toNodeGuid: 835a4f43-2432-4e62-8191-8b0c29525d94

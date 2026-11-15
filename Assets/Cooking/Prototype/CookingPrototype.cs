@@ -37,8 +37,20 @@ namespace Cooking.Prototype
         [Header("Orders")]
         [Tooltip("Menu price = ingredient cost × margin.")]
         [SerializeField, Min(0f)] private float margin = 1.6f;
-        [Tooltip("How well an unordered dish must share a zone with the order to be accepted.")]
-        [SerializeField, Range(0f, 1f)] private float likeThreshold = 0.5f;
+        [Header("Good enough (how close a dish must be to the order)")]
+        [Tooltip("Share of similarity that comes from flavour (radar distance); the rest comes from ingredients, prep and cooking.")]
+        [SerializeField, Range(0f, 1f)] private float flavourWeight = 0.5f;
+        [Tooltip("Radar distance at which flavour similarity drops to 0.")]
+        [SerializeField, Min(0.5f)] private float flavourRange = 6f;
+        [SerializeField, Range(0f, 1f)] private float veryCloseAt = 0.8f;
+        [Tooltip("Share of the price paid for a very close dish.")]
+        [SerializeField, Range(0f, 1f)] private float veryClosePay = 0.8f;
+        [Tooltip("Below this similarity they refuse to pay.")]
+        [SerializeField, Range(0f, 1f)] private float closeEnoughAt = 0.55f;
+        [Tooltip("Share of the price paid for a close-enough dish.")]
+        [SerializeField, Range(0f, 1f)] private float closeEnoughPay = 0.6f;
+        [Tooltip("Off: orders have no timer and nothing is ever late (the calmer 'social kitchen' version). Can also be switched in game each morning.")]
+        [SerializeField] private bool timedOrders = true;
         [Tooltip("Order timer = base + per unit of ingredient + per prep step the recipe needs.")]
         [SerializeField, Min(5f)] private float orderBaseSeconds = 30f;
         [SerializeField, Min(0f)] private float orderSecondsPerUnit = 4f;
@@ -80,12 +92,14 @@ namespace Cooking.Prototype
         {
             public Text Customer;
             public Text Line;
+            public Text Speech;
             public Text Order;
             public Text Timer;
             public GameObject TimerBar;
             public RectTransform TimerFill;
             public Image TimerFillImage;
             public Button TakeOrder;
+            public Button TimerToggle;
         }
 
         // Day state
@@ -154,6 +168,7 @@ namespace Cooking.Prototype
             CreateKitchenState();
             EnsureEventSystem();
             BuildUI();
+            InitNpcs();
             StartDay();
         }
 
@@ -163,8 +178,9 @@ namespace Cooking.Prototype
 
             // The kitchen keeps cooking and the clock keeps running whichever area you're in.
             TickKitchen(Time.deltaTime);
-            if(orderTaken) orderTimeLeft -= Time.deltaTime;
+            if(orderTaken && timedOrders) orderTimeLeft -= Time.deltaTime;
             UpdateTicketTimers();
+            CheckHurry();
         }
 
         // ------------------------------------------------------------------ Day flow
@@ -176,6 +192,7 @@ namespace Cooking.Prototype
             happyToday = 0;
             spentToday = 0f;
             earnedToday = 0f;
+            progressToday.Clear();
             customer = null;
             order = null;
             orderTaken = false;
@@ -228,8 +245,9 @@ namespace Cooking.Prototype
             }
 
             customer = customers[customerIndex];
-            List<RecipeDefinition> options = customer.orders != null && customer.orders.Count > 0 ? customer.orders : menu;
-            order = options.Count > 0 ? options[random.Next(options.Count)] : null;
+            // What they order grows as they like things; after their dream meal, it's always that.
+            order = Relationship(customer).PickOrder(random, menu);
+            BeginVisit();
             orderProfile = order != null ? order.CalculateProfile(rules) : FlavourProfile.Zero;
             orderZone = FlavourEvaluator.FindBestZone(orderProfile, zones, Falloff).Zone;
             orderLine = customer.GetOrderLine(order, random);
@@ -246,7 +264,21 @@ namespace Cooking.Prototype
             orderTaken = true;
             orderDuration = OrderSeconds(order);
             orderTimeLeft = orderDuration;
-            Say(customer.name + ": \"" + orderLine + "\"  You have " + FormatTime(orderDuration) + ".");
+            Say(customer.name + ": \"" + orderLine + "\"" + (timedOrders ? "  You have " + FormatTime(orderDuration) + "." : ""));
+            OnOrderTaken();
+            Speak(DialogueSystem.DialogueEventType.Order, null);
+            RefreshAll();
+        }
+
+        /// <summary>Switches between timed orders and the untimed version. Mornings only, so a day is all one or the other.</summary>
+        private void ToggleTimedOrders()
+        {
+            if(phase != Phase.Morning) return;
+
+            timedOrders = !timedOrders;
+            Say(timedOrders
+                ? "Timed orders: each order has a timer, and late dishes get no tip."
+                : "Untimed orders: take as long as you like. Nothing is ever late.");
             RefreshAll();
         }
 
@@ -285,8 +317,12 @@ namespace Cooking.Prototype
             servedToday++;
             if(result.IsHappy) happyToday++;
 
-            ShowResult(result);
+            RelationshipChange change = RecordServe(result);
+            ShowResult(result, change);
             ClearPlate();
+
+            // Their eureka: a dish nobody made before. Name it for the recipe book.
+            if(change.StageChanged && change.After == NpcStage.Eureka) ShowNamingPrompt(Relationship(customer));
         }
 
         private void AfterResult()
@@ -312,6 +348,7 @@ namespace Cooking.Prototype
             sb.Append("Spent at the store <b>$").Append(spentToday.ToString("0.00")).Append("</b>\n");
             float net = earnedToday - spentToday;
             sb.Append("Net <b><color=#").Append(net >= 0f ? "73cc73" : "e5594d").Append(">$").Append(net.ToString("0.00")).Append("</color></b>\n\n");
+            sb.Append(DescribeProgressToday());
 
             if(spoiled.Count > 0)
             {
@@ -374,6 +411,7 @@ namespace Cooking.Prototype
             }
 
             area = target;
+            if(recipeBookOverlay != null) recipeBookOverlay.SetActive(false);
             foreach(KeyValuePair<Area, GameObject> pair in areaRoots) pair.Value.SetActive(pair.Key == target);
             RefreshAll();
         }
@@ -403,6 +441,7 @@ namespace Cooking.Prototype
             RefreshPrep();
             RefreshKitchen();
             RefreshTickets();
+            RefreshRecipeBook();
         }
 
         // ------------------------------------------------------------------ Ticket
@@ -412,8 +451,10 @@ namespace Cooking.Prototype
             foreach(TicketView ticket in tickets)
             {
                 ticket.TakeOrder.transform.parent.gameObject.SetActive(phase == Phase.Service && customer != null && !orderTaken);
-                ticket.TimerBar.SetActive(phase == Phase.Service && orderTaken);
-                ticket.Timer.gameObject.SetActive(phase == Phase.Service && orderTaken);
+                ticket.TimerBar.SetActive(timedOrders && phase == Phase.Service && orderTaken);
+                ticket.Timer.gameObject.SetActive(timedOrders && phase == Phase.Service && orderTaken);
+                ticket.TimerToggle.transform.parent.gameObject.SetActive(phase == Phase.Morning);
+                UIFactory.SetButtonText(ticket.TimerToggle, timedOrders ? "Timed orders: on" : "Timed orders: off");
 
                 if(phase == Phase.Morning)
                 {
@@ -424,7 +465,7 @@ namespace Cooking.Prototype
                 }
                 else if(phase == Phase.Service && customer != null)
                 {
-                    ticket.Customer.text = customer.name;
+                    ticket.Customer.text = customer.name + "  <size=17><color=#a6a199>" + StageLabel(Relationship(customer).Stage) + "</color></size>";
 
                     if(orderTaken)
                     {
@@ -478,18 +519,26 @@ namespace Cooking.Prototype
 
             foreach(Customer regular in customers)
             {
-                sb.Append("<color=#f28c33>").Append(regular.name).Append("</color>: ");
+                CustomerRelationship relationship = Relationship(regular);
+                sb.Append("<color=#f28c33>").Append(regular.name).Append("</color> <color=#77736d>(")
+                  .Append(StageLabel(relationship.Stage)).Append(")</color>: ");
 
-                if(regular.orders == null || regular.orders.Count == 0)
+                if(relationship.DreamMeal != null)
+                {
+                    sb.Append("always ").Append(relationship.DreamMeal.DisplayName).Append('\n');
+                    continue;
+                }
+
+                if(relationship.LikedMeals.Count == 0)
                 {
                     sb.Append("anything on the menu\n");
                     continue;
                 }
 
-                for(int i = 0; i < regular.orders.Count; i++)
+                for(int i = 0; i < relationship.LikedMeals.Count; i++)
                 {
                     if(i > 0) sb.Append(", ");
-                    sb.Append(regular.orders[i] != null ? regular.orders[i].DisplayName : "?");
+                    sb.Append(relationship.LikedMeals[i].DisplayName);
                 }
 
                 sb.Append('\n');
@@ -557,6 +606,7 @@ namespace Cooking.Prototype
                 sb.Append("• ").Append(Describe(portion, true)).Append("  ").Append(readiness).Append('\n');
             }
 
+            sb.Append("<color=#a6a199>Steps are in the Recipe book.</color>\n");
             sb.Append("\nMenu price <b>$").Append(DishJudge.MenuPrice(recipe, margin).ToString("0.00")).Append("</b>");
 
             if(orderZone != null)
@@ -575,6 +625,26 @@ namespace Cooking.Prototype
             messageText.color = color ?? UIFactory.TextColor;
         }
 
+        /// <summary>"Similar to the order: 76% (flavour 82%, ingredients 70%) → Close enough".</summary>
+        private string DescribeSimilarity(JudgeResult result)
+        {
+            if(result.ExactMatch) return "Similar to the order: <color=#73cc73>exact</color>";
+
+            Similarity s = result.Similarity;
+            string tier = s.Combined >= veryCloseAt ? "<color=#73cc73>very close</color>"
+                : s.Combined >= closeEnoughAt ? "<color=#f28c33>close enough</color>"
+                : "<color=#e5594d>too different</color>";
+
+            return "Similar to the order: <b>" + Percent(s.Combined) + "</b> " + tier
+                   + "\n<color=#a6a199>  flavour " + Percent(s.Flavour) + ", ingredients " + Percent(s.Ingredients)
+                   + ". Very close from " + Percent(veryCloseAt) + ", close enough from " + Percent(closeEnoughAt) + ".</color>";
+        }
+
+        private static string Percent(float value)
+        {
+            return (value * 100f).ToString("0") + "%";
+        }
+
         private static string ZoneText(FlavourZoneMatch match)
         {
             if(!match.IsMatch) return "<color=#a6a199>none</color>";
@@ -584,7 +654,7 @@ namespace Cooking.Prototype
 
         // ------------------------------------------------------------------ Result
 
-        private void ShowResult(JudgeResult result)
+        private void ShowResult(JudgeResult result, RelationshipChange change)
         {
             overlayOpen = true;
             resultOverlay.SetActive(true);
@@ -599,48 +669,54 @@ namespace Cooking.Prototype
                     title = "Dream meal!"; line = customer.dreamLine; color = UIFactory.Accent; break;
                 case Verdict.Ordered:
                     title = "Just what they ordered"; line = customer.likedLine; color = UIFactory.Good; break;
-                case Verdict.LikedSubstitute:
-                    title = "Not what they ordered, but they like it"; line = customer.likedLine; color = UIFactory.Good; break;
+                case Verdict.VeryClose:
+                    title = "Very close. They're happy with it"; line = customer.likedLine; color = UIFactory.Good; break;
+                case Verdict.CloseEnough:
+                    title = "Close enough. They pay, but not all of it"; line = "It's... fine."; color = UIFactory.Accent; break;
                 case Verdict.Refused:
                     title = "Refused"; line = customer.refusedLine; color = UIFactory.Bad; break;
                 default:
-                    title = "They didn't like it"; line = customer.dislikedLine; color = UIFactory.Bad; break;
+                    title = "Too different. They won't pay"; line = customer.dislikedLine; color = UIFactory.Bad; break;
             }
 
-            if(result.Late && result.IsPaid)
+            if(result.Late && result.IsPaid && result.Verdict != Verdict.DreamMeal)
             {
                 title = "Late. They paid, but they're not happy";
                 line = "Took you long enough.";
                 color = UIFactory.Accent;
             }
 
-            resultTitle.text = title + "\n<size=22><i>" + customer.name + ": \"" + line + "\"</i></size>";
+            resultTitle.text = title;
             resultTitle.color = color;
 
+            // What they say comes from the dialogue catalog (lines stream in below the title),
+            // or the customer's fallback line when the catalog has nothing for this moment.
+            Speak(CustomerDialogue.EventFor(result), line);
+
             StringBuilder sb = new StringBuilder();
+            sb.Append(DescribeChange(change));
             sb.Append("<b>Ordered</b>  ").Append(order != null ? order.DisplayName : "-").Append('\n');
             sb.Append("<b>Served</b>\n");
             foreach(IngredientPortion portion in plate) sb.Append("  ").Append(Describe(portion, true)).Append('\n');
 
             if(result.Late) sb.Append("\n<color=#e5594d>Served ").Append(FormatTime(-orderTimeLeft)).Append(" late: no tip.</color>\n");
-            else sb.Append("\n<color=#73cc73>On time, with ").Append(FormatTime(orderTimeLeft)).Append(" to spare.</color>\n");
+            else if(timedOrders) sb.Append("\n<color=#73cc73>On time, with ").Append(FormatTime(orderTimeLeft)).Append(" to spare.</color>\n");
 
             sb.Append("\n<b>Flavour</b>\n<size=17>").Append(result.Dish.ToString()).Append("</size>\n\n");
-            sb.Append("Exact order: ").Append(result.ExactMatch ? "<color=#73cc73>yes</color>" : "no").Append('\n');
+            sb.Append(DescribeSimilarity(result)).Append('\n');
             sb.Append("Best zone: ").Append(ZoneText(result.BestZone)).Append('\n');
-            sb.Append("Same zone as the order: ").Append(ZoneText(result.SharedZone)).Append('\n');
             if(result.RefusedIngredient != null) sb.Append("Won't eat: <color=#e5594d>").Append(result.RefusedIngredient.DisplayName).Append("</color>\n");
             if(result.DesireScore >= 0f) sb.Append("<color=#a6a199>Secret desire (debug): ").Append((result.DesireScore * 100f).ToString("0")).Append("%</color>\n");
 
             float profit = result.Payment + result.Tip - dishCost;
             sb.Append("\nPaid <b>$").Append(result.Payment.ToString("0.00")).Append("</b>");
+            if(result.IsPaid && result.PayShare < 1f) sb.Append("  <color=#a6a199>(").Append((result.PayShare * 100f).ToString("0")).Append("% of $").Append(result.Price.ToString("0.00")).Append(")</color>");
             if(result.Tip > 0f) sb.Append("  + tip <b>$").Append(result.Tip.ToString("0.00")).Append("</b>");
             sb.Append("\nIngredients used $").Append(dishCost.ToString("0.00"));
             sb.Append("\nProfit <b><color=#").Append(profit >= 0f ? "73cc73" : "e5594d").Append(">$").Append(profit.ToString("0.00")).Append("</color></b>");
             resultBody.text = sb.ToString();
 
-            FlavourZone highlight = result.SharedZone.Zone != null ? result.SharedZone.Zone : result.BestZone.Zone;
-            resultRadar.SetHighlight(highlight);
+            resultRadar.SetHighlight(result.BestZone.Zone);
             resultRadar.ClearProfiles();
             resultRadar.AddProfile(result.Ordered, new Color(0.85f, 0.85f, 0.85f, 0.7f), false);
             resultRadar.AddProfile(result.Dish, UIFactory.Accent, true);
@@ -692,8 +768,11 @@ namespace Cooking.Prototype
             areaRoots[Area.Prep] = BuildPrepArea(AreaRoot(content, "Prep Area"));
             areaRoots[Area.Kitchen] = BuildKitchenArea(AreaRoot(content, "Kitchen Area"));
 
+            // The book sits over the areas; result and summary screens go on top of it.
+            BuildRecipeBook(root);
             BuildResultOverlay(root);
             BuildSummaryOverlay(root);
+            BuildNamingPrompt(root);
         }
 
         private static RectTransform AreaRoot(RectTransform parent, string name)
@@ -715,17 +794,21 @@ namespace Cooking.Prototype
             UIFactory.Place(title.rectTransform, 0f, 0f, 0.17f, 1f).offsetMin = new Vector2(20f, 0f);
 
             RectTransform tabRow = UIFactory.Rect(top, "Tabs");
-            UIFactory.Place(tabRow, 0.17f, 0f, 0.52f, 1f, 8f);
+            UIFactory.Place(tabRow, 0.17f, 0f, 0.47f, 1f, 8f);
             UIFactory.Horizontal(tabRow.gameObject, 8f);
             tabs[Area.Store] = UIFactory.Button(tabRow, "Store", () => ShowArea(Area.Store), null, 20);
             tabs[Area.Prep] = UIFactory.Button(tabRow, "Prep", () => ShowArea(Area.Prep), null, 20);
             tabs[Area.Kitchen] = UIFactory.Button(tabRow, "Kitchen", () => ShowArea(Area.Kitchen), null, 20);
 
+            // Always available, whichever area you're in.
+            recipeBookButton = UIFactory.Button(top, "Recipe book", ToggleRecipeBook, new Color(0.3f, 0.36f, 0.5f, 1f), 20);
+            UIFactory.Place((RectTransform)recipeBookButton.transform, 0.47f, 0f, 0.59f, 1f, 8f);
+
             dayText = UIFactory.Label(top, "", 22, TextAnchor.MiddleCenter);
-            UIFactory.Place(dayText.rectTransform, 0.52f, 0f, 0.7f, 1f);
+            UIFactory.Place(dayText.rectTransform, 0.59f, 0f, 0.72f, 1f);
 
             phaseButton = UIFactory.Button(top, "Open the stall →", OpenStall, new Color(0.75f, 0.42f, 0.15f, 1f), 20);
-            UIFactory.Place((RectTransform)phaseButton.transform, 0.7f, 0f, 0.86f, 1f, 8f);
+            UIFactory.Place((RectTransform)phaseButton.transform, 0.72f, 0f, 0.86f, 1f, 8f);
 
             moneyText = UIFactory.Label(top, "", 30, TextAnchor.MiddleRight, FontStyle.Bold, UIFactory.Good);
             UIFactory.Place(moneyText.rectTransform, 0.86f, 0f, 1f, 1f).offsetMax = new Vector2(-20f, 0f);
@@ -757,9 +840,13 @@ namespace Cooking.Prototype
             Header(column, "CUSTOMER");
             ticket.Customer = UIFactory.Label(column, "", 30, TextAnchor.UpperLeft, FontStyle.Bold, UIFactory.Accent);
             ticket.Line = UIFactory.Label(column, "", 19, TextAnchor.UpperLeft, FontStyle.Italic);
+            ticket.Speech = UIFactory.Label(column, "", 18, TextAnchor.UpperLeft, FontStyle.Italic);
 
             RectTransform row = UIFactory.Row(column, 50f);
             ticket.TakeOrder = UIFactory.Button(row, "Take order", TakeOrder, new Color(0.75f, 0.42f, 0.15f, 1f), 22);
+
+            RectTransform toggleRow = UIFactory.Row(column, 40f);
+            ticket.TimerToggle = UIFactory.Button(toggleRow, "", ToggleTimedOrders, null, 18);
 
             Image timerBack = UIFactory.Panel(column, "Timer", new Color(0.08f, 0.08f, 0.09f, 1f));
             UIFactory.Size(timerBack, 16f, 0f);
@@ -843,6 +930,7 @@ namespace Cooking.Prototype
             layout.childForceExpandHeight = false;
 
             resultTitle = UIFactory.Label(right, "", 34, TextAnchor.UpperLeft, FontStyle.Bold);
+            resultSpeech = UIFactory.Label(right, "", 21, TextAnchor.UpperLeft, FontStyle.Italic);
             resultBody = UIFactory.Label(right, "", 19);
             UIFactory.Size(resultBody, -1f, 1f);
             RectTransform row = UIFactory.Row(right, 56f);

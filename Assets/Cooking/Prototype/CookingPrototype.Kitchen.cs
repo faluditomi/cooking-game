@@ -181,11 +181,13 @@ namespace Cooking.Prototype
             {
                 station.AddAll(batch);
                 Say(units + (units == 1 ? " unit" : " units") + " → " + station.Name + (station.IsSoup ? " (soup)." : ".") + " Press Start when it's all in.");
+                LogCooking(station.Name, "Put in " + ListPortions(batch) + (station.IsSoup ? " (soup)." : "."));
             }
             else
             {
                 foreach(IngredientPortion portion in batch) AddToPlate(portion);
                 Say(units + (units == 1 ? " unit" : " units") + " → plate, raw.");
+                LogCooking("Plate", "Raw onto the plate: " + ListPortions(batch) + ".");
             }
 
             dishCost += cost;
@@ -195,17 +197,27 @@ namespace Cooking.Prototype
 
         private void StartStation(StationView view)
         {
-            if(view.Station.StartCooking()) Say(view.Station.Name + " on. Watch the bar.");
+            if(view.Station.StartCooking())
+            {
+                Say(view.Station.Name + " on. Watch the bar.");
+                if(view.Station == wok) shakesThisCook = 0;
+                LogCooking(view.Station.Name, "Started" + (view.Station.IsSoup ? " the soup." : "."));
+            }
+
             RefreshAll();
         }
 
         private void TakeOff(StationView view)
         {
             Doneness doneness = view.Station.CurrentDoneness;
+            float progress = view.Station.Progress;
             List<IngredientPortion> cooked = view.Station.TakeOff();
             if(cooked.Count == 0) return;
 
             foreach(IngredientPortion portion in cooked) AddToPlate(portion);
+
+            string shakes = view.Station == wok && shakesThisCook > 0 ? ", after " + shakesThisCook + (shakesThisCook == 1 ? " shake" : " shakes") : "";
+            LogCooking(view.Station.Name, "Took it off at " + (progress * 100f).ToString("0") + "%: " + DonenessLabel(doneness) + shakes + ".");
 
             Say(view.Station.Name + " → plate: " + DonenessLabel(doneness) + ".", doneness == Doneness.Perfect ? UIFactory.Good : UIFactory.Bad);
             RefreshAll();
@@ -213,6 +225,7 @@ namespace Cooking.Prototype
 
         private void BinStation(StationView view)
         {
+            LogCooking(view.Station.Name, "Binned " + ListPortions(view.Station.Contents) + ".");
             view.Station.Clear();
             Say("Binned the " + view.Station.Name.ToLowerInvariant() + ".");
             RefreshAll();
@@ -235,6 +248,7 @@ namespace Cooking.Prototype
 
         private void BinPlate()
         {
+            LogCooking("Plate", "Binned the plate: " + ListPortions(plate) + ".");
             ClearPlate();
             Say("Binned the plate.");
             RefreshAll();
@@ -260,12 +274,20 @@ namespace Cooking.Prototype
                 return;
             }
 
+            JudgeResult result = DishJudge.Judge(order, plate, customer, zones, rules, JudgeSettings(), late: timedOrders && orderTimeLeft < 0f);
+            FinishOrder(result);
+        }
+
+        private DishJudge.Settings JudgeSettings()
+        {
             DishJudge.Settings settings = DishJudge.Settings.Default;
             settings.Margin = margin;
-            settings.LikeThreshold = likeThreshold;
-
-            JudgeResult result = DishJudge.Judge(order, plate, customer, zones, rules, settings, late: orderTimeLeft < 0f);
-            FinishOrder(result);
+            settings.Similarity = new DishSimilarity.Settings { FlavourWeight = flavourWeight, FlavourRange = flavourRange };
+            settings.VeryCloseAt = veryCloseAt;
+            settings.VeryClosePay = veryClosePay;
+            settings.CloseEnoughAt = closeEnoughAt;
+            settings.CloseEnoughPay = closeEnoughPay;
+            return settings;
         }
 
         // ------------------------------------------------------------------ Wok shaking
@@ -281,13 +303,39 @@ namespace Cooking.Prototype
             wokPad.AddTrailPoint(position);
             if(!shakeGesture.Move(position)) return;
 
-            if(wok.Shake()) Say("Wok magic!", UIFactory.Accent);
+            if(wok.Shake())
+            {
+                shakesThisCook++;
+                Say("Wok magic!", UIFactory.Accent);
+            }
             else if(wok.IsCooking && wok.Progress < wok.DangerStart - 0.1f) Say("No need to shake yet. Wait for the red.");
         }
 
         private void OnWokReleased()
         {
             shakeGesture.End();
+        }
+
+        private int shakesThisCook;
+
+        /// <summary>"2× Rice, 1× Onion (peeled, sliced)" for the history.</summary>
+        private static string ListPortions(IReadOnlyList<IngredientPortion> portions)
+        {
+            List<string> items = new List<string>();
+
+            foreach(IngredientPortion portion in portions)
+            {
+                if(portion == null || !portion.IsValid) continue;
+                string item = portion.quantity + "× " + portion.ingredient.DisplayName;
+                List<string> prep = new List<string>();
+                if((portion.prep & PrepSteps.Peeled) != 0) prep.Add("peeled");
+                if((portion.prep & PrepSteps.Sliced) != 0) prep.Add("sliced");
+                if((portion.prep & PrepSteps.Grated) != 0) prep.Add("grated");
+                if(prep.Count > 0) item += " (" + string.Join(", ", prep) + ")";
+                items.Add(item);
+            }
+
+            return items.Count > 0 ? string.Join(", ", items) : "nothing";
         }
 
         // ------------------------------------------------------------------ UI

@@ -1,0 +1,58 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Woman - DreamMeal - Any
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: 76681814-1203-4947-a500-2aec61b61252
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: 0e79540c-7e5f-4f9d-9e20-2ad9f47bf7d6
+    kind: 0
+    line:
+      text: ...
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: 73dfc544-7594-4f74-96c1-f0a95feb3064
+    kind: 0
+    line:
+      text: I used to make this. For someone.
+      delaySeconds: 1.8
+    editorPosition: {x: 520, y: 0}
+  - guid: a179a246-5813-4ce2-acd3-1131f942aef3
+    kind: 0
+    line:
+      text: I have to go. I have to find them before the flux finds me.
+      delaySeconds: 1.8
+    editorPosition: {x: 780, y: 0}
+  - guid: 8a3ce5a1-b5df-4a84-8a54-0d31abf44dbe
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 1040, y: 0}
+  edges:
+  - fromNodeGuid: 76681814-1203-4947-a500-2aec61b61252
+    fromOptionGuid: 
+    toNodeGuid: 0e79540c-7e5f-4f9d-9e20-2ad9f47bf7d6
+  - fromNodeGuid: 0e79540c-7e5f-4f9d-9e20-2ad9f47bf7d6
+    fromOptionGuid: 
+    toNodeGuid: 73dfc544-7594-4f74-96c1-f0a95feb3064
+  - fromNodeGuid: 73dfc544-7594-4f74-96c1-f0a95feb3064
+    fromOptionGuid: 
+    toNodeGuid: a179a246-5813-4ce2-acd3-1131f942aef3
+  - fromNodeGuid: a179a246-5813-4ce2-acd3-1131f942aef3
+    fromOptionGuid: 
+    toNodeGuid: 8a3ce5a1-b5df-4a84-8a54-0d31abf44dbe

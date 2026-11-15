@@ -9,14 +9,18 @@ namespace Cooking.Prototype
     public class Customer
     {
         public string name = "Eyesider";
-        [Tooltip("Dishes they order. Empty means anything on the menu.")]
+        [Tooltip("Which NPC this is in the DialogueSystem catalog. None uses the fallback lines below.")]
+        public DialogueSystem.DialogueNpcId dialogueId;
+        [Tooltip("Happy meals before they warm up to you (Dejected → Warmed up). The design doc says 2–3.")]
+        [Min(1)] public int happyMealsToWarmUp = 2;
+        [Tooltip("Dishes they order at first. Empty means anything on the menu. Liked dishes get added as you go.")]
         public List<RecipeDefinition> orders = new List<RecipeDefinition>();
         [Tooltip("Hitting this zone is their dream meal. Optional.")]
         public FlavourZone secretDesire;
         [Tooltip("They refuse any dish containing these.")]
         public List<IngredientDefinition> refuses = new List<IngredientDefinition>();
 
-        [Header("Lines ({0} is the dish name)")]
+        [Header("Order line ({0} is the dish name). Other lines are fallbacks for when the dialogue catalog has none.")]
         public List<string> orderLines = new List<string>();
         public string likedLine = "...";
         public string dislikedLine = "...";

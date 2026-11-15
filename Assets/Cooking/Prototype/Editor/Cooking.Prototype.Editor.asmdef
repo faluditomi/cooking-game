@@ -4,6 +4,8 @@
     "references": [
         "Cooking.Runtime",
         "Cooking.Prototype",
+        "DialogueSystem.Runtime",
+        "DialogueSystem.Editor",
         "UnityEngine.UI",
         "Unity.InputSystem"
     ],

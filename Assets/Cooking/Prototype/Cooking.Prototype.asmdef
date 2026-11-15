@@ -3,6 +3,7 @@
     "rootNamespace": "Cooking.Prototype",
     "references": [
         "Cooking.Runtime",
+        "DialogueSystem.Runtime",
         "UnityEngine.UI",
         "Unity.InputSystem"
     ],

@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Man - LateDish - Any
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: 15216abd-4e4f-4d2b-b512-6aa933ca0cc8
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: a9d1d1bd-cd42-4423-872d-bbef74dfb383
+    kind: 0
+    line:
+      text: The kids are waiting, you know.
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: 285ad9db-d8b2-4612-b670-2babb9244154
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 520, y: 0}
+  edges:
+  - fromNodeGuid: 15216abd-4e4f-4d2b-b512-6aa933ca0cc8
+    fromOptionGuid: 
+    toNodeGuid: a9d1d1bd-cd42-4423-872d-bbef74dfb383
+  - fromNodeGuid: a9d1d1bd-cd42-4423-872d-bbef74dfb383
+    fromOptionGuid: 
+    toNodeGuid: 285ad9db-d8b2-4612-b670-2babb9244154
