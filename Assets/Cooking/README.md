@@ -121,6 +121,10 @@ tracks units per prep state ("3× Onion raw", "1× Onion peeled, sliced").
    - Everything in a station comes off at once with the same doneness.
    - **Serve**: the dish is judged (`DishJudge`) and its flavour is revealed on the radar next to
      the order. **Late** (timer at zero) still pays, but never tips, and the customer isn't happy.
+   - **Untimed orders**: to compare the "time trial gauntlet" and "zen social kitchen" vibes
+     (design doc TODO), switch **Timed orders** off on the ticket in the morning, or untick
+     `timedOrders` on the `Cooking Prototype` object. With it off, there's no countdown and nothing
+     is ever late. It can only change in the morning, so a whole day plays one way.
 4. **End of day**: a summary of what you earned and spent, and who left happy. Anything left in
    the stations or on the board is binned. **Prepped stock spoils; raw stock carries over.**
 

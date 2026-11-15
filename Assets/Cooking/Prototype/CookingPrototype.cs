@@ -39,6 +39,8 @@ namespace Cooking.Prototype
         [SerializeField, Min(0f)] private float margin = 1.6f;
         [Tooltip("How well an unordered dish must share a zone with the order to be accepted.")]
         [SerializeField, Range(0f, 1f)] private float likeThreshold = 0.5f;
+        [Tooltip("Off: orders have no timer and nothing is ever late (the calmer 'social kitchen' version). Can also be switched in game each morning.")]
+        [SerializeField] private bool timedOrders = true;
         [Tooltip("Order timer = base + per unit of ingredient + per prep step the recipe needs.")]
         [SerializeField, Min(5f)] private float orderBaseSeconds = 30f;
         [SerializeField, Min(0f)] private float orderSecondsPerUnit = 4f;
@@ -86,6 +88,7 @@ namespace Cooking.Prototype
             public RectTransform TimerFill;
             public Image TimerFillImage;
             public Button TakeOrder;
+            public Button TimerToggle;
         }
 
         // Day state
@@ -163,7 +166,7 @@ namespace Cooking.Prototype
 
             // The kitchen keeps cooking and the clock keeps running whichever area you're in.
             TickKitchen(Time.deltaTime);
-            if(orderTaken) orderTimeLeft -= Time.deltaTime;
+            if(orderTaken && timedOrders) orderTimeLeft -= Time.deltaTime;
             UpdateTicketTimers();
         }
 
@@ -246,7 +249,19 @@ namespace Cooking.Prototype
             orderTaken = true;
             orderDuration = OrderSeconds(order);
             orderTimeLeft = orderDuration;
-            Say(customer.name + ": \"" + orderLine + "\"  You have " + FormatTime(orderDuration) + ".");
+            Say(customer.name + ": \"" + orderLine + "\"" + (timedOrders ? "  You have " + FormatTime(orderDuration) + "." : ""));
+            RefreshAll();
+        }
+
+        /// <summary>Switches between timed orders and the untimed version. Mornings only, so a day is all one or the other.</summary>
+        private void ToggleTimedOrders()
+        {
+            if(phase != Phase.Morning) return;
+
+            timedOrders = !timedOrders;
+            Say(timedOrders
+                ? "Timed orders: each order has a timer, and late dishes get no tip."
+                : "Untimed orders: take as long as you like. Nothing is ever late.");
             RefreshAll();
         }
 
@@ -412,8 +427,10 @@ namespace Cooking.Prototype
             foreach(TicketView ticket in tickets)
             {
                 ticket.TakeOrder.transform.parent.gameObject.SetActive(phase == Phase.Service && customer != null && !orderTaken);
-                ticket.TimerBar.SetActive(phase == Phase.Service && orderTaken);
-                ticket.Timer.gameObject.SetActive(phase == Phase.Service && orderTaken);
+                ticket.TimerBar.SetActive(timedOrders && phase == Phase.Service && orderTaken);
+                ticket.Timer.gameObject.SetActive(timedOrders && phase == Phase.Service && orderTaken);
+                ticket.TimerToggle.transform.parent.gameObject.SetActive(phase == Phase.Morning);
+                UIFactory.SetButtonText(ticket.TimerToggle, timedOrders ? "Timed orders: on" : "Timed orders: off");
 
                 if(phase == Phase.Morning)
                 {
@@ -623,7 +640,7 @@ namespace Cooking.Prototype
             foreach(IngredientPortion portion in plate) sb.Append("  ").Append(Describe(portion, true)).Append('\n');
 
             if(result.Late) sb.Append("\n<color=#e5594d>Served ").Append(FormatTime(-orderTimeLeft)).Append(" late: no tip.</color>\n");
-            else sb.Append("\n<color=#73cc73>On time, with ").Append(FormatTime(orderTimeLeft)).Append(" to spare.</color>\n");
+            else if(timedOrders) sb.Append("\n<color=#73cc73>On time, with ").Append(FormatTime(orderTimeLeft)).Append(" to spare.</color>\n");
 
             sb.Append("\n<b>Flavour</b>\n<size=17>").Append(result.Dish.ToString()).Append("</size>\n\n");
             sb.Append("Exact order: ").Append(result.ExactMatch ? "<color=#73cc73>yes</color>" : "no").Append('\n');
@@ -760,6 +777,9 @@ namespace Cooking.Prototype
 
             RectTransform row = UIFactory.Row(column, 50f);
             ticket.TakeOrder = UIFactory.Button(row, "Take order", TakeOrder, new Color(0.75f, 0.42f, 0.15f, 1f), 22);
+
+            RectTransform toggleRow = UIFactory.Row(column, 40f);
+            ticket.TimerToggle = UIFactory.Button(toggleRow, "", ToggleTimedOrders, null, 18);
 
             Image timerBack = UIFactory.Panel(column, "Timer", new Color(0.08f, 0.08f, 0.09f, 1f));
             UIFactory.Size(timerBack, 16f, 0f);

@@ -264,7 +264,7 @@ namespace Cooking.Prototype
             settings.Margin = margin;
             settings.LikeThreshold = likeThreshold;
 
-            JudgeResult result = DishJudge.Judge(order, plate, customer, zones, rules, settings, late: orderTimeLeft < 0f);
+            JudgeResult result = DishJudge.Judge(order, plate, customer, zones, rules, settings, late: timedOrders && orderTimeLeft < 0f);
             FinishOrder(result);
         }
 
