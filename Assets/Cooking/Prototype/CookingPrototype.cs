@@ -184,12 +184,19 @@ namespace Cooking.Prototype
             resultOverlay.SetActive(false);
 
             ShowArea(Area.Store);
-            Say("Day " + day + ". Buy what you need for " + customersPerDay + " customers, prep what you can, then open the stall.");
+            Say("Day " + day + ". Fill the cart for " + customersPerDay + " customers and check out, prep what you can, then open the stall.");
         }
 
         private void OpenStall()
         {
             if(phase != Phase.Morning) return;
+
+            if(!cart.IsEmpty)
+            {
+                Say("You still have " + cart.TotalUnits + " units in the cart. Buy them or clear the cart before opening.", UIFactory.Bad);
+                ShowArea(Area.Store);
+                return;
+            }
 
             if(inventory.IsEmpty && boardUnit == null)
             {

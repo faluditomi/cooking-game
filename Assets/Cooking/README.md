@@ -98,8 +98,12 @@ The game runs in days, and there are three areas you switch between with the tab
 **Store**, **Prep** and **Kitchen**. Everything you buy goes into your stock (`Inventory`), which
 tracks units per prep state ("3× Onion raw", "1× Onion peeled, sliced").
 
-1. **Morning** (untimed). The **Store** is open: buy what you think the day needs. The menu panel
-   shows each dish's ingredients as have/need, and who tends to order what. On the **Prep** board, prep
+1. **Morning** (untimed). The **Store** is open. Fill a cart (`ShoppingCart`) and pay for it all
+   at once with **Buy everything**; nothing is bought before that. Add ingredients one at a time
+   from the shelf (−, +1, +5), or by dish from the menu: **+ One serving** adds a full set of that
+   dish's ingredients, and **+ What's missing** adds only what your stock plus cart doesn't already
+   cover for one serving. The menu shows have/need per ingredient (stock + cart) and who tends to
+   order what. You can't open the stall with an unpaid cart. On the **Prep** board, prep
    stock one unit at a time (as in the design doc): put a unit on the board, pick up a tool, do its
    gesture, then put it back. It goes back into stock prepped. The Kitchen is locked.
 2. **Open the stall** (top bar). The Store closes until tomorrow.
