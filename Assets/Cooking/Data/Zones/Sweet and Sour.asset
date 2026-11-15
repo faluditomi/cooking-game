@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce3b2af0cee65f04b8b8553a214d35ac, type: 3}
+  m_Name: Sweet and Sour
+  m_EditorClassIdentifier: Cooking.Runtime::Cooking.FlavourZone
+  displayName: Sweet & Sour
+  color: {r: 0.9, g: 0.4, b: 0.7, a: 1}
+  description: Bright and tangy. Nobody on the Eye cooks like this anymore.
+  min:
+    savoury: 0
+    salty: 0
+    sweet: 2
+    bitter: 0
+    sour: 2
+    pain: 0
+    nutrition: 0
+    texture: 0
+  max:
+    savoury: 8
+    salty: 5
+    sweet: 7
+    bitter: 3
+    sour: 7
+    pain: 4
+    nutrition: 10
+    texture: 10

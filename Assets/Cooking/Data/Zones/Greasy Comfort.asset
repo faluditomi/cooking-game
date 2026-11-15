@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce3b2af0cee65f04b8b8553a214d35ac, type: 3}
+  m_Name: Greasy Comfort
+  m_EditorClassIdentifier: Cooking.Runtime::Cooking.FlavourZone
+  displayName: Greasy Comfort
+  color: {r: 0.95, g: 0.55, b: 0.2, a: 1}
+  description: Fried, savoury and filling. What most Eyesiders order without thinking.
+  min:
+    savoury: 4
+    salty: 1.5
+    sweet: 0
+    bitter: 0
+    sour: 0
+    pain: 0
+    nutrition: 4
+    texture: 4
+  max:
+    savoury: 10
+    salty: 6
+    sweet: 5
+    bitter: 2.5
+    sour: 2.5
+    pain: 3
+    nutrition: 10
+    texture: 10

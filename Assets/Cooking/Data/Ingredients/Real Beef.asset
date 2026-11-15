@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c322ebb6d6ecaaa4986a5c1dcd6f348d, type: 3}
+  m_Name: Real Beef
+  m_EditorClassIdentifier: Cooking.Runtime::Cooking.IngredientDefinition
+  displayName: '"Real Beef"'
+  icon: {fileID: 0}
+  price: 8
+  bulk: 1
+  flavour:
+    savoury: 7
+    salty: 1
+    sweet: 0
+    bitter: 0
+    sour: 0
+    pain: 0
+    nutrition: 8
+    texture: 6
+  rawDelta:
+    savoury: 0
+    salty: 0
+    sweet: 0
+    bitter: 2
+    sour: 0
+    pain: 0
+    nutrition: -2
+    texture: 0
+  notes: Placeholder values. Tune in the Flavour Lab.

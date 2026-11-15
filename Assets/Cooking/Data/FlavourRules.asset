@@ -1,0 +1,87 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64569e122e234b64d93c415699b46e03, type: 3}
+  m_Name: FlavourRules
+  m_EditorClassIdentifier: Cooking.Runtime::Cooking.FlavourRules
+  peeled:
+    savoury: 0
+    salty: 0
+    sweet: 0
+    bitter: -1
+    sour: 0
+    pain: 0
+    nutrition: 0
+    texture: 0
+  sliced:
+    savoury: 0
+    salty: 0
+    sweet: 0
+    bitter: 0
+    sour: 0
+    pain: 0
+    nutrition: 0
+    texture: -0.5
+  grated:
+    savoury: 0
+    salty: 0
+    sweet: 0
+    bitter: 0
+    sour: 0
+    pain: 0
+    nutrition: 0
+    texture: -3
+  boiled:
+    savoury: -0.5
+    salty: 0
+    sweet: 0
+    bitter: 0
+    sour: 0
+    pain: 0
+    nutrition: 0
+    texture: -3
+  fried:
+    savoury: 1.5
+    salty: 0
+    sweet: 0
+    bitter: 0
+    sour: 0
+    pain: 0
+    nutrition: -0.5
+    texture: 2
+  undercooked:
+    savoury: 0
+    salty: 0
+    sweet: 0
+    bitter: 1
+    sour: 0
+    pain: 0
+    nutrition: -2
+    texture: 2
+  overcooked:
+    savoury: -1
+    salty: 0
+    sweet: 0
+    bitter: 0
+    sour: 0
+    pain: 0
+    nutrition: -1
+    texture: -3
+  burnt:
+    savoury: -2
+    salty: 0
+    sweet: 0
+    bitter: 6
+    sour: 0
+    pain: 0
+    nutrition: 0
+    texture: 3
+  zoneFalloff: 2
