@@ -23,6 +23,11 @@ namespace Cooking.Prototype
         private Text bookShopHint;
         private Button recipeBookButton;
         private RecipeDefinition bookRecipe;
+        private Text bookRadarHeader;
+        private GameObject bookShopGroup;
+        private Text bookHistoryInfo;
+        private Button recipesPageButton;
+        private Button historyPageButton;
 
         private bool RecipeBookOpen => recipeBookOverlay != null && recipeBookOverlay.activeSelf;
 
@@ -76,6 +81,19 @@ namespace Cooking.Prototype
             UIFactory.SetButtonText(recipeBookButton, RecipeBookOpen ? "Close recipe book" : "Recipe book");
             if(!RecipeBookOpen) return;
 
+            Color active = new Color(0.75f, 0.42f, 0.15f, 1f);
+            recipesPageButton.GetComponent<Image>().color = bookPage == BookPage.Recipes ? active : UIFactory.ButtonColor;
+            historyPageButton.GetComponent<Image>().color = bookPage == BookPage.History ? active : UIFactory.ButtonColor;
+            bookShopGroup.SetActive(bookPage == BookPage.Recipes);
+            bookHistoryInfo.gameObject.SetActive(bookPage == BookPage.History);
+
+            if(bookPage == BookPage.History)
+            {
+                RefreshHistoryPage();
+                return;
+            }
+
+            bookRadarHeader.text = "FLAVOUR";
             RebuildBookList();
 
             if(bookRecipe == null)
@@ -182,6 +200,9 @@ namespace Cooking.Prototype
             leftLayout.childForceExpandHeight = false;
             Text bookHeader = UIFactory.Label(left, "RECIPE BOOK", 22, TextAnchor.MiddleLeft, FontStyle.Bold, UIFactory.Accent);
             UIFactory.Size(bookHeader, 32f, 0f);
+            RectTransform pages = UIFactory.Row(left, 40f, 6f);
+            recipesPageButton = UIFactory.Button(pages, "Recipes", () => ShowBookPage(BookPage.Recipes), null, 18);
+            historyPageButton = UIFactory.Button(pages, "History", () => ShowBookPage(BookPage.History), null, 18);
             bookList = UIFactory.ScrollList(left, 6f);
 
             // Middle: the steps.
@@ -198,7 +219,7 @@ namespace Cooking.Prototype
             UIFactory.Place(right, 0.66f, 0f, 1f, 1f, 12f);
             VerticalLayoutGroup rightLayout = UIFactory.Vertical(right.gameObject, 10f, 14);
             rightLayout.childForceExpandHeight = false;
-            Header(right, "FLAVOUR");
+            bookRadarHeader = Header(right, "FLAVOUR");
 
             RectTransform radarArea = UIFactory.Rect(right, "Radar");
             UIFactory.Size(radarArea, 260f, 1f);
@@ -207,14 +228,23 @@ namespace Cooking.Prototype
             bookRadar.SetZones(zones);
             bookRadar.CreateLabels(UIFactory.Font, 15, UIFactory.MutedText);
 
-            Header(right, "SHOPPING  <color=#77736d>stock + cart</color>");
-            bookNeeds = UIFactory.Label(right, "", 17);
-            RectTransform shopRow = UIFactory.Row(right, 44f, 8f);
+            // Recipes page: shopping for the selected dish.
+            RectTransform shop = UIFactory.Rect(right, "Shopping");
+            VerticalLayoutGroup shopLayout = UIFactory.Vertical(shop.gameObject, 10f, 0);
+            shopLayout.childForceExpandHeight = false;
+            bookShopGroup = shop.gameObject;
+            Header(shop, "SHOPPING  <color=#77736d>stock + cart</color>");
+            bookNeeds = UIFactory.Label(shop, "", 17);
+            RectTransform shopRow = UIFactory.Row(shop, 44f, 8f);
             bookServingButton = UIFactory.Button(shopRow, "+ One serving", () => { if(bookRecipe != null) AddServingToCart(bookRecipe); }, null, 18);
             bookMissingButton = UIFactory.Button(shopRow, "+ What's missing", () => { if(bookRecipe != null) AddMissingToCart(bookRecipe); },
                 new Color(0.25f, 0.4f, 0.25f, 1f), 18);
-            bookShopHint = UIFactory.Label(right, "", 15);
+            bookShopHint = UIFactory.Label(shop, "", 15);
             UIFactory.Size(bookShopHint, 22f, 0f);
+
+            // History page: what you know about the selected regular.
+            bookHistoryInfo = UIFactory.Label(right, "", 17);
+            bookHistoryInfo.gameObject.SetActive(false);
 
             RectTransform closeRow = UIFactory.Row(right, 46f);
             UIFactory.Button(closeRow, "Close", ToggleRecipeBook, new Color(0.75f, 0.42f, 0.15f, 1f), 20);

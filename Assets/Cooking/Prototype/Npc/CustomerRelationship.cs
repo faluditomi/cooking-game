@@ -41,6 +41,27 @@ namespace Cooking.Prototype
         public int HappyMeals { get; private set; }
         public RecipeDefinition DreamMeal { get; private set; }
 
+        /// <summary>Closest any served dish has come to their secret desire (radar distance). Infinity until the first.</summary>
+        public float BestDesireDistance { get; private set; } = float.PositiveInfinity;
+
+        /// <summary>Compares a dish's distance to their desire with the best so far, then remembers it.</summary>
+        public Warmth RecordDesireDistance(float distance)
+        {
+            Warmth warmth = DesireClue.Compare(distance, BestDesireDistance);
+            if(distance < BestDesireDistance) BestDesireDistance = distance;
+            return warmth;
+        }
+
+        /// <summary>Renames the discovered dream meal (the player names it for the recipe book).</summary>
+        public void NameDreamMeal(string displayName)
+        {
+            if(DreamMeal == null || string.IsNullOrWhiteSpace(displayName)) return;
+
+            List<IngredientPortion> portions = new List<IngredientPortion>(DreamMeal.Portions);
+            DreamMeal.name = displayName.Trim();
+            DreamMeal.Configure(displayName.Trim(), DreamMeal.Origin, portions);
+        }
+
         private readonly List<RecipeDefinition> likedMeals = new List<RecipeDefinition>();
         public IReadOnlyList<RecipeDefinition> LikedMeals => likedMeals;
 
@@ -76,7 +97,7 @@ namespace Cooking.Prototype
             if(result.Verdict == Verdict.DreamMeal)
             {
                 // The dream meal is about the food; even served late, it's the eureka moment.
-                DreamMeal = CreateMeal(Customer.name + "'s dream meal", served);
+                DreamMeal = CreateMeal(Customer.name + "'s dream meal", served, "Discovered for " + Customer.name);
                 Stage = NpcStage.Eureka;
             }
             else if(result.IsHappy)
@@ -115,13 +136,13 @@ namespace Cooking.Prototype
             return count;
         }
 
-        /// <summary>A recipe made from what was on the plate, cooked perfectly, credited to Emphis.</summary>
-        private static RecipeDefinition CreateMeal(string displayName, IReadOnlyList<IngredientPortion> served)
+        /// <summary>A recipe made from what was on the plate, cooked perfectly. Credited to Emphis unless said otherwise.</summary>
+        private static RecipeDefinition CreateMeal(string displayName, IReadOnlyList<IngredientPortion> served, string origin = "Emphis")
         {
             RecipeDefinition recipe = ScriptableObject.CreateInstance<RecipeDefinition>();
             recipe.name = displayName;
             recipe.hideFlags = HideFlags.DontSave;
-            recipe.Configure(displayName, "Emphis", Perfect(served));
+            recipe.Configure(displayName, origin, Perfect(served));
             return recipe;
         }
 

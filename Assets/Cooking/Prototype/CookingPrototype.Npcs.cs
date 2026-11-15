@@ -24,6 +24,13 @@ namespace Cooking.Prototype
         private readonly Dictionary<Customer, CustomerRelationship> relationships = new Dictionary<Customer, CustomerRelationship>();
         private readonly List<string> speech = new List<string>();
         private readonly List<string> progressToday = new List<string>();
+        private readonly List<HistoryEntry> history = new List<HistoryEntry>();
+        /// <summary>The served dish of the current visit; later lines are added to it.</summary>
+        private HistoryEntry currentEntry;
+        /// <summary>A desire clue waiting for the customer's reaction lines to finish.</summary>
+        private string pendingClue;
+        /// <summary>The dialogue event whose end releases <see cref="pendingClue"/>; None until the reaction is triggered.</summary>
+        private DialogueEventType clueAfter;
         private bool hurried;
         private UnityEngine.UI.Text resultSpeech;
 
@@ -38,11 +45,13 @@ namespace Cooking.Prototype
         private void OnEnable()
         {
             Dialogue.LineReceived += HandleDialogueLine;
+            Dialogue.DialogueEnded += HandleDialogueEnded;
         }
 
         private void OnDisable()
         {
             Dialogue.LineReceived -= HandleDialogueLine;
+            Dialogue.DialogueEnded -= HandleDialogueEnded;
         }
 
         private CustomerRelationship Relationship(Customer regular)
@@ -85,11 +94,15 @@ namespace Cooking.Prototype
 
             if(canPlay)
             {
+                // A pending clue follows when these lines end (HandleDialogueEnded), not when some
+                // earlier dialogue (the order chat) is cut off by this one.
+                if(pendingClue != null) clueAfter = eventType;
                 Dialogue.Trigger(customer.dialogueId, eventType, state);
             }
-            else if(!string.IsNullOrEmpty(fallback))
+            else
             {
-                AddSpeech(fallback);
+                if(!string.IsNullOrEmpty(fallback)) AddSpeech(fallback);
+                FlushClue();
             }
         }
 
@@ -100,8 +113,26 @@ namespace Cooking.Prototype
             AddSpeech(line.Text);
         }
 
+        private void HandleDialogueEnded(DialogueEndedEventArgs ended)
+        {
+            if(customer == null || ended.TriggerNpc != customer.dialogueId) return;
+            if(clueAfter == DialogueEventType.None || ended.EventType != clueAfter) return;
+            FlushClue();
+        }
+
+        private void FlushClue()
+        {
+            if(string.IsNullOrEmpty(pendingClue)) return;
+
+            string clue = pendingClue;
+            pendingClue = null;
+            clueAfter = DialogueEventType.None;
+            AddSpeech(clue);
+        }
+
         private void AddSpeech(string text)
         {
+            if(currentEntry != null) currentEntry.Lines.Add(text);
             speech.Add(text);
             while(speech.Count > SpeechLines) speech.RemoveAt(0);
             RefreshSpeech();
@@ -144,14 +175,57 @@ namespace Cooking.Prototype
         private void BeginVisit()
         {
             hurried = false;
+            currentEntry = null;
+            pendingClue = null;
+            clueAfter = DialogueEventType.None;
             ClearSpeech();
         }
 
-        /// <summary>Records the served dish with the customer and has them react. Call before the plate is cleared.</summary>
+        /// <summary>
+        /// Records the served dish with the customer: their relationship, a cooking-history entry,
+        /// and (once they've warmed up) a clue towards their secret desire. Call before the plate is cleared.
+        /// </summary>
         private RelationshipChange RecordServe(JudgeResult result)
         {
             CustomerRelationship relationship = Relationship(customer);
+            NpcStage stageBefore = relationship.Stage;
             RelationshipChange change = relationship.Record(result, plate);
+
+            currentEntry = new HistoryEntry
+            {
+                Day = day,
+                Customer = customer,
+                Stage = stageBefore,
+                Ordered = order != null ? order.DisplayName : "-",
+                Flavour = result.Dish,
+                Verdict = result.Verdict,
+                Similarity = result.ExactMatch ? 1f : result.Similarity.Combined,
+                PayShare = result.PayShare,
+                Paid = result.Payment + result.Tip,
+                Late = result.Late,
+            };
+
+            foreach(IngredientPortion portion in plate)
+            {
+                currentEntry.Served.Add(new IngredientPortion(portion.ingredient, portion.quantity, portion.prep, portion.cooking, portion.doneness));
+            }
+
+            // What they said before the dish (ordering, hurrying) belongs to the visit too.
+            currentEntry.Lines.AddRange(speech);
+            history.Add(currentEntry);
+
+            if(customer.secretDesire != null)
+            {
+                currentEntry.DesireDistance = result.Verdict == Verdict.DreamMeal ? 0f : customer.secretDesire.DistanceOutside(result.Dish);
+                currentEntry.Warmth = relationship.RecordDesireDistance(currentEntry.DesireDistance);
+
+                // Dejected regulars keep it to themselves; once warmed up they let things slip.
+                if(result.Verdict != Verdict.DreamMeal && result.Verdict != Verdict.Refused && stageBefore != NpcStage.Dejected)
+                {
+                    currentEntry.Clue = DesireClue.Describe(result.Dish, customer.secretDesire, currentEntry.Warmth);
+                    pendingClue = currentEntry.Clue;
+                }
+            }
 
             if(change.StageChanged)
             {

@@ -90,7 +90,11 @@ namespace Cooking.Tests
 
             Assert.AreEqual(NpcStage.Eureka, change.After, "even served late, the dream meal is the eureka moment");
             Assert.IsNotNull(relationship.DreamMeal);
-            Assert.AreEqual("Emphis", relationship.DreamMeal.Origin);
+            Assert.AreEqual("Discovered for The Woman", relationship.DreamMeal.Origin);
+
+            relationship.NameDreamMeal("  Grandma's tang  ");
+            Assert.AreEqual("Grandma's tang", relationship.DreamMeal.DisplayName);
+            Assert.IsTrue(relationship.DreamMeal.Matches(served), "renaming keeps the recipe");
             Assert.IsTrue(relationship.DreamMeal.Matches(served));
 
             System.Random random = new System.Random(1);

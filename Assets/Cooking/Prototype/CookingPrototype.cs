@@ -319,6 +319,9 @@ namespace Cooking.Prototype
             RelationshipChange change = RecordServe(result);
             ShowResult(result, change);
             ClearPlate();
+
+            // Their eureka: a dish nobody made before. Name it for the recipe book.
+            if(change.StageChanged && change.After == NpcStage.Eureka) ShowNamingPrompt(Relationship(customer));
         }
 
         private void AfterResult()
@@ -768,6 +771,7 @@ namespace Cooking.Prototype
             BuildRecipeBook(root);
             BuildResultOverlay(root);
             BuildSummaryOverlay(root);
+            BuildNamingPrompt(root);
         }
 
         private static RectTransform AreaRoot(RectTransform parent, string name)

@@ -166,10 +166,10 @@ and aren't happy; a very close dish they didn't order is added to what they like
 
 Price is the **ordered** dish's ingredient cost × `margin`. Customers come from the design doc's NPC notes:
 
-- **The Woman**: refuses beef, secretly craves Sweet & Sour.
-- **The Man**: refuses synthetic chicken, craves Hearty Broth.
-- **The Sleeper**: orders boiled synthetic chicken, craves Fire Bowl.
-- **A generic Eyesider**: orders anything on the menu.
+- **The Woman**: refuses beef. Secretly craves *Their lost love's soup* (sweet, sour, soft).
+- **The Man**: refuses synthetic chicken. Craves *An honest broth* (filling, a little to chew, a touch sweet).
+- **The Sleeper**: orders boiled synthetic chicken. Craves *Mother's fire* (very hot, savoury, not sweet).
+- **A generic Eyesider**: orders anything on the menu, craves nothing.
 
 Customer lines and other settings (margin, station speed, live preview) are on the
 `Cooking Prototype` object in the scene. The live flavour preview is a tuning aid. The design
@@ -221,6 +221,33 @@ From the design doc's Conversation section. Each regular has a `CustomerRelation
   runs it too.
 - The day summary lists who warmed up or had their dream meal; the morning ticket shows each
   regular's stage and what they order now.
+
+### Discovering a regular's recipe (`DesireClue`, `CookingPrototype.Discovery.cs`, `.History.cs`)
+
+Each regular has an order (what they ask for), dishes they like, and a **secret desire**: their
+own flavour zone in `Data/Zones/Desires/` that **no menu recipe reaches**, so the dish has to be
+invented. **Custom Tools → Cooking Prototype → Build Desire Zones** creates them (existing ones are
+kept, so tune them in the Inspector) and assigns them to the regulars in the open scene. They're
+built around dishes from the design doc that aren't on the menu; one way to hit each:
+
+| Regular | Desire | One dish that hits it |
+|---|---|---|
+| The Woman | Their lost love's soup | Soup Cube, 2× Tofu sliced, Onion peeled+sliced, 2× Sugar, 2× Citric Acid, boiled |
+| The Man | An honest broth | Soup Cube, 2× Potato peeled+sliced, Pak Choi sliced, Mushroom sliced, Salt, boiled |
+| The Sleeper | Mother's fire | Seaweed Noodles, Synthetic Chicken sliced, 4× Chilli grated, 2× MSG2 grated, fried |
+
+- **Clues.** From the Warmed up stage, after each dish (unless refused or the dream meal) the
+  regular adds a clue after their reaction: warmer / colder / about the same than their closest
+  dish so far, plus the flavour that's most off ("It should be sweeter", "Hotter. Much hotter",
+  "It needs more depth"). Dejected regulars keep it to themselves. Their dialogue lines drop
+  story hints too.
+- **Cooking history.** Every served dish is saved: day, who, stage, what was ordered and served,
+  the outcome and similarity, pay, everything they said and the clue. The recipe book's
+  **History** page lists it newest first, filterable by regular, with that regular's closest dish
+  so far on the radar and all their clues in one place.
+- **Unlocking.** Hitting the desire is their dream meal (eureka story beat and dialogue, they
+  always order it afterwards) and the dish becomes a new recipe: a prompt asks you to **name it**,
+  and it goes into the recipe book's Learned section ("Discovered for …").
 
 ## Tests
 
