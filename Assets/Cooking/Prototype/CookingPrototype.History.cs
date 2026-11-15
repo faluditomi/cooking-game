@@ -6,9 +6,10 @@ using UnityEngine.UI;
 namespace Cooking.Prototype
 {
     /// <summary>
-    /// The recipe book's History page (design doc: Recipe App → Cooking history): every dish you've
-    /// served, who for, how it went, what they said, and the clues towards each regular's secret
-    /// desire. Filter by regular to see whether you're getting closer.
+    /// The recipe book's History page (design doc: Recipe App → Cooking history). Every order is
+    /// kept as a full report: what was ordered, everything said, everything cooked (in order, with
+    /// times), what was served, its flavour profile next to the order's, and how it went. Filter by
+    /// regular to follow your attempts at their secret desire.
     /// </summary>
     public partial class CookingPrototype
     {
@@ -21,6 +22,9 @@ namespace Cooking.Prototype
         private BookPage bookPage = BookPage.Recipes;
         /// <summary>Regular the history is filtered to, or null for everyone.</summary>
         private Customer historyFilter;
+        private HistoryEntry selectedEntry;
+
+        private const string Muted = "#a6a199";
 
         private void ShowBookPage(BookPage page)
         {
@@ -31,167 +35,236 @@ namespace Cooking.Prototype
         private void FilterHistory(Customer regular)
         {
             historyFilter = regular;
+            selectedEntry = null;
+            RefreshAll();
+        }
+
+        private void SelectEntry(HistoryEntry entry)
+        {
+            selectedEntry = entry;
             RefreshAll();
         }
 
         private void RefreshHistoryPage()
         {
-            RebuildHistoryFilters();
-
             List<HistoryEntry> entries = history.FindAll(e => historyFilter == null || e.Customer == historyFilter);
-            bookTitle.text = "<b>Cooking history</b>\n<size=18><color=#a6a199>"
-                             + (historyFilter == null ? "Everyone" : historyFilter.name) + ", newest first. "
-                             + entries.Count + (entries.Count == 1 ? " dish." : " dishes.") + "</color></size>";
+            if(selectedEntry == null || !entries.Contains(selectedEntry)) selectedEntry = entries.Count > 0 ? entries[entries.Count - 1] : null;
 
-            if(entries.Count == 0)
+            RebuildHistoryList(entries);
+
+            if(selectedEntry == null)
             {
-                bookSteps.text = "<color=#a6a199>Nothing served yet.</color>";
+                bookTitle.text = "<b>Cooking history</b>\n<size=18><color=" + Muted + ">Nothing served yet"
+                                 + (historyFilter != null ? " to " + historyFilter.name : "") + ".</color></size>";
+                bookSteps.text = "<color=" + Muted + ">Every order you serve is kept here as a full report: what they ordered and said, "
+                                 + "what you cooked, the flavour of the dish, and how it went.</color>";
             }
             else
             {
-                StringBuilder sb = new StringBuilder();
-                for(int i = entries.Count - 1; i >= 0; i--) AppendEntry(sb, entries[i]);
-                bookSteps.text = sb.ToString();
+                HistoryEntry entry = selectedEntry;
+                bookTitle.text = "<b>Day " + entry.Day + ", customer " + entry.Visit + ": " + entry.Customer.name + "</b>\n<size=18><color=" + Muted + ">"
+                                 + StageLabel(entry.Stage) + " · ordered " + entry.Ordered + " · " + VerdictLabel(entry.Verdict) + "</color></size>";
+                bookSteps.text = Report(entry);
             }
 
             RefreshHistorySide();
         }
 
-        private void RebuildHistoryFilters()
+        // ------------------------------------------------------------------ Left: filters and orders
+
+        private void RebuildHistoryList(List<HistoryEntry> entries)
         {
             UIFactory.ClearChildren(bookList);
-            AddFilterButton("Everyone", null);
+
+            Text who = Header(bookList, "WHO");
+            UIFactory.Size(who, 24f, 0f);
+            AddListButton("Everyone", historyFilter == null, () => FilterHistory(null), 34f);
 
             foreach(Customer regular in customers)
             {
-                if(regular != null) AddFilterButton(regular.name + "  <size=15><color=#a6a199>" + StageLabel(Relationship(regular).Stage) + "</color></size>", regular);
+                if(regular == null) continue;
+                Customer captured = regular;
+                AddListButton(regular.name + "  <size=14><color=" + Muted + ">" + StageLabel(Relationship(regular).Stage) + "</color></size>",
+                    historyFilter == regular, () => FilterHistory(captured), 34f);
+            }
+
+            Text orders = Header(bookList, "ORDERS  <color=#77736d>" + entries.Count + ", newest first</color>");
+            UIFactory.Size(orders, 34f, 0f);
+
+            for(int i = entries.Count - 1; i >= 0; i--)
+            {
+                HistoryEntry entry = entries[i];
+                string label = "Day " + entry.Day + " · " + entry.Customer.name
+                               + "\n<size=14>" + VerdictLabel(entry.Verdict) + " <color=" + Muted + ">· $" + entry.Paid.ToString("0.00")
+                               + (string.IsNullOrEmpty(entry.Clue) ? "" : " · clue") + "</color></size>";
+                AddListButton(label, entry == selectedEntry, () => SelectEntry(entry), 52f);
             }
         }
 
-        private void AddFilterButton(string label, Customer regular)
+        private void AddListButton(string label, bool selected, UnityEngine.Events.UnityAction onClick, float height)
         {
-            Button button = UIFactory.Button(bookList, label, () => FilterHistory(regular),
-                historyFilter == regular ? new Color(0.75f, 0.42f, 0.15f, 1f) : UIFactory.ButtonColor, 18);
+            Button button = UIFactory.Button(bookList, label, onClick, selected ? new Color(0.75f, 0.42f, 0.15f, 1f) : UIFactory.ButtonColor, 17);
             Text text = button.GetComponentInChildren<Text>();
             text.alignment = TextAnchor.MiddleLeft;
             text.rectTransform.offsetMin = new Vector2(12f, 0f);
-            UIFactory.Size(button, 42f, 0f);
+            UIFactory.Size(button, height, 0f);
         }
 
-        private static void AppendEntry(StringBuilder sb, HistoryEntry entry)
+        // ------------------------------------------------------------------ Middle: the report
+
+        /// <summary>The full report for one order.</summary>
+        private static string Report(HistoryEntry entry)
         {
-            sb.Append("<b>Day ").Append(entry.Day).Append(" · ").Append(entry.Customer.name).Append("</b>  <color=#a6a199>")
-              .Append(StageLabelStatic(entry.Stage)).Append(" · ordered ").Append(entry.Ordered).Append("</color>\n");
+            StringBuilder sb = new StringBuilder();
 
-            List<string> served = new List<string>();
-            foreach(IngredientPortion portion in entry.Served) served.Add(Describe(portion, true));
-            sb.Append("  ").Append(string.Join(",  ", served)).Append('\n');
-
-            sb.Append("  ").Append(VerdictLabel(entry.Verdict));
-            if(entry.Verdict != Verdict.Refused && entry.Verdict != Verdict.DreamMeal && entry.Verdict != Verdict.Ordered)
-            {
-                sb.Append(" <color=#a6a199>(").Append((entry.Similarity * 100f).ToString("0")).Append("% like the order)</color>");
-            }
-
-            sb.Append(" · paid $").Append(entry.Paid.ToString("0.00"));
-            if(entry.Late) sb.Append(" <color=#e5594d>late</color>");
+            // Order
+            sb.Append("<b>ORDER</b>\n");
+            sb.Append("  ").Append(entry.Ordered);
+            if(!string.IsNullOrEmpty(entry.OrderLine)) sb.Append("  <i><color=#c8c3ba>\"").Append(entry.OrderLine).Append("\"</color></i>");
             sb.Append('\n');
 
-            foreach(string line in entry.Lines)
+            if(entry.Timed)
             {
-                if(line == entry.Clue) continue;
-                sb.Append("  <i><color=#c8c3ba>\"").Append(line).Append("\"</color></i>\n");
+                sb.Append("  Timer ").Append(FormatTime(entry.TimeAllowed)).Append(", served after ").Append(FormatTime(entry.TimeTaken))
+                  .Append(entry.Late ? "  <color=#e5594d>late</color>" : "  <color=#73cc73>on time</color>").Append('\n');
+            }
+            else
+            {
+                sb.Append("  <color=").Append(Muted).Append(">Untimed. Served after ").Append(FormatTime(entry.TimeTaken)).Append(".</color>\n");
             }
 
-            if(!string.IsNullOrEmpty(entry.Clue))
+            // What was said
+            sb.Append("\n<b>WHAT WAS SAID</b>\n");
+            if(entry.Speech.Count == 0) sb.Append("  <color=").Append(Muted).Append(">Nothing.</color>\n");
+
+            foreach(VisitEvent line in entry.Speech)
             {
-                sb.Append("  <color=#f28c33>Clue: \"").Append(entry.Clue).Append("\"</color>  ").Append(WarmthLabel(entry.Warmth)).Append('\n');
+                bool clue = line.Tag == "Clue";
+                sb.Append("  <color=").Append(Muted).Append(">").Append(Stamp(line.Time)).Append(' ').Append(line.Tag).Append("</color>  ")
+                  .Append(clue ? "<color=#f28c33>\"" : "<i><color=#c8c3ba>\"").Append(line.Text).Append(clue ? "\"</color>" : "\"</color></i>");
+                if(clue) sb.Append("  ").Append(WarmthLabel(entry.Warmth));
+                sb.Append('\n');
             }
 
-            sb.Append('\n');
+            // What was cooked
+            sb.Append("\n<b>WHAT WAS COOKED</b>\n");
+            if(entry.Cooking.Count == 0) sb.Append("  <color=").Append(Muted).Append(">Nothing logged.</color>\n");
+
+            foreach(VisitEvent step in entry.Cooking)
+            {
+                sb.Append("  <color=").Append(Muted).Append(">").Append(Stamp(step.Time)).Append("</color> <b>").Append(step.Tag).Append("</b>  ")
+                  .Append(step.Text).Append('\n');
+            }
+
+            // Served
+            sb.Append("\n<b>SERVED</b>\n");
+            foreach(IngredientPortion portion in entry.Served) sb.Append("  ").Append(Describe(portion, true)).Append('\n');
+
+            // Flavour profile, next to the order's
+            sb.Append("\n<b>FLAVOUR PROFILE</b>  <color=").Append(Muted).Append(">served (ordered)</color>\n");
+            for(int i = 0; i < FlavourAxes.Count; i += 2)
+            {
+                sb.Append("  ").Append(AxisCell(entry, FlavourAxes.All[i]));
+                if(i + 1 < FlavourAxes.Count) sb.Append("     ").Append(AxisCell(entry, FlavourAxes.All[i + 1]));
+                sb.Append('\n');
+            }
+
+            sb.Append("  Tastes like: ").Append(string.IsNullOrEmpty(entry.BestZone) ? "<color=" + Muted + ">no desirable zone</color>" : entry.BestZone).Append('\n');
+
+            // Result
+            sb.Append("\n<b>RESULT</b>\n  ").Append(VerdictLabel(entry.Verdict));
+            if(entry.Exact) sb.Append("  <color=").Append(Muted).Append(">exact recipe</color>");
+            else if(entry.Verdict != Verdict.Refused)
+            {
+                sb.Append("  <color=").Append(Muted).Append(">").Append((entry.Similarity.Combined * 100f).ToString("0"))
+                  .Append("% like the order (flavour ").Append((entry.Similarity.Flavour * 100f).ToString("0"))
+                  .Append("%, ingredients ").Append((entry.Similarity.Ingredients * 100f).ToString("0")).Append("%)</color>");
+            }
+
+            sb.Append("\n  Paid $").Append(entry.Payment.ToString("0.00"));
+            if(entry.Payment > 0f && entry.PayShare < 1f) sb.Append(" <color=").Append(Muted).Append(">(").Append((entry.PayShare * 100f).ToString("0")).Append("% of $").Append(entry.Price.ToString("0.00")).Append(")</color>");
+            if(entry.Tip > 0f) sb.Append(" + tip $").Append(entry.Tip.ToString("0.00"));
+            float profit = entry.Paid - entry.IngredientCost;
+            sb.Append("   Ingredients $").Append(entry.IngredientCost.ToString("0.00"))
+              .Append("   Profit <color=#").Append(profit >= 0f ? "73cc73" : "e5594d").Append(">$").Append(profit.ToString("0.00")).Append("</color>\n");
+
+            return sb.ToString();
         }
 
-        /// <summary>Right side: the closest dish so far for the selected regular, and the clues they've given.</summary>
+        private static string AxisCell(HistoryEntry entry, FlavourAxis axis)
+        {
+            float served = entry.Flavour[axis];
+            float ordered = entry.OrderedFlavour[axis];
+            float diff = served - ordered;
+            string color = Mathf.Abs(diff) < 0.75f ? "#ebe6db" : diff > 0f ? "#f28c33" : "#7fb2e5";
+            return (FlavourAxes.Label(axis) + " ").PadRight(11) + "<color=" + color + "><b>" + served.ToString("0.0") + "</b></color> <color=" + Muted + ">(" + ordered.ToString("0.0") + ")</color>";
+        }
+
+        private static string Stamp(float seconds)
+        {
+            return "[" + FormatTime(seconds) + "]";
+        }
+
+        // ------------------------------------------------------------------ Right: the dish's flavour
+
         private void RefreshHistorySide()
         {
             bookRadar.ClearProfiles();
             bookRadar.SetHighlight(null);
+            StringBuilder sb = new StringBuilder();
 
-            if(historyFilter == null)
+            if(selectedEntry != null)
             {
-                bookRadarHeader.text = "SELECT A REGULAR";
-                StringBuilder all = new StringBuilder("<color=#a6a199>Pick someone on the left to see the closest you've come to what they crave.</color>\n\n");
+                bookRadarHeader.text = "FLAVOUR OF THIS DISH";
+                bookRadar.SetHighlight(zones.Find(z => z != null && z.DisplayName == selectedEntry.BestZone));
+                bookRadar.AddProfile(selectedEntry.OrderedFlavour, new Color(0.6f, 0.6f, 0.6f, 0.8f), false);
+                bookRadar.AddProfile(selectedEntry.Flavour, new Color(0.95f, 0.93f, 0.86f, 1f), true);
+                sb.Append("<color=#ebe6db>Light</color>: what you served.  <color=#999999>Grey outline</color>: what they ordered.\n");
+                sb.Append("<color=").Append(Muted).Append(">In the profile, orange is more than the order, blue is less.</color>\n\n");
+            }
+            else
+            {
+                bookRadarHeader.text = "FLAVOUR";
+            }
 
-                foreach(Customer regular in customers)
-                {
-                    if(regular == null || regular.secretDesire == null) continue;
-                    CustomerRelationship relationship = Relationship(regular);
-                    all.Append("<b>").Append(regular.name).Append("</b>: ")
-                       .Append(relationship.DreamMeal != null ? "<color=#f28c33>found: " + relationship.DreamMeal.DisplayName + "</color>" : CluesHeard(regular) + " clues heard")
-                       .Append('\n');
-                }
+            Customer regular = historyFilter ?? selectedEntry?.Customer;
+            if(regular != null) AppendDesireProgress(sb, regular);
+            bookHistoryInfo.text = sb.ToString();
+        }
 
-                bookHistoryInfo.text = all.ToString();
+        /// <summary>What you know so far about a regular's secret desire.</summary>
+        private void AppendDesireProgress(StringBuilder sb, Customer regular)
+        {
+            CustomerRelationship relationship = Relationship(regular);
+            sb.Append("<b>").Append(regular.name).Append("</b>\n");
+
+            if(relationship.DreamMeal != null)
+            {
+                sb.Append("<color=#f28c33>Found it: ").Append(relationship.DreamMeal.DisplayName).Append("</color>\n");
                 return;
             }
 
-            CustomerRelationship selected = Relationship(historyFilter);
-            HistoryEntry closest = null;
-
-            foreach(HistoryEntry entry in history)
+            if(regular.secretDesire == null)
             {
-                if(entry.Customer == historyFilter && (closest == null || entry.DesireDistance < closest.DesireDistance)) closest = entry;
+                sb.Append("<color=").Append(Muted).Append(">They don't seem to crave anything in particular.</color>\n");
+                return;
             }
 
-            bookRadarHeader.text = "CLOSEST DISH SO FAR";
-            if(closest != null) bookRadar.AddProfile(closest.Flavour, new Color(0.95f, 0.93f, 0.86f, 1f), true);
-
-            StringBuilder sb = new StringBuilder();
-
-            if(selected.DreamMeal != null)
+            if(relationship.Stage == NpcStage.Dejected)
             {
-                sb.Append("<color=#f28c33><b>Found it: ").Append(selected.DreamMeal.DisplayName).Append("</b></color>\n");
-            }
-            else if(historyFilter.secretDesire == null)
-            {
-                sb.Append("<color=#a6a199>They don't seem to crave anything in particular.</color>\n");
-            }
-            else if(closest != null)
-            {
-                List<string> served = new List<string>();
-                foreach(IngredientPortion portion in closest.Served) served.Add(portion.quantity + "× " + portion.ingredient.DisplayName);
-                sb.Append("Day ").Append(closest.Day).Append(": ").Append(string.Join(", ", served)).Append('\n');
+                sb.Append("<color=").Append(Muted).Append(">They don't open up yet. Warm them up and they'll start dropping hints.</color>\n");
             }
 
-            if(selected.Stage == NpcStage.Dejected && selected.DreamMeal == null)
-            {
-                sb.Append("<color=#a6a199>They don't open up yet. Warm them up and they'll start dropping hints.</color>\n");
-            }
-
-            sb.Append("\n<b>Clues</b>\n");
             int clues = 0;
-
             foreach(HistoryEntry entry in history)
             {
-                if(entry.Customer != historyFilter || string.IsNullOrEmpty(entry.Clue)) continue;
+                if(entry.Customer != regular || string.IsNullOrEmpty(entry.Clue)) continue;
+                if(clues == 0) sb.Append("Clues so far:\n");
                 sb.Append("  Day ").Append(entry.Day).Append(": \"").Append(entry.Clue).Append("\"\n");
                 clues++;
             }
 
-            if(clues == 0) sb.Append("  <color=#a6a199>None yet.</color>\n");
-            bookHistoryInfo.text = sb.ToString();
-        }
-
-        private int CluesHeard(Customer regular)
-        {
-            int count = 0;
-            foreach(HistoryEntry entry in history) if(entry.Customer == regular && !string.IsNullOrEmpty(entry.Clue)) count++;
-            return count;
-        }
-
-        private static string StageLabelStatic(NpcStage stage)
-        {
-            return StageLabel(stage);
+            if(clues == 0 && relationship.Stage != NpcStage.Dejected) sb.Append("<color=").Append(Muted).Append(">No clues yet.</color>\n");
         }
 
         private static string VerdictLabel(Verdict verdict)

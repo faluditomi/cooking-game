@@ -31,6 +31,8 @@ namespace Cooking.Prototype
         private string pendingClue;
         /// <summary>The dialogue event whose end releases <see cref="pendingClue"/>; None until the reaction is triggered.</summary>
         private DialogueEventType clueAfter;
+        private float visitStarted;
+        private float orderTakenAt;
         private bool hurried;
         private UnityEngine.UI.Text resultSpeech;
 
@@ -101,8 +103,20 @@ namespace Cooking.Prototype
             }
             else
             {
-                if(!string.IsNullOrEmpty(fallback)) AddSpeech(fallback);
+                if(!string.IsNullOrEmpty(fallback)) AddSpeech(fallback, SpeechTag(eventType));
                 FlushClue();
+            }
+        }
+
+        /// <summary>How a line is labelled in the history.</summary>
+        private static string SpeechTag(DialogueEventType eventType)
+        {
+            switch(eventType)
+            {
+                case DialogueEventType.Order: return "Order";
+                case DialogueEventType.Hurry: return "Hurrying";
+                case DialogueEventType.None: return "Says";
+                default: return "Reaction";
             }
         }
 
@@ -110,7 +124,7 @@ namespace Cooking.Prototype
         {
             // Lines from a customer who already left (aborted by Replace) don't belong to this visit.
             if(customer == null || line.TriggerNpc != customer.dialogueId) return;
-            AddSpeech(line.Text);
+            AddSpeech(line.Text, SpeechTag(line.EventType));
         }
 
         private void HandleDialogueEnded(DialogueEndedEventArgs ended)
@@ -127,12 +141,15 @@ namespace Cooking.Prototype
             string clue = pendingClue;
             pendingClue = null;
             clueAfter = DialogueEventType.None;
-            AddSpeech(clue);
+            AddSpeech(clue, "Clue");
         }
 
-        private void AddSpeech(string text)
+        /// <summary>Seconds since the current customer arrived.</summary>
+        private float VisitTime => Time.time - visitStarted;
+
+        private void AddSpeech(string text, string tag = "Says")
         {
-            if(currentEntry != null) currentEntry.Lines.Add(text);
+            if(currentEntry != null) currentEntry.Speech.Add(new VisitEvent { Time = VisitTime, Tag = tag, Text = text });
             speech.Add(text);
             while(speech.Count > SpeechLines) speech.RemoveAt(0);
             RefreshSpeech();
@@ -172,17 +189,50 @@ namespace Cooking.Prototype
 
         // ------------------------------------------------------------------ Visits
 
+        /// <summary>A customer arrives: start a fresh visit record that collects what's said and cooked until they're served.</summary>
         private void BeginVisit()
         {
             hurried = false;
-            currentEntry = null;
             pendingClue = null;
             clueAfter = DialogueEventType.None;
+            visitStarted = Time.time;
+            orderTakenAt = 0f;
             ClearSpeech();
+            currentEntry = NewVisitEntry();
+        }
+
+        private HistoryEntry NewVisitEntry()
+        {
+            return new HistoryEntry
+            {
+                Day = day,
+                Visit = servedToday + 1,
+                Customer = customer,
+                Stage = Relationship(customer).Stage,
+                Ordered = order != null ? order.DisplayName : "-",
+            };
+        }
+
+        /// <summary>Notes a cooking step for the current visit's history.</summary>
+        private void LogCooking(string tag, string text)
+        {
+            if(currentEntry == null || phase != Phase.Service) return;
+            currentEntry.Cooking.Add(new VisitEvent { Time = VisitTime, Tag = tag, Text = text });
+        }
+
+        private void OnOrderTaken()
+        {
+            orderTakenAt = VisitTime;
+            if(currentEntry == null) return;
+
+            currentEntry.OrderLine = orderLine;
+            currentEntry.Timed = timedOrders;
+            currentEntry.TimeAllowed = orderDuration;
+            currentEntry.Speech.Add(new VisitEvent { Time = VisitTime, Tag = "Order", Text = orderLine });
         }
 
         /// <summary>
-        /// Records the served dish with the customer: their relationship, a cooking-history entry,
+        /// Records the served dish with the customer: their relationship, the visit's history entry,
         /// and (once they've warmed up) a clue towards their secret desire. Call before the plate is cleared.
         /// </summary>
         private RelationshipChange RecordServe(JudgeResult result)
@@ -191,27 +241,30 @@ namespace Cooking.Prototype
             NpcStage stageBefore = relationship.Stage;
             RelationshipChange change = relationship.Record(result, plate);
 
-            currentEntry = new HistoryEntry
-            {
-                Day = day,
-                Customer = customer,
-                Stage = stageBefore,
-                Ordered = order != null ? order.DisplayName : "-",
-                Flavour = result.Dish,
-                Verdict = result.Verdict,
-                Similarity = result.ExactMatch ? 1f : result.Similarity.Combined,
-                PayShare = result.PayShare,
-                Paid = result.Payment + result.Tip,
-                Late = result.Late,
-            };
+            if(currentEntry == null) currentEntry = NewVisitEntry();
+
+            currentEntry.Stage = stageBefore;
+            currentEntry.Ordered = order != null ? order.DisplayName : "-";
+            currentEntry.OrderedFlavour = result.Ordered;
+            currentEntry.Flavour = result.Dish;
+            currentEntry.BestZone = result.BestZone.IsMatch ? result.BestZone.Zone.DisplayName : null;
+            currentEntry.Verdict = result.Verdict;
+            currentEntry.Exact = result.ExactMatch;
+            currentEntry.Similarity = result.Similarity;
+            currentEntry.Price = result.Price;
+            currentEntry.PayShare = result.PayShare;
+            currentEntry.Payment = result.Payment;
+            currentEntry.Tip = result.Tip;
+            currentEntry.IngredientCost = dishCost;
+            currentEntry.Late = result.Late;
+            currentEntry.TimeTaken = Mathf.Max(0f, VisitTime - orderTakenAt);
 
             foreach(IngredientPortion portion in plate)
             {
                 currentEntry.Served.Add(new IngredientPortion(portion.ingredient, portion.quantity, portion.prep, portion.cooking, portion.doneness));
             }
 
-            // What they said before the dish (ordering, hurrying) belongs to the visit too.
-            currentEntry.Lines.AddRange(speech);
+            LogCooking("Serve", "Served the plate.");
             history.Add(currentEntry);
 
             if(customer.secretDesire != null)

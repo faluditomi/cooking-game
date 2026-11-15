@@ -181,6 +181,7 @@ namespace Cooking.Prototype
             PrepSteps done = activeTool;
             boardUnit.prep |= done;
             PutDownTool();
+            LogCooking("Prep", done + " 1× " + boardUnit.ingredient.DisplayName + " during the order.");
             Say(done + " " + boardUnit.ingredient.DisplayName + ". Another step, or put it back in stock.", UIFactory.Good);
             RefreshAll();
         }

@@ -265,6 +265,7 @@ namespace Cooking.Prototype
             orderDuration = OrderSeconds(order);
             orderTimeLeft = orderDuration;
             Say(customer.name + ": \"" + orderLine + "\"" + (timedOrders ? "  You have " + FormatTime(orderDuration) + "." : ""));
+            OnOrderTaken();
             Speak(DialogueSystem.DialogueEventType.Order, null);
             RefreshAll();
         }

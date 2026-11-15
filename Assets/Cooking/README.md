@@ -241,10 +241,19 @@ built around dishes from the design doc that aren't on the menu; one way to hit 
   dish so far, plus the flavour that's most off ("It should be sweeter", "Hotter. Much hotter",
   "It needs more depth"). Dejected regulars keep it to themselves. Their dialogue lines drop
   story hints too.
-- **Cooking history.** Every served dish is saved: day, who, stage, what was ordered and served,
-  the outcome and similarity, pay, everything they said and the clue. The recipe book's
-  **History** page lists it newest first, filterable by regular, with that regular's closest dish
-  so far on the radar and all their clues in one place.
+- **Cooking history.** Each visit is recorded from the moment the customer arrives
+  (`HistoryEntry`) as a full report on the recipe book's **History** page. On the left you filter
+  by regular and pick an order (newest first). In the middle is the report:
+  - **Order:** the dish, their order line, the timer and when it was served (or untimed).
+  - **What was said:** every line with a timestamp, labelled Order, Hurrying, Reaction or Clue.
+  - **What was cooked:** a timestamped log of units put into the wok/pot/plate, stations started
+    and taken off (at what %, doneness, wok shakes), anything binned, and prep done during the order.
+  - **Served**, the dish's **flavour profile** per axis next to the order's (orange = more, blue
+    = less), the zone it tastes like, and the **result** (verdict, similarity breakdown, pay,
+    ingredient cost, profit).
+
+  On the right is that dish on the radar against the order's outline, plus what you know about
+  that regular's secret desire (their clues so far, or the recipe you found).
 - **Unlocking.** Hitting the desire is their dream meal (eureka story beat and dialogue, they
   always order it afterwards) and the dish becomes a new recipe: a prompt asks you to **name it**,
   and it goes into the recipe book's Learned section ("Discovered for …").
