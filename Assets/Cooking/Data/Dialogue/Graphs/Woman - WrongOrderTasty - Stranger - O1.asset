@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Woman - WrongOrderTasty - Stranger - O1
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: 1b5885e1-3bf2-475a-aaec-a475c6b21257
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: 7bd0a326-4af9-4d49-8632-63810876fe75
+    kind: 0
+    line:
+      text: You fucked up, Pot Boy.
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: 644cf6a1-8918-4cf6-81ee-ab318543bb61
+    kind: 0
+    line:
+      text: But I'll let you live...
+      delaySeconds: 1.8
+    editorPosition: {x: 520, y: 0}
+  - guid: 23a3d0c8-8bcb-47cb-8009-8007e3cddcdd
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 780, y: 0}
+  edges:
+  - fromNodeGuid: 1b5885e1-3bf2-475a-aaec-a475c6b21257
+    fromOptionGuid: 
+    toNodeGuid: 7bd0a326-4af9-4d49-8632-63810876fe75
+  - fromNodeGuid: 7bd0a326-4af9-4d49-8632-63810876fe75
+    fromOptionGuid: 
+    toNodeGuid: 644cf6a1-8918-4cf6-81ee-ab318543bb61
+  - fromNodeGuid: 644cf6a1-8918-4cf6-81ee-ab318543bb61
+    fromOptionGuid: 
+    toNodeGuid: 23a3d0c8-8bcb-47cb-8009-8007e3cddcdd
+  isOneShot: 0
+  payload: 

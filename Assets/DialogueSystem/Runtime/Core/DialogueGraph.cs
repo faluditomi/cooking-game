@@ -13,6 +13,12 @@ namespace DialogueSystem
         public List<DialogueNodeData> nodes = new List<DialogueNodeData>();
         public List<DialogueEdgeData> edges = new List<DialogueEdgeData>();
 
+        [Tooltip("Plays at most once per game (until DialogueCatalog.ResetPlayed). Once played it is never picked again, even when its set starts over.")]
+        public bool isOneShot;
+
+        [Tooltip("Free text for the game; the package never reads it. For example, the dish an order dialogue names.")]
+        public string payload;
+
         public DialogueNodeData GetNode(string guid)
         {
             if(nodes == null || string.IsNullOrEmpty(guid)) return null;

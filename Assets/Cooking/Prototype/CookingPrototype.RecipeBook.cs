@@ -28,14 +28,17 @@ namespace Cooking.Prototype
         private Text bookHistoryInfo;
         private Button recipesPageButton;
         private Button historyPageButton;
+        private Button bookDeleteButton;
 
         private bool RecipeBookOpen => recipeBookOverlay != null && recipeBookOverlay.activeSelf;
 
-        /// <summary>The menu, plus dishes you've learned from customers (their specials and dream meals).</summary>
+        /// <summary>
+        /// The menu, then dishes regulars order that aren't on it: their favourites and dream meals
+        /// you haven't named, or took off the menu.
+        /// </summary>
         private List<RecipeDefinition> KnownRecipes()
         {
-            List<RecipeDefinition> known = new List<RecipeDefinition>();
-            foreach(RecipeDefinition recipe in menu) if(recipe != null && !known.Contains(recipe)) known.Add(recipe);
+            List<RecipeDefinition> known = VisibleMenu();
 
             foreach(CustomerRelationship relationship in relationships.Values)
             {
@@ -57,10 +60,23 @@ namespace Cooking.Prototype
 
             // Open on the dish being cooked, if there is one.
             List<RecipeDefinition> known = KnownRecipes();
-            if(orderTaken && order != null && known.Contains(order)) bookRecipe = order;
+            if(orderIn && order != null && known.Contains(order)) bookRecipe = order;
             else if(bookRecipe == null || !known.Contains(bookRecipe)) bookRecipe = known.Count > 0 ? known[0] : null;
 
             recipeBookOverlay.SetActive(true);
+            RefreshAll();
+        }
+
+
+        /// <summary>Takes the selected dish off the menu. It stays known (regulars can still order it), just unnamed in their lines.</summary>
+        private void DeleteFromMenu()
+        {
+            if(bookRecipe == null || !IsOnMenu(bookRecipe)) return;
+
+            deletedDishes.Add(bookRecipe);
+            Say("\"" + bookRecipe.DisplayName + "\" is off the menu.");
+            List<RecipeDefinition> known = KnownRecipes();
+            if(!known.Contains(bookRecipe)) bookRecipe = known.Count > 0 ? known[0] : null;
             RefreshAll();
         }
 
@@ -86,6 +102,7 @@ namespace Cooking.Prototype
             historyPageButton.GetComponent<Image>().color = bookPage == BookPage.History ? active : UIFactory.ButtonColor;
             bookShopGroup.SetActive(bookPage == BookPage.Recipes);
             bookHistoryInfo.gameObject.SetActive(bookPage == BookPage.History);
+            bookDeleteButton.transform.parent.gameObject.SetActive(false);
 
             if(bookPage == BookPage.History)
             {
@@ -103,6 +120,7 @@ namespace Cooking.Prototype
                 bookNeeds.text = "";
                 bookServingButton.interactable = false;
                 bookMissingButton.interactable = false;
+                bookDeleteButton.transform.parent.gameObject.SetActive(false);
                 return;
             }
 
@@ -112,6 +130,8 @@ namespace Cooking.Prototype
 
             StringBuilder title = new StringBuilder();
             title.Append("<b>").Append(recipe.DisplayName).Append("</b>\n<size=18><color=#a6a199>");
+            title.Append(DishType(recipe)).Append("   ");
+            if(!IsOnMenu(recipe)) title.Append("<color=#f28c33>Not on the menu</color>   ");
             if(!string.IsNullOrEmpty(recipe.Origin)) title.Append("Origin: ").Append(recipe.Origin).Append("   ");
             title.Append("Menu price $").Append(DishJudge.MenuPrice(recipe, margin).ToString("0.00"));
             title.Append("   Ingredients $").Append(recipe.CalculateIngredientCost().ToString("0.00")).Append("</color>");
@@ -122,10 +142,9 @@ namespace Cooking.Prototype
 
             bookSteps.text = RecipeGuide.Steps(recipe, Owned);
 
-            bookRadar.SetHighlight(zone);
+            // Only the selected dish: no zone bands, so its shape reads at a glance.
             bookRadar.ClearProfiles();
-            // Light rather than orange, so the dish stands out from zones like Greasy Comfort.
-            bookRadar.AddProfile(profile, new Color(0.95f, 0.93f, 0.86f, 1f), true);
+            bookRadar.AddProfile(profile, new Color(0.95f, 0.55f, 0.2f, 1f), true);
 
             // Shopping: have/need per ingredient, counting stock, cart and the prep board.
             StringBuilder needs = new StringBuilder();
@@ -141,6 +160,8 @@ namespace Cooking.Prototype
             }
 
             bookNeeds.text = (covered ? "<color=#73cc73>You have enough for one.</color>\n" : "") + needs;
+
+            bookDeleteButton.transform.parent.gameObject.SetActive(IsOnMenu(recipe));
 
             bool shopOpen = phase == Phase.Morning;
             bookServingButton.interactable = shopOpen;
@@ -161,16 +182,16 @@ namespace Cooking.Prototype
 
             foreach(RecipeDefinition recipe in known)
             {
-                if(!learnedHeader && !menu.Contains(recipe))
+                if(!learnedHeader && !IsOnMenu(recipe))
                 {
                     learnedHeader = true;
-                    Text header = Header(bookList, "LEARNED FROM CUSTOMERS");
+                    Text header = Header(bookList, "NOT ON THE MENU");
                     UIFactory.Size(header, 30f, 0f);
                 }
 
                 RecipeDefinition captured = recipe;
                 bool selected = recipe == bookRecipe;
-                bool ordered = orderTaken && recipe == order;
+                bool ordered = orderIn && recipe == order;
                 string label = recipe.DisplayName + (ordered ? "  <color=#f28c33>ordered</color>" : "");
                 Button button = UIFactory.Button(bookList, label, () => SelectRecipe(captured),
                     selected ? new Color(0.75f, 0.42f, 0.15f, 1f) : UIFactory.ButtonColor, 18);
@@ -185,6 +206,7 @@ namespace Cooking.Prototype
         {
             Image overlay = UIFactory.Panel(root, "Recipe Book", new Color(0f, 0f, 0f, 0.7f));
             UIFactory.Stretch(overlay.rectTransform);
+            overlay.rectTransform.anchorMax = new Vector2(1f - SidebarWidth, 1f);
             // Leave the top bar clickable (the same button closes the book) and the message bar visible.
             overlay.rectTransform.offsetMax = new Vector2(0f, -60f);
             overlay.rectTransform.offsetMin = new Vector2(0f, 44f);
@@ -225,7 +247,7 @@ namespace Cooking.Prototype
             UIFactory.Size(radarArea, 260f, 1f);
             bookRadar = radarArea.gameObject.AddComponent<FlavourRadarGraphic>();
             bookRadar.raycastTarget = false;
-            bookRadar.SetZones(zones);
+            // No zones: the book's radar shows just the dish (the title says which zone it tastes like).
             bookRadar.CreateLabels(UIFactory.Font, 15, UIFactory.MutedText);
 
             // Recipes page: shopping for the selected dish.
@@ -245,6 +267,9 @@ namespace Cooking.Prototype
             // History page: what you know about the selected regular.
             bookHistoryInfo = UIFactory.Label(right, "", 17);
             bookHistoryInfo.gameObject.SetActive(false);
+
+            RectTransform deleteRow = UIFactory.Row(right, 38f);
+            bookDeleteButton = UIFactory.Button(deleteRow, "Remove from the menu", DeleteFromMenu, new Color(0.35f, 0.2f, 0.2f, 1f), 16);
 
             RectTransform closeRow = UIFactory.Row(right, 46f);
             UIFactory.Button(closeRow, "Close", ToggleRecipeBook, new Color(0.75f, 0.42f, 0.15f, 1f), 20);

@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Woman - CorrectOrder - Familiar - O2
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: 47fd912f-30dd-4513-a6cd-a6109a7717fe
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: 8e05253f-d41f-4799-aed3-9085e7e337e4
+    kind: 0
+    line:
+      text: Thanks.
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: 61d6dd74-6246-4530-b680-a9360783f323
+    kind: 0
+    line:
+      text: Reminds me of the stuff I used to make. 'Twas a long time ago now...
+      delaySeconds: 1.2
+    editorPosition: {x: 520, y: 0}
+  - guid: 04d5a01c-ce20-4021-8217-ce74be31e075
+    kind: 0
+    line:
+      text: How time flies, Pot Boy.
+      delaySeconds: 3.4
+    editorPosition: {x: 780, y: 0}
+  - guid: 5b2bbfd6-7873-4eac-aff3-2839b8fbb47c
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 1040, y: 0}
+  edges:
+  - fromNodeGuid: 47fd912f-30dd-4513-a6cd-a6109a7717fe
+    fromOptionGuid: 
+    toNodeGuid: 8e05253f-d41f-4799-aed3-9085e7e337e4
+  - fromNodeGuid: 8e05253f-d41f-4799-aed3-9085e7e337e4
+    fromOptionGuid: 
+    toNodeGuid: 61d6dd74-6246-4530-b680-a9360783f323
+  - fromNodeGuid: 61d6dd74-6246-4530-b680-a9360783f323
+    fromOptionGuid: 
+    toNodeGuid: 04d5a01c-ce20-4021-8217-ce74be31e075
+  - fromNodeGuid: 04d5a01c-ce20-4021-8217-ce74be31e075
+    fromOptionGuid: 
+    toNodeGuid: 5b2bbfd6-7873-4eac-aff3-2839b8fbb47c
+  isOneShot: 0
+  payload: 

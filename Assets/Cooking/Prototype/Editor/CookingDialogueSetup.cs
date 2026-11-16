@@ -8,15 +8,18 @@ using UnityEngine;
 namespace Cooking.Prototype.EditorTools
 {
     /// <summary>
-    /// Builds placeholder dialogue for the regulars with the DialogueSystem's own editor API:
-    /// one graph per (NPC, event, stage) and a catalog registering them, then wires the open
-    /// prototype scene to it. Graphs that already exist are left alone, so rewriting the text in
-    /// the Dialogue Graph Editor is safe; rerunning only adds what's missing.
+    /// Builds the regulars' dialogue with the DialogueSystem's own editor API: one graph per option
+    /// (O1, O2, ...) of each (NPC, event, stage), registered in the catalog in that order (the catalog
+    /// plays them in order the first time, then at random), then wires the open prototype scene to it.
+    /// Graphs that already exist are left alone, so rewriting the text in the Dialogue Graph Editor is
+    /// safe; rerunning only adds what's missing.
     /// </summary>
     /// <remarks>
-    /// Lines are placeholders written from the design doc's NPC notes. Dejected lines are terse,
-    /// Warmed up lines drop clues towards each NPC's secret desire, Eureka lines pay it off.
-    /// Entries with state None are the fallback for any stage.
+    /// The Woman's lines are from the Cooking Game Miro board (Stranger / Familiar / Friendly, plus the
+    /// dream order scene), as written. Order graphs carry a payload: a dish name, or a [liked meal] /
+    /// [dream dish] token. [name of her lover] is left in the text until the board names her. The Man
+    /// has the board's one MSG line; he and the others otherwise keep placeholders from the design doc.
+    /// Entries with state None play at any stage.
     /// </remarks>
     public static class CookingDialogueSetup
     {
@@ -29,93 +32,210 @@ namespace Cooking.Prototype.EditorTools
             public DialogueNpcId Npc;
             public DialogueEventType Event;
             public DialogueNpcState State;
+            public int Option;
+            public string Payload;
+            public bool OneShot;
             public string[] Lines;
+        }
 
-            public Spec(DialogueNpcId npc, DialogueEventType eventType, DialogueNpcState state, params string[] lines)
+        /// <summary>Collects specs, numbering options per (NPC, event, state) in the order they're added.</summary>
+        private class Builder
+        {
+            public readonly List<Spec> Specs = new List<Spec>();
+            private readonly Dictionary<string, int> options = new Dictionary<string, int>();
+
+            public void Add(DialogueNpcId npc, DialogueEventType eventType, DialogueNpcState state, params string[] lines)
             {
-                Npc = npc;
-                Event = eventType;
-                State = state;
-                Lines = lines;
+                Add(npc, eventType, state, null, false, lines);
+            }
+
+            public void Add(DialogueNpcId npc, DialogueEventType eventType, DialogueNpcState state, string payload, bool oneShot, params string[] lines)
+            {
+                string key = npc + "|" + eventType + "|" + state;
+                options.TryGetValue(key, out int option);
+                options[key] = ++option;
+                Specs.Add(new Spec { Npc = npc, Event = eventType, State = state, Option = option, Payload = payload, OneShot = oneShot, Lines = lines });
             }
         }
 
         private static List<Spec> Content()
         {
             const DialogueNpcState Any = DialogueNpcState.None;
-            const DialogueNpcState Dejected = DialogueNpcState.Dejected;
-            const DialogueNpcState Warm = DialogueNpcState.WarmedUp;
-            const DialogueNpcState Eureka = DialogueNpcState.Eureka;
+            const DialogueNpcState Stranger = DialogueNpcState.Stranger;
+            const DialogueNpcState Familiar = DialogueNpcState.Familiar;
+            const DialogueNpcState Friendly = DialogueNpcState.Friendly;
+
+            const DialogueEventType Order = DialogueEventType.Order;
+            const DialogueEventType Musing = DialogueEventType.Musing;
+            const DialogueEventType Hurry = DialogueEventType.Hurry;
+            const DialogueEventType Correct = DialogueEventType.CorrectOrder;
+            const DialogueEventType Tasty = DialogueEventType.WrongOrderTasty;
+            const DialogueEventType Nasty = DialogueEventType.WrongOrderNasty;
+            const DialogueEventType Dream = DialogueEventType.DreamOrder;
+
+            const string MSBeef = "MSBeef fried rice";
+            const string Liked = "[liked meal]";
+            const string DreamDish = "[dream dish]";
 
             DialogueNpcId woman = DialogueNpcId.Woman;
             DialogueNpcId man = DialogueNpcId.Man;
             DialogueNpcId sleeper = DialogueNpcId.Sleeper;
             DialogueNpcId eyesider = DialogueNpcId.Eyesider;
 
-            return new List<Spec>
-            {
-                // The Woman: loud, unbothered by "the flux", avoids anything that reminds her of her love.
-                // Desire: the sweet and sour soup she used to make for them.
-                new Spec(woman, DialogueEventType.Order, Dejected, "Everyone's panicking about the flux. Ridiculous."),
-                new Spec(woman, DialogueEventType.Order, Warm,
-                    "You know what nobody on the Eye makes anymore? Anything with a bit of tang to it.",
-                    "Someone I knew used to make a soup like that. Sweet. Sour. It doesn't matter."),
-                new Spec(woman, DialogueEventType.Order, Eureka,
-                    "I've been looking at shuttle schedules.",
-                    "Don't look at me like that. Just cook."),
-                new Spec(woman, DialogueEventType.GoodDish, Any, "Fine. That's fine."),
-                new Spec(woman, DialogueEventType.GoodDish, Warm, "Not bad. Not bad at all.", "Greasy, salty. Nothing to think about. Good."),
-                new Spec(woman, DialogueEventType.BadDish, Any, "Is this what passes for food now?"),
-                new Spec(woman, DialogueEventType.OkDish, Any, "It'll do. Don't expect a thank-you."),
-                new Spec(woman, DialogueEventType.Refused, Any, "I said no beef. Are you deaf?"),
-                new Spec(woman, DialogueEventType.LateDish, Any, "Took you long enough."),
-                new Spec(woman, DialogueEventType.Hurry, Any, "Any day now."),
-                new Spec(woman, DialogueEventType.DreamMeal, Any,
-                    "...",
-                    "I used to make this. For someone.",
-                    "I have to go. I have to find them before the flux finds me."),
+            Builder b = new Builder();
 
-                // The Man: works with orphans, careful about where food comes from.
-                // Desire: something simple and tasty with nothing questionable in it (a hearty broth).
-                new Spec(man, DialogueEventType.Order, Dejected, "The food on this station... Don't get me started."),
-                new Spec(man, DialogueEventType.Order, Warm,
-                    "I look after kids, down in the lower rings.",
-                    "I just want something simple. Something I could make for them without feeling sick about where it came from."),
-                new Spec(man, DialogueEventType.Order, Eureka, "I made it for the kids three times this week. They asked for it again."),
-                new Spec(man, DialogueEventType.GoodDish, Any, "That's... decent. Thank you."),
-                new Spec(man, DialogueEventType.BadDish, Any, "Healthy, I suppose. Joyless."),
-                new Spec(man, DialogueEventType.OkDish, Any, "It's... not quite what I asked for. It's fine."),
-                new Spec(man, DialogueEventType.Refused, Any, "Don't even get me started on the synthetic chicken."),
-                new Spec(man, DialogueEventType.LateDish, Any, "The kids are waiting, you know."),
-                new Spec(man, DialogueEventType.Hurry, Any, "I really need to get back."),
-                new Spec(man, DialogueEventType.DreamMeal, Any,
-                    "Simple. Tasty. Nobody got hurt making it.",
-                    "Could I... could I make this for the kids?"),
+            // ---------------------------------------------------------------- The Woman (Miro board)
 
-                // The Sleeper: clueless, direct, can barely taste. Secretly a spice fiend.
-                // Desire: something fiery that brings back their human parent.
-                new Spec(sleeper, DialogueEventType.Order, Dejected, "Is that a thing people eat?"),
-                new Spec(sleeper, DialogueEventType.Order, Warm,
-                    "This place feels like home. I've never been here.",
-                    "I remember heat. A kitchen that made your eyes water."),
-                new Spec(sleeper, DialogueEventType.Order, Eureka, "I found her. She cooks like you do. Hotter, actually."),
-                new Spec(sleeper, DialogueEventType.GoodDish, Any, "Wow! That kinda tastes.", "So that's why people stuff their face?"),
-                new Spec(sleeper, DialogueEventType.BadDish, Any, "Uhh... thanks?"),
-                new Spec(sleeper, DialogueEventType.OkDish, Any, "Is it supposed to be like this? I honestly can't tell."),
-                new Spec(sleeper, DialogueEventType.LateDish, Any, "Was I supposed to be waiting?"),
-                new Spec(sleeper, DialogueEventType.Hurry, Any, "Is it supposed to take this long? I don't know how food works."),
-                new Spec(sleeper, DialogueEventType.DreamMeal, Any,
-                    "That burn...",
-                    "I remember a kitchen. Someone's hands.",
-                    "I have to go. I know where she is."),
+            // Stranger
+            b.Add(woman, Order, Stranger, MSBeef, false,
+                "Whip me up an MSBeef rice real quick!",
+                "And none of that beef shit, you hear me? I only eat Real Beef™!",
+                "Fuck knows what they put in those animals...");
+            b.Add(woman, Order, Stranger, Liked, false, "[liked meal]. Get on it!", "I'm starving.");
+            b.Add(woman, Order, Stranger, Liked, false, "Need that [liked meal], Pot Boy.", "And try getting it done this cycle, ey?");
+            b.Add(woman, Hurry, Stranger, "I really ain't got all day, Pot Boy.");
+            b.Add(woman, Hurry, Stranger,
+                "Did you hear they found one of the stall owners in peaces recently?",
+                "Cut up in tiny little pieces... Behind that alley actually.",
+                "Come to think of it, wasn't that your neighbour?");
+            b.Add(woman, Hurry, Stranger, "aaaaaaaaAAAAAAHHHHH!!!", "What is even taking you this long!?");
+            b.Add(woman, Tasty, Stranger, "You fucked up, Pot Boy.", "But I'll let you live...");
+            b.Add(woman, Tasty, Stranger, "It'll do.", "But get it right next time.");
+            b.Add(woman, Nasty, Stranger, "Can't read, can't cook.", "You're lucky you're the only food stall in the Bright Market.");
+            b.Add(woman, Nasty, Stranger, "What even is this, Pot Boy?", "You call this cooking?");
+            b.Add(woman, Nasty, Stranger, "Thanks, I guess I'll go hungry today...");
 
-                // Generic Eyesiders: they give nothing.
-                new Spec(eyesider, DialogueEventType.GoodDish, Any, "..."),
-                new Spec(eyesider, DialogueEventType.BadDish, Any, "Tch."),
-                new Spec(eyesider, DialogueEventType.OkDish, Any, "Mm."),
-                new Spec(eyesider, DialogueEventType.LateDish, Any, "Tch. Slow."),
-                new Spec(eyesider, DialogueEventType.DreamMeal, Any, "...huh."),
-            };
+            // Familiar
+            b.Add(woman, Order, Familiar, Liked, false, "Hey. Get me that [liked dish], will ya?", "Please.");
+            b.Add(woman, Order, Familiar, MSBeef, false,
+                "Craving an MSBeef fried rice, and no funky stuff.",
+                "Don't take it the wrong way, Pot Boy. Not many chefs know their way around that beef animal.",
+                "Not tryna start my cycle with a fucked up stomach.");
+            b.Add(woman, Musing, Familiar,
+                "Look at all these cowards roaming the market.",
+                "The Flux comes knocking a few times and they all scramble to leave everything behind.",
+                "Taking all their fancy beef with them, leaving only us real ones behind.",
+                "Pathetic...",
+                "For real, though. You can barely scrape together some beef these days.",
+                "Not like I'd want to anyway...");
+            b.Add(woman, Musing, Familiar,
+                "Been here long, Pot Boy?",
+                "Build a life here, I assume. Like anyone with a sliver of perseverance in their guts.",
+                "Lost some people too, ey?",
+                "Didn't we all?",
+                "The Flux sours all sweetness before long.");
+            b.Add(woman, Musing, Familiar,
+                "You know, I've been meaning to tell you. Even the sour notes hit right in your cooking.",
+                "That's hard to do, Pot Boy. You should be proud.");
+            b.Add(woman, Hurry, Familiar,
+                "Ya know, when I woke up this morning, I didn't expect I'd spend half my cycle watching you tryna whip up a passing dish.");
+            b.Add(woman, Hurry, Familiar,
+                "I haven't been here much, but even I know better how your kitchen-eque patchwork station functions.",
+                "Need help finding something?");
+            b.Add(woman, Hurry, Familiar, "I don't come here for fun...", "Are we clear on that?");
+            b.Add(woman, Correct, Familiar, "That hits the spot.", "I'll see you around, ey?");
+            b.Add(woman, Correct, Familiar, "Thanks.", "Reminds me of the stuff I used to make. 'Twas a long time ago now...", "How time flies, Pot Boy.");
+            b.Add(woman, Tasty, Familiar, "Alright! Pot Boy got skills.", "Why you tryna hide these recipes from me, ey?");
+            b.Add(woman, Tasty, Familiar, "Mmmm, damn!", "The fuck else are you hiding from me?");
+            b.Add(woman, Tasty, Familiar, "This...", "This is good shit, Pot Boy.", "Update your menu, for Flux' sake!");
+            b.Add(woman, Nasty, Familiar, "Is that you, Pot Boy? Am I at the wrong stall?", "Why would you do me like this?");
+            b.Add(woman, Nasty, Familiar, "You and me will pretend this never happened.", "I'll giving you another chance.");
+
+            // The dream order scene (between Familiar and Friendly): once per game.
+            b.Add(woman, Dream, Any, null, true,
+                "This... This is...",
+                "It can't be.",
+                "I know this soup, I used to make it over and over again for...",
+                "Ohh, [name of her lover], where might you be be now. Why did you have to leave it all behind... Leave me behind...",
+                "Pot Boy, who the fuck are you? Why do you know my recipe?",
+                "The balance of sweet and sour, the thickness of the broth, and the beef!?",
+                "The beef is tender, just the way she liked it. Just the way she always was.",
+                "[name of her lover] is my partner. Or, was my partner. Once the Flux events started she wanted nothing more to do with this place and left.",
+                "More like I let her go, the bonehead that I am.",
+                "She was smart to leave and I was too caught up in the sour to see the sweetness slip away. Been caught up ever since.",
+                "I have to go now.",
+                "I have to go but I'll be back. I'm not done with you yet.");
+
+            // Friendly
+            b.Add(woman, Order, Friendly, DreamDish, false, "Hey Pot Boy.", "Get me that [dream dish], will ya?");
+            b.Add(woman, Order, Friendly, Liked, false, "Hit me with that [liked dish], boss!");
+            b.Add(woman, Order, Friendly, Liked, false, "Hey Boss!", "Will take a [liked dish]. Unless you're up for some... Magic.");
+            b.Add(woman, Musing, Friendly, null, true,
+                "I still don't know how you did that by the way.",
+                "Dusty ass market cook turns out not just to be a beef boss, but a clairvoyant recipe thief, sending my brain reeling with some street food.",
+                "Anyways... Your soup made me realise some things I should have realised a long time ago.",
+                "All those cycles ago, I fucked up majorly.",
+                "I shouldn't have let her leave on her own, and though I might have fucked it permanently, I have to try and make things right.",
+                "I have to make [name of her lover] her favourite soup once more.",
+                "What I'm trying to say is thank you, I owe you one.",
+                "But don't expect no tips from me. Especially now that I have to buy my way off this piece of metal.");
+            b.Add(woman, Musing, Friendly,
+                "Catch this, I got a lead on [name of her lover].",
+                "She hitched a ride on a cargo run that still comes around today. It's coming out of an agriculture sector not far from here.",
+                "Dunno where she headed from there, but hey, it's a start.",
+                "Maybe I'll even see how your precious potatoes are created.",
+                "Or... Maybe it's a beef factory...",
+                "Fuck, I didn't think of that!");
+            b.Add(woman, Musing, Friendly,
+                "Get this, Pot Boy!",
+                "This blockhead just secured some tix out of here.",
+                "That's right, few weeks time, imma be clean out. Looking for someone I last seen many many lonely birthdays ago. Tyna cook for them.",
+                "Fuckin' terrifying...");
+            b.Add(woman, Hurry, Friendly, "Umm... Yeah...", "Take your time, boss.");
+            b.Add(woman, Hurry, Friendly, "You know, if the grub wasn't this good, I wouldn't put up with this, Pot Boy.");
+            b.Add(woman, Hurry, Friendly,
+                "I was already hungry when I got here.",
+                "Keeping me in suspense doesn't make me more hungry.",
+                "Only more fu--",
+                "I mean, nothing. This is great.");
+            b.Add(woman, Correct, Friendly, "Ohh yeah, That's the stuff.", "Have a good one Pot Boy, I'll see you 'round.");
+            b.Add(woman, Correct, Friendly, "Mmm...", "Maybe I should take you with me, ey?", "Yeah, I'll miss this.");
+            b.Add(woman, Tasty, Friendly,
+                "Dunno how you does it, and to be honest, I don't care either.",
+                "Just keep doing what you're doing.",
+                "Same time tomorrow.");
+            b.Add(woman, Tasty, Friendly, "Ohhh... The boss pulls out another one.", "Be back soon, alright?");
+            b.Add(woman, Tasty, Friendly, "All this taste... Obliterating my mouth right now.", "I fuckin' love it.");
+            b.Add(woman, Nasty, Friendly, "Is this your evil twin, or what?", "Did you sleep alright? I see some bad energies under your eyes.");
+            b.Add(woman, Nasty, Friendly, "No, not evil Pot Boy again...", "Now that I look at you, you do look about as bad today as this meal.");
+            b.Add(woman, Nasty, Friendly, "You know, I'm not disappointed, just fucking mad.");
+
+            // ---------------------------------------------------------------- The Man (placeholders + the board's MSG line)
+
+            b.Add(man, Order, Stranger, "The food on this station... Don't get me started.");
+            b.Add(man, Order, Familiar,
+                "I look after kids, down in the lower rings.",
+                "I just want something simple. Something I could make for them without feeling sick about where it came from.");
+            b.Add(man, Order, Friendly, "I made it for the kids three times this week. They asked for it again.");
+            b.Add(man, Musing, Familiar, "Did you know MSG stands for Major Societal deGeneracy?", "And they made two of them!", "The bastards.");
+            b.Add(man, Hurry, Any, "I really need to get back.");
+            b.Add(man, Correct, Any, "That's... decent. Thank you.");
+            b.Add(man, Tasty, Any, "It's... not quite what I asked for. It's fine.");
+            b.Add(man, Nasty, Any, "Healthy, I suppose. Joyless.");
+            b.Add(man, Nasty, Any, "Don't even get me started on the synthetic chicken.");
+            b.Add(man, Dream, Any, null, true, "Simple. Tasty. Nobody got hurt making it.", "Could I... could I make this for the kids?");
+
+            // ---------------------------------------------------------------- The Sleeper (placeholders; the board's template is empty)
+
+            b.Add(sleeper, Order, Stranger, "Is that a thing people eat?");
+            b.Add(sleeper, Order, Familiar,
+                "This place feels like home. I've never been here.",
+                "I remember heat. A kitchen that made your eyes water.");
+            b.Add(sleeper, Order, Friendly, "I found her. She cooks like you do. Hotter, actually.");
+            b.Add(sleeper, Hurry, Any, "Is it supposed to take this long? I don't know how food works.");
+            b.Add(sleeper, Correct, Any, "Wow! That kinda tastes.", "So that's why people stuff their face?");
+            b.Add(sleeper, Tasty, Any, "Is it supposed to be like this? I honestly can't tell.");
+            b.Add(sleeper, Nasty, Any, "Uhh... thanks?");
+            b.Add(sleeper, Dream, Any, null, true, "That burn...", "I remember a kitchen. Someone's hands.", "I have to go. I know where she is.");
+
+            // ---------------------------------------------------------------- Generic Eyesiders: they give nothing.
+
+            b.Add(eyesider, Correct, Any, "...");
+            b.Add(eyesider, Tasty, Any, "Mm.");
+            b.Add(eyesider, Nasty, Any, "Tch.");
+            b.Add(eyesider, Dream, Any, null, true, "...huh.");
+
+            return b.Specs;
         }
 
         [MenuItem("Custom Tools/Cooking Prototype/Build Dialogue")]
@@ -154,12 +274,14 @@ namespace Cooking.Prototype.EditorTools
         private static DialogueGraph EnsureGraph(Spec spec, ref int created)
         {
             string stateName = spec.State == DialogueNpcState.None ? "Any" : spec.State.ToString();
-            string path = GraphFolder + "/" + spec.Npc + " - " + spec.Event + " - " + stateName + ".asset";
+            string path = GraphFolder + "/" + spec.Npc + " - " + spec.Event + " - " + stateName + " - O" + spec.Option + ".asset";
 
             DialogueGraph graph = AssetDatabase.LoadAssetAtPath<DialogueGraph>(path);
             if(graph != null) return graph;
 
             graph = ScriptableObject.CreateInstance<DialogueGraph>();
+            graph.isOneShot = spec.OneShot;
+            graph.payload = spec.Payload ?? "";
             AssetDatabase.CreateAsset(graph, path);
 
             // Entry → Line → Line ... → End, laid out left to right like the graph editor's layout.
@@ -170,8 +292,8 @@ namespace Cooking.Prototype.EditorTools
             {
                 DialogueNodeData line = graph.AddNode(DialogueNodeKind.Line);
                 line.line.text = spec.Lines[i];
-                // First line comes quickly; later ones leave time to read.
-                line.line.delaySeconds = i == 0 ? 0.4f : 1.8f;
+                // The first line comes quickly; each later one waits long enough to read the one before.
+                line.line.delaySeconds = i == 0 ? 0.4f : Mathf.Round((1f + spec.Lines[i - 1].Length / 28f) * 10f) / 10f;
                 line.editorPosition = new Vector2(260f * (i + 1), 0f);
                 graph.Connect(previous.guid, line.guid);
                 previous = line;
@@ -227,8 +349,8 @@ namespace Cooking.Prototype.EditorTools
 
             SerializedObject directorSo = new SerializedObject(director);
             directorSo.FindProperty("catalog").objectReferenceValue = catalog;
-            // A new customer's lines cut off the last customer's instead of queueing behind them.
-            directorSo.FindProperty("policyOnNewTrigger").enumValueIndex = (int)DialoguePolicyOnNewTrigger.Replace;
+            // What's being said finishes; the next line waits a beat, and a reaction to the dish jumps the queue.
+            directorSo.FindProperty("policyOnNewTrigger").enumValueIndex = (int)DialoguePolicyOnNewTrigger.FinishThenQueue;
             directorSo.ApplyModifiedProperties();
 
             EditorSceneManager.MarkSceneDirty(prototype.gameObject.scene);

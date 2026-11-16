@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Man - Musing - Familiar - O1
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: 36702bcd-fb47-4604-a554-83ab9ba40df6
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: 25cb56b3-a49d-4c61-84cd-f9d063f798fc
+    kind: 0
+    line:
+      text: Did you know MSG stands for Major Societal deGeneracy?
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: 724ed453-5050-4774-8276-2daa0a0dad60
+    kind: 0
+    line:
+      text: And they made two of them!
+      delaySeconds: 2.9
+    editorPosition: {x: 520, y: 0}
+  - guid: 0b0db60f-8bf7-4187-bd44-61e35a43aa06
+    kind: 0
+    line:
+      text: The bastards.
+      delaySeconds: 1.9
+    editorPosition: {x: 780, y: 0}
+  - guid: 679ea3f7-6285-42c8-9a03-452d544cf10e
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 1040, y: 0}
+  edges:
+  - fromNodeGuid: 36702bcd-fb47-4604-a554-83ab9ba40df6
+    fromOptionGuid: 
+    toNodeGuid: 25cb56b3-a49d-4c61-84cd-f9d063f798fc
+  - fromNodeGuid: 25cb56b3-a49d-4c61-84cd-f9d063f798fc
+    fromOptionGuid: 
+    toNodeGuid: 724ed453-5050-4774-8276-2daa0a0dad60
+  - fromNodeGuid: 724ed453-5050-4774-8276-2daa0a0dad60
+    fromOptionGuid: 
+    toNodeGuid: 0b0db60f-8bf7-4187-bd44-61e35a43aa06
+  - fromNodeGuid: 0b0db60f-8bf7-4187-bd44-61e35a43aa06
+    fromOptionGuid: 
+    toNodeGuid: 679ea3f7-6285-42c8-9a03-452d544cf10e
+  isOneShot: 0
+  payload: 

@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Man - WrongOrderTasty - Any - O1
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: 83a62786-8977-495f-96be-155f2c3db865
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: b46af964-9d77-48ae-bf03-e5722b5892f6
+    kind: 0
+    line:
+      text: It's... not quite what I asked for. It's fine.
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: 4b39f48f-5282-49d8-b6d4-45f2e53c3f13
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 520, y: 0}
+  edges:
+  - fromNodeGuid: 83a62786-8977-495f-96be-155f2c3db865
+    fromOptionGuid: 
+    toNodeGuid: b46af964-9d77-48ae-bf03-e5722b5892f6
+  - fromNodeGuid: b46af964-9d77-48ae-bf03-e5722b5892f6
+    fromOptionGuid: 
+    toNodeGuid: 4b39f48f-5282-49d8-b6d4-45f2e53c3f13
+  isOneShot: 0
+  payload: 

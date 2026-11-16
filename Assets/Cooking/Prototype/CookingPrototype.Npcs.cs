@@ -2,39 +2,55 @@ using System.Collections.Generic;
 using System.Text;
 using DialogueSystem;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Cooking.Prototype
 {
     /// <summary>
-    /// Regulars getting to know you: each customer's stage (Dejected → Warmed up → Eureka), the
+    /// Regulars getting to know you: each customer's stage (Stranger → Familiar → Friendly), the
     /// dishes they like and order, and what they say. Lines come from the DialogueSystem catalog,
-    /// triggered as (NPC, event, stage); when the catalog has nothing, the customer's fallback
-    /// lines are used.
+    /// triggered as (NPC, event, stage), and type out in the sidebar; when the catalog has nothing,
+    /// the customer's fallback lines are used.
     /// </summary>
+    /// <remarks>
+    /// A visit: they arrive and order (Order). Their order dialogue says what they want, through the
+    /// graph's payload (a dish name) or a [liked meal] / [dream dish] token in the text. While you
+    /// cook they muse once (Musing) and hurry you now and then (Hurry). Serving plays their reaction
+    /// (CorrectOrder, WrongOrderTasty, WrongOrderNasty, or DreamOrder once per game) as a priority
+    /// trigger, so it plays straight after whatever they were saying.
+    /// </remarks>
     public partial class CookingPrototype
     {
         [Header("Dialogue")]
         [Tooltip("Catalog the prototype checks for lines. Use the same one as the scene's DialogueDirector. Built by Custom Tools → Cooking Prototype → Build Dialogue.")]
         [SerializeField] private DialogueCatalog dialogueCatalog;
-        [Tooltip("Share of the order timer left when the customer starts hurrying you.")]
-        [SerializeField, Range(0f, 1f)] private float hurryAt = 0.25f;
+        [Tooltip("Letters per second in the sidebar.")]
+        [SerializeField, Min(5f)] private float typewriterSpeed = 45f;
 
-        private const int SpeechLines = 4;
+        private const int SpeechLines = 8;
 
         private readonly Dictionary<Customer, CustomerRelationship> relationships = new Dictionary<Customer, CustomerRelationship>();
         private readonly List<string> speech = new List<string>();
         private readonly List<string> progressToday = new List<string>();
         private readonly List<HistoryEntry> history = new List<HistoryEntry>();
-        /// <summary>The served dish of the current visit; later lines are added to it.</summary>
+        /// <summary>The current visit; lines and cooking steps are added to it.</summary>
         private HistoryEntry currentEntry;
         /// <summary>A desire clue waiting for the customer's reaction lines to finish.</summary>
         private string pendingClue;
         /// <summary>The dialogue event whose end releases <see cref="pendingClue"/>; None until the reaction is triggered.</summary>
         private DialogueEventType clueAfter;
         private float visitStarted;
-        private float orderTakenAt;
-        private bool hurried;
-        private UnityEngine.UI.Text resultSpeech;
+        private float orderInAt;
+        private float nextHurryAt;
+        private float musingAt;
+        private bool mused;
+        /// <summary>The liked meal this visit's [liked meal] tokens stand for.</summary>
+        private RecipeDefinition visitLiked;
+        /// <summary>Letters of the newest line shown so far.</summary>
+        private float typed;
+        private Text resultSpeech;
+        private Text sidebarCustomer;
+        private Text sidebarSpeech;
 
         private void InitNpcs()
         {
@@ -73,9 +89,9 @@ namespace Cooking.Prototype
         {
             switch(stage)
             {
-                case NpcStage.WarmedUp: return "warmed up";
-                case NpcStage.Eureka: return "eureka";
-                default: return "dejected";
+                case NpcStage.Familiar: return "familiar";
+                case NpcStage.Friendly: return "friendly";
+                default: return "stranger";
             }
         }
 
@@ -84,10 +100,11 @@ namespace Cooking.Prototype
         /// <summary>
         /// Has the current customer say something about <paramref name="eventType"/>: catalog lines
         /// for their stage, or any-stage lines, or <paramref name="fallback"/> if there are none.
+        /// Returns true when the catalog will play lines.
         /// </summary>
-        private void Speak(DialogueEventType eventType, string fallback)
+        private bool Speak(DialogueEventType eventType, string fallback, bool priority = false)
         {
-            if(customer == null) return;
+            if(customer == null) return false;
 
             NpcStage stage = Relationship(customer).Stage;
             DialogueNpcState state = DialogueNpcState.None;
@@ -96,16 +113,15 @@ namespace Cooking.Prototype
 
             if(canPlay)
             {
-                // A pending clue follows when these lines end (HandleDialogueEnded), not when some
-                // earlier dialogue (the order chat) is cut off by this one.
+                // A pending clue follows when these lines end (HandleDialogueEnded).
                 if(pendingClue != null) clueAfter = eventType;
-                Dialogue.Trigger(customer.dialogueId, eventType, state);
+                Dialogue.Trigger(customer.dialogueId, eventType, state, priority);
+                return true;
             }
-            else
-            {
-                if(!string.IsNullOrEmpty(fallback)) AddSpeech(fallback, SpeechTag(eventType));
-                FlushClue();
-            }
+
+            if(!string.IsNullOrEmpty(fallback)) AddSpeech(fallback, SpeechTag(eventType));
+            FlushClue();
+            return false;
         }
 
         /// <summary>How a line is labelled in the history.</summary>
@@ -115,6 +131,7 @@ namespace Cooking.Prototype
             {
                 case DialogueEventType.Order: return "Order";
                 case DialogueEventType.Hurry: return "Hurrying";
+                case DialogueEventType.Musing: return "Musing";
                 case DialogueEventType.None: return "Says";
                 default: return "Reaction";
             }
@@ -122,14 +139,34 @@ namespace Cooking.Prototype
 
         private void HandleDialogueLine(DialogueLineEventArgs line)
         {
-            // Lines from a customer who already left (aborted by Replace) don't belong to this visit.
+            // Lines from a customer who already left don't belong to this visit.
             if(customer == null || line.TriggerNpc != customer.dialogueId) return;
-            AddSpeech(line.Text, SpeechTag(line.EventType));
+
+            // The first order line says what they want.
+            if(line.EventType == DialogueEventType.Order && !orderIn)
+            {
+                ResolveOrder(line.Graph != null ? line.Graph.payload : null, line.Text);
+            }
+
+            string text = CustomerDialogue.FillTokens(line.Text, NameIfSaved(visitLiked), NameIfSaved(Relationship(customer).DreamMeal));
+
+            if(line.EventType == DialogueEventType.Order)
+            {
+                orderLine = string.IsNullOrEmpty(orderLine) ? text : orderLine + " " + text;
+                if(currentEntry != null) currentEntry.OrderLine = orderLine;
+                RefreshTickets();
+            }
+
+            AddSpeech(text, SpeechTag(line.EventType));
         }
 
         private void HandleDialogueEnded(DialogueEndedEventArgs ended)
         {
             if(customer == null || ended.TriggerNpc != customer.dialogueId) return;
+
+            // An order dialogue without lines still has to end in an order.
+            if(ended.EventType == DialogueEventType.Order && !orderIn) SetOrder(DefaultOrder());
+
             if(clueAfter == DialogueEventType.None || ended.EventType != clueAfter) return;
             FlushClue();
         }
@@ -144,6 +181,40 @@ namespace Cooking.Prototype
             AddSpeech(clue, "Clue");
         }
 
+        /// <summary>A dish's name for their lines, or null when it isn't on the menu (unsaved or deleted).</summary>
+        private string NameIfSaved(RecipeDefinition recipe)
+        {
+            return IsOnMenu(recipe) ? recipe.DisplayName : null;
+        }
+
+        private RecipeDefinition DefaultOrder()
+        {
+            return Relationship(customer).PickOrder(random, VisibleMenu());
+        }
+
+        /// <summary>Works out the order from the order dialogue's payload or tokens.</summary>
+        private void ResolveOrder(string payload, string text)
+        {
+            CustomerRelationship relationship = Relationship(customer);
+            RecipeDefinition pick = null;
+
+            switch(CustomerDialogue.ReadOrder(payload, text, out string dishName))
+            {
+                case CustomerDialogue.OrderKind.Named:
+                    pick = CustomerDialogue.FindByName(menu, dishName);
+                    if(pick == null) Debug.LogWarning("[Cooking] Order dialogue names \"" + dishName + "\", which isn't a dish. Using a default order.");
+                    break;
+                case CustomerDialogue.OrderKind.Liked:
+                    pick = visitLiked;
+                    break;
+                case CustomerDialogue.OrderKind.Dream:
+                    pick = relationship.DreamMeal ?? visitLiked;
+                    break;
+            }
+
+            SetOrder(pick ?? DefaultOrder());
+        }
+
         /// <summary>Seconds since the current customer arrived.</summary>
         private float VisitTime => Time.time - visitStarted;
 
@@ -152,13 +223,28 @@ namespace Cooking.Prototype
             if(currentEntry != null) currentEntry.Speech.Add(new VisitEvent { Time = VisitTime, Tag = tag, Text = text });
             speech.Add(text);
             while(speech.Count > SpeechLines) speech.RemoveAt(0);
+            typed = 0f;
             RefreshSpeech();
         }
 
         private void ClearSpeech()
         {
             speech.Clear();
+            typed = 0f;
             RefreshSpeech();
+        }
+
+        /// <summary>Types the newest line out, letter by letter.</summary>
+        private void TickSpeech(float deltaTime)
+        {
+            if(speech.Count == 0) return;
+
+            int length = speech[speech.Count - 1].Length;
+            if(typed >= length) return;
+
+            int before = Mathf.FloorToInt(typed);
+            typed = Mathf.Min(length, typed + deltaTime * typewriterSpeed);
+            if(Mathf.FloorToInt(typed) != before) RefreshSpeech();
         }
 
         private void RefreshSpeech()
@@ -167,84 +253,152 @@ namespace Cooking.Prototype
 
             for(int i = 0; i < speech.Count; i++)
             {
-                // Older lines fade so the newest reads first.
                 bool newest = i == speech.Count - 1;
-                sb.Append(newest ? "<color=#ebe6db>\"" : "<color=#8f8a83>\"").Append(speech[i]).Append("\"</color>\n");
+                string line = newest ? speech[i].Substring(0, Mathf.Clamp(Mathf.FloorToInt(typed), 0, speech[i].Length)) : speech[i];
+
+                // Older lines fade so the newest reads first.
+                sb.Append(newest ? "<color=#ebe6db>\"" : "<color=#8f8a83>\"").Append(line);
+                if(!newest || typed >= speech[i].Length) sb.Append('"');
+                sb.Append("</color>\n\n");
             }
 
             string text = sb.ToString();
-            foreach(TicketView ticket in tickets) ticket.Speech.text = text;
+            if(sidebarSpeech != null) sidebarSpeech.text = text;
             if(resultSpeech != null) resultSpeech.text = text;
         }
 
-        /// <summary>Per frame during an order: the customer hurries you once when time runs low.</summary>
-        private void CheckHurry()
+        private void RefreshSidebar()
         {
-            if(hurried || !timedOrders || !orderTaken || orderDuration <= 0f) return;
-            if(orderTimeLeft > orderDuration * hurryAt) return;
+            if(sidebarCustomer == null) return;
 
-            hurried = true;
-            Speak(DialogueEventType.Hurry, null);
+            if(phase == Phase.Service && customer != null)
+            {
+                sidebarCustomer.text = customer.name + "\n<size=16><color=#a6a199>" + StageLabel(Relationship(customer).Stage)
+                                       + (orderIn ? " · wants " + DishName(order) : " · ordering") + "</color></size>";
+            }
+            else if(phase == Phase.Service)
+            {
+                sidebarCustomer.text = "<color=#a6a199>Nobody at the counter</color>";
+            }
+            else
+            {
+                sidebarCustomer.text = "<color=#a6a199>" + (phase == Phase.Morning ? "Customers come when the day starts." : "Closed.") + "</color>";
+            }
+        }
+
+        private void BuildSpeechSidebar(Transform root)
+        {
+            RectTransform panel = UIFactory.Panel(root, "Speech Sidebar", UIFactory.PanelDark).rectTransform;
+            panel.anchorMin = new Vector2(1f - SidebarWidth, 0f);
+            panel.anchorMax = Vector2.one;
+            panel.offsetMin = new Vector2(0f, 44f);
+            panel.offsetMax = new Vector2(0f, -60f);
+            VerticalLayoutGroup layout = UIFactory.Vertical(panel.gameObject, 10f, 18);
+            layout.childForceExpandHeight = false;
+
+            Header(panel, "AT THE COUNTER");
+            sidebarCustomer = UIFactory.Label(panel, "", 26, TextAnchor.UpperLeft, FontStyle.Bold, UIFactory.Accent);
+            sidebarSpeech = UIFactory.Label(panel, "", 19, TextAnchor.UpperLeft, FontStyle.Italic);
+            UIFactory.Size(sidebarSpeech, -1f, 1f);
         }
 
         // ------------------------------------------------------------------ Visits
 
-        /// <summary>A customer arrives: start a fresh visit record that collects what's said and cooked until they're served.</summary>
+        /// <summary>A customer arrives: start a fresh visit record and have them order.</summary>
         private void BeginVisit()
         {
-            hurried = false;
             pendingClue = null;
             clueAfter = DialogueEventType.None;
             visitStarted = Time.time;
-            orderTakenAt = 0f;
+            orderInAt = 0f;
+            nextHurryAt = Time.time + Mathf.Max(5f, customer.hurryAfter);
+            musingAt = float.MaxValue;
+            mused = false;
             ClearSpeech();
-            currentEntry = NewVisitEntry();
-        }
 
-        private HistoryEntry NewVisitEntry()
-        {
-            return new HistoryEntry
+            CustomerRelationship relationship = Relationship(customer);
+            visitLiked = relationship.PickLiked(random);
+            currentEntry = new HistoryEntry
             {
                 Day = day,
                 Visit = servedToday + 1,
                 Customer = customer,
-                Stage = Relationship(customer).Stage,
-                Ordered = order != null ? order.DisplayName : "-",
+                Stage = relationship.Stage,
             };
+
+            // Their order dialogue says what they want; without one, they just order.
+            if(!Speak(DialogueEventType.Order, null))
+            {
+                SetOrder(DefaultOrder());
+                orderLine = customer.GetOrderLine(order, random);
+                currentEntry.OrderLine = orderLine;
+                AddSpeech(orderLine, "Order");
+                RefreshTickets();
+            }
+        }
+
+        /// <summary>Per frame while a customer waits: they muse once, and hurry you every so often.</summary>
+        private void TickVisit()
+        {
+            if(customer == null) return;
+
+            if(orderIn && !mused && Time.time >= musingAt)
+            {
+                mused = true;
+                Speak(DialogueEventType.Musing, null);
+            }
+
+            if(Time.time >= nextHurryAt)
+            {
+                nextHurryAt = Time.time + Mathf.Max(5f, customer.hurryAfter);
+                Speak(DialogueEventType.Hurry, null);
+            }
+        }
+
+        /// <summary>The order is known: note it for the history and start the musing countdown.</summary>
+        private void OnOrderIn()
+        {
+            orderInAt = VisitTime;
+            float min = Mathf.Max(0f, Mathf.Min(customer.musingAfter.x, customer.musingAfter.y));
+            float max = Mathf.Max(customer.musingAfter.x, customer.musingAfter.y);
+            musingAt = Time.time + Random.Range(min, max);
+
+            if(currentEntry == null) return;
+            currentEntry.Order = order;
+            currentEntry.Ordered = DishName(order);
         }
 
         /// <summary>Notes a cooking step for the current visit's history.</summary>
         private void LogCooking(string tag, string text)
         {
-            if(currentEntry == null || phase != Phase.Service) return;
+            if(currentEntry == null || phase != Phase.Service || customer == null) return;
             currentEntry.Cooking.Add(new VisitEvent { Time = VisitTime, Tag = tag, Text = text });
         }
 
-        private void OnOrderTaken()
-        {
-            orderTakenAt = VisitTime;
-            if(currentEntry == null) return;
-
-            currentEntry.OrderLine = orderLine;
-            currentEntry.Timed = timedOrders;
-            currentEntry.TimeAllowed = orderDuration;
-            currentEntry.Speech.Add(new VisitEvent { Time = VisitTime, Tag = "Order", Text = orderLine });
-        }
-
         /// <summary>
-        /// Records the served dish with the customer: their relationship, the visit's history entry,
-        /// and (once they've warmed up) a clue towards their secret desire. Call before the plate is cleared.
+        /// Records the served dish with the customer: their relationship, the visit's history entry
+        /// (with the dish, named or not), and (once they're familiar) a clue towards their secret
+        /// desire. Call before the plate is cleared.
         /// </summary>
         private RelationshipChange RecordServe(JudgeResult result)
         {
             CustomerRelationship relationship = Relationship(customer);
             NpcStage stageBefore = relationship.Stage;
-            RelationshipChange change = relationship.Record(result, plate);
+            List<RecipeDefinition> known = KnownRecipes();
+            RelationshipChange change = relationship.Record(result, plate, known);
 
-            if(currentEntry == null) currentEntry = NewVisitEntry();
+            if(currentEntry == null) currentEntry = new HistoryEntry { Day = day, Visit = servedToday, Customer = customer };
+
+            // The dish as a recipe: a menu dish it makes exactly, a dish they already know, or a new nameless one.
+            known = KnownRecipes();
+            RecipeDefinition dish = CustomerRelationship.FindMatch(known, plate);
+            foreach(HistoryEntry past in history) if(dish == null && past.Dish != null && CustomerRelationship.FindMatch(new[] { past.Dish }, plate) != null) dish = past.Dish;
+            if(dish == null && plate.Count > 0) dish = CustomerRelationship.CreateMeal(CustomerRelationship.Nameless, plate);
 
             currentEntry.Stage = stageBefore;
-            currentEntry.Ordered = order != null ? order.DisplayName : "-";
+            currentEntry.Order = order;
+            currentEntry.Ordered = DishName(order);
+            currentEntry.Dish = dish;
             currentEntry.OrderedFlavour = result.Ordered;
             currentEntry.Flavour = result.Dish;
             currentEntry.BestZone = result.BestZone.IsMatch ? result.BestZone.Zone.DisplayName : null;
@@ -256,8 +410,7 @@ namespace Cooking.Prototype
             currentEntry.Payment = result.Payment;
             currentEntry.Tip = result.Tip;
             currentEntry.IngredientCost = dishCost;
-            currentEntry.Late = result.Late;
-            currentEntry.TimeTaken = Mathf.Max(0f, VisitTime - orderTakenAt);
+            currentEntry.TimeTaken = Mathf.Max(0f, VisitTime - orderInAt);
 
             foreach(IngredientPortion portion in plate)
             {
@@ -272,22 +425,22 @@ namespace Cooking.Prototype
                 currentEntry.DesireDistance = result.Verdict == Verdict.DreamMeal ? 0f : customer.secretDesire.DistanceOutside(result.Dish);
                 currentEntry.Warmth = relationship.RecordDesireDistance(currentEntry.DesireDistance);
 
-                // Dejected regulars keep it to themselves; once warmed up they let things slip.
-                if(result.Verdict != Verdict.DreamMeal && result.Verdict != Verdict.Refused && stageBefore != NpcStage.Dejected)
+                // Strangers keep it to themselves; once familiar they let things slip.
+                if(result.Verdict != Verdict.DreamMeal && stageBefore != NpcStage.Stranger && relationship.DreamMeal == null)
                 {
-                    currentEntry.Clue = DesireClue.Describe(result.Dish, customer.secretDesire, currentEntry.Warmth);
+                    currentEntry.Clue = DesireClue.Describe(result.Dish, customer.secretDesire, currentEntry.Warmth, missingNeed: result.DesireScore >= 1f);
                     pendingClue = currentEntry.Clue;
                 }
             }
 
             if(change.StageChanged)
             {
-                progressToday.Add(change.After == NpcStage.Eureka
-                    ? customer.name + " had their dream meal. They'll order it from now on."
-                    : customer.name + " warmed up to you.");
+                progressToday.Add(change.After == NpcStage.Friendly
+                    ? customer.name + " had their dream meal. You're friends now."
+                    : customer.name + " is getting familiar with you.");
             }
 
-            if(change.NewLikedMeal != null) progressToday.Add(customer.name + " liked something new: " + change.NewLikedMeal.DisplayName + ".");
+            if(change.NewLikedMeal != null) progressToday.Add(customer.name + " liked something new: " + DishName(change.NewLikedMeal) + ".");
             return change;
         }
 
@@ -299,20 +452,20 @@ namespace Cooking.Prototype
             if(change.StageChanged)
             {
                 sb.Append("<color=#f28c33><b>")
-                  .Append(change.After == NpcStage.Eureka ? "Eureka! " + customer.name + " found their dream meal." : customer.name + " is warming up to you.")
+                  .Append(change.After == NpcStage.Friendly ? customer.name + " found their dream meal. You're friends now." : customer.name + " is getting familiar with you.")
                   .Append("</b></color>\n");
             }
 
             if(change.NewLikedMeal != null)
             {
-                sb.Append("<color=#73cc73>They'll order this again as \"").Append(change.NewLikedMeal.DisplayName).Append("\".</color>\n");
+                sb.Append("<color=#73cc73>They liked it and will order it again.</color>\n");
             }
 
             CustomerRelationship relationship = Relationship(customer);
-            if(relationship.Stage == NpcStage.Dejected)
+            if(relationship.Stage == NpcStage.Stranger)
             {
-                int left = Mathf.Max(0, customer.happyMealsToWarmUp - relationship.HappyMeals);
-                sb.Append("<color=#a6a199>").Append(left).Append(left == 1 ? " more happy meal" : " more happy meals").Append(" until they open up.</color>\n");
+                int left = Mathf.Max(0, customer.likedMealsToFamiliar - relationship.LikedCount);
+                sb.Append("<color=#a6a199>").Append(left).Append(left == 1 ? " more liked meal" : " more liked meals").Append(" until they're familiar.</color>\n");
             }
 
             return sb.ToString();

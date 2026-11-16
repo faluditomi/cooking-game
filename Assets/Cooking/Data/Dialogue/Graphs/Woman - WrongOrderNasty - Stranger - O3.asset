@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Woman - WrongOrderNasty - Stranger - O3
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: d9c133ab-2005-40d8-ab3e-462fe83be5f4
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: 5e19f5cc-56fe-45e6-82df-784cd729d557
+    kind: 0
+    line:
+      text: Thanks, I guess I'll go hungry today...
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: 75f15335-b63a-402f-8979-fb98970ea7b9
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 520, y: 0}
+  edges:
+  - fromNodeGuid: d9c133ab-2005-40d8-ab3e-462fe83be5f4
+    fromOptionGuid: 
+    toNodeGuid: 5e19f5cc-56fe-45e6-82df-784cd729d557
+  - fromNodeGuid: 5e19f5cc-56fe-45e6-82df-784cd729d557
+    fromOptionGuid: 
+    toNodeGuid: 75f15335-b63a-402f-8979-fb98970ea7b9
+  isOneShot: 0
+  payload: 

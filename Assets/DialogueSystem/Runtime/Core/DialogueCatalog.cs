@@ -32,6 +32,8 @@ namespace DialogueSystem
         // Session-only bookkeeping keyed by "npcId|eventType|npcState".
         // A Dictionary is acceptable here only because it is not Unity-serialized.
         [System.NonSerialized] private Dictionary<string, HashSet<DialogueGraph>> playedGraphsBySet;
+        // One-shot graphs that have played, across every set; they never play again until ResetPlayed.
+        [System.NonSerialized] private HashSet<DialogueGraph> playedOneShots;
 
         /// <summary>
         /// Picks a graph for the NPC/event pair from the play-once bag. Every distinct graph in
@@ -58,24 +60,36 @@ namespace DialogueSystem
             string key = BuildBagKey(npcId, eventType, npcState);
             HashSet<DialogueGraph> played = GetPlayedSet(key);
 
-            List<DialogueGraph> unplayed = new List<DialogueGraph>();
-
+            // First time through: in authored order (O1, O2, O3...).
             foreach(DialogueGraph graph in matched)
             {
-                if(!played.Contains(graph)) unplayed.Add(graph);
+                if(played.Contains(graph) || IsSpentOneShot(graph)) continue;
+                MarkPlayed(played, graph);
+                return graph;
             }
 
-            if(unplayed.Count == 0)
+            // Everything has played once: random from now on, never repeating a one-shot.
+            List<DialogueGraph> repeatable = new List<DialogueGraph>();
+            foreach(DialogueGraph graph in matched) if(!graph.isOneShot) repeatable.Add(graph);
+            if(repeatable.Count == 0) return null;
+
+            return repeatable[UnityEngine.Random.Range(0, repeatable.Count)];
+        }
+
+        private bool IsSpentOneShot(DialogueGraph graph)
+        {
+            return graph.isOneShot && playedOneShots != null && playedOneShots.Contains(graph);
+        }
+
+        private void MarkPlayed(HashSet<DialogueGraph> played, DialogueGraph graph)
+        {
+            played.Add(graph);
+
+            if(graph.isOneShot)
             {
-                // Whole set has played: reset that exact set and pick again.
-                played.Clear();
-                unplayed.AddRange(matched);
+                if(playedOneShots == null) playedOneShots = new HashSet<DialogueGraph>();
+                playedOneShots.Add(graph);
             }
-
-            int index = UnityEngine.Random.Range(0, unplayed.Count);
-            DialogueGraph selected = unplayed[index];
-            played.Add(selected);
-            return selected;
         }
 
         /// <summary>
@@ -101,6 +115,7 @@ namespace DialogueSystem
         public void ResetPlayed()
         {
             if(playedGraphsBySet != null) playedGraphsBySet.Clear();
+            if(playedOneShots != null) playedOneShots.Clear();
         }
 
         private DialogueNpcGroup FindGroup(DialogueNpcId npcId)

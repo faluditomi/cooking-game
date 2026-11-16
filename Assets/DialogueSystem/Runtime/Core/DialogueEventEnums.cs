@@ -11,22 +11,21 @@ namespace DialogueSystem
     public enum DialogueEventType
     {
         None = 0,
-        /// <summary>The customer places their order.</summary>
+        /// <summary>The customer arrives and orders. The graph's payload (or a [liked meal] / [dream dish] token) names the dish.</summary>
         Order = 1,
-        /// <summary>Served on time and they're happy (their order, or a dish they like).</summary>
-        GoodDish = 2,
-        /// <summary>Served and they didn't like it.</summary>
-        BadDish = 3,
-        /// <summary>The dish has something they won't eat.</summary>
-        Refused = 4,
-        /// <summary>Served after the order timer ran out (they still pay).</summary>
-        LateDish = 5,
-        /// <summary>The dish hit their secret desire: the eureka moment.</summary>
-        DreamMeal = 6,
-        /// <summary>The order timer is running low.</summary>
+        /// <summary>Served exactly what they ordered.</summary>
+        CorrectOrder = 2,
+        /// <summary>Served something wrong that isn't good (too different, or something they won't eat).</summary>
+        WrongOrderNasty = 3,
+        // 4 and 5 were Refused and LateDish; keep them unused.
+        /// <summary>The dish hit their secret desire: the dream order scene. Once per game.</summary>
+        DreamOrder = 6,
+        /// <summary>They've been waiting a while (restarts after each hurry).</summary>
         Hurry = 7,
-        /// <summary>Close enough to pay for, but not what they wanted. Lukewarm.</summary>
-        OkDish = 8,
+        /// <summary>Served something else, but it's good (very close or close enough).</summary>
+        WrongOrderTasty = 8,
+        /// <summary>Mid-cooking chat, once per order after a random delay.</summary>
+        Musing = 9,
     }
 
     // Game developer: extend this enum with the real NPC states your game uses. The package
@@ -35,14 +34,14 @@ namespace DialogueSystem
     // the DialogueCatalog. None is reserved for events that carry no NPC state and only
     // matches authored entries using None.
     //
-    // Cooking game: how far the NPC has opened up (design doc: Dejected / Warmed up / Eureka).
+    // Cooking game: how far the NPC has opened up (Miro board: Stranger / Familiar / Friendly).
     // Entries authored with None act as the fallback for any stage.
     public enum DialogueNpcState
     {
         None = 0,
-        Dejected = 1,
-        WarmedUp = 2,
-        Eureka = 3,
+        Stranger = 1,
+        Familiar = 2,
+        Friendly = 3,
     }
 
     // Game developer: extend this enum with the real NPC identifiers your game uses. The package

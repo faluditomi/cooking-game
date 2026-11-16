@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Woman - Hurry - Familiar - O1
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: f768c7fc-9ea6-4be4-9892-348137279640
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: 3cd0091c-c737-4721-b719-fec79cc9d2b0
+    kind: 0
+    line:
+      text: Ya know, when I woke up this morning, I didn't expect I'd spend half my cycle watching you tryna whip up a passing dish.
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: 4293559c-cb19-4dbf-80a4-9a0dbf2aa2d7
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 520, y: 0}
+  edges:
+  - fromNodeGuid: f768c7fc-9ea6-4be4-9892-348137279640
+    fromOptionGuid: 
+    toNodeGuid: 3cd0091c-c737-4721-b719-fec79cc9d2b0
+  - fromNodeGuid: 3cd0091c-c737-4721-b719-fec79cc9d2b0
+    fromOptionGuid: 
+    toNodeGuid: 4293559c-cb19-4dbf-80a4-9a0dbf2aa2d7
+  isOneShot: 0
+  payload: 

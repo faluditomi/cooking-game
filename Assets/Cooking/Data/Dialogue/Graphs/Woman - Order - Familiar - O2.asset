@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Woman - Order - Familiar - O2
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: 25ae5bad-9e04-4c67-9faa-c5241d1875b4
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: c715ee08-5453-4ec7-a646-f63f8e86b399
+    kind: 0
+    line:
+      text: Craving an MSBeef fried rice, and no funky stuff.
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: 90f0c0d0-0fab-459f-a72d-bceb1f1fa7af
+    kind: 0
+    line:
+      text: Don't take it the wrong way, Pot Boy. Not many chefs know their way around that beef animal.
+      delaySeconds: 2.8
+    editorPosition: {x: 520, y: 0}
+  - guid: c6bc4857-fec7-4159-860b-062f4066a734
+    kind: 0
+    line:
+      text: Not tryna start my cycle with a fucked up stomach.
+      delaySeconds: 4.3
+    editorPosition: {x: 780, y: 0}
+  - guid: 57d186ce-63a2-4041-89c5-339ace31ae06
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 1040, y: 0}
+  edges:
+  - fromNodeGuid: 25ae5bad-9e04-4c67-9faa-c5241d1875b4
+    fromOptionGuid: 
+    toNodeGuid: c715ee08-5453-4ec7-a646-f63f8e86b399
+  - fromNodeGuid: c715ee08-5453-4ec7-a646-f63f8e86b399
+    fromOptionGuid: 
+    toNodeGuid: 90f0c0d0-0fab-459f-a72d-bceb1f1fa7af
+  - fromNodeGuid: 90f0c0d0-0fab-459f-a72d-bceb1f1fa7af
+    fromOptionGuid: 
+    toNodeGuid: c6bc4857-fec7-4159-860b-062f4066a734
+  - fromNodeGuid: c6bc4857-fec7-4159-860b-062f4066a734
+    fromOptionGuid: 
+    toNodeGuid: 57d186ce-63a2-4041-89c5-339ace31ae06
+  isOneShot: 0
+  payload: MSBeef fried rice

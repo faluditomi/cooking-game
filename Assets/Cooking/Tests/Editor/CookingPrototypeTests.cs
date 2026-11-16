@@ -230,7 +230,7 @@ namespace Cooking.Tests
             Assert.AreEqual(2.4f, result.Payment, 0.0001f);
             Assert.AreEqual(0f, result.Tip);
             Assert.IsTrue(result.IsPaid);
-            Assert.IsFalse(result.IsHappy, "close enough is paid but lukewarm");
+            Assert.IsFalse(result.IsLiked, "close enough is paid but lukewarm");
         }
 
         [Test]
@@ -249,7 +249,7 @@ namespace Cooking.Tests
 
             Assert.AreEqual(Verdict.VeryClose, result.Verdict);
             Assert.AreEqual(16f * 0.8f, result.Payment, 0.0001f);
-            Assert.IsTrue(result.IsHappy);
+            Assert.IsTrue(result.IsLiked);
         }
 
         [Test]

@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Woman - WrongOrderNasty - Friendly - O3
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: 67d74ade-c3c0-40ca-8ea1-746575a5252b
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: ca4bbe90-98f2-496a-947a-6aa8cc8f896f
+    kind: 0
+    line:
+      text: You know, I'm not disappointed, just fucking mad.
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: 7fb1fad9-cc4e-44dc-8d41-985d31159fb5
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 520, y: 0}
+  edges:
+  - fromNodeGuid: 67d74ade-c3c0-40ca-8ea1-746575a5252b
+    fromOptionGuid: 
+    toNodeGuid: ca4bbe90-98f2-496a-947a-6aa8cc8f896f
+  - fromNodeGuid: ca4bbe90-98f2-496a-947a-6aa8cc8f896f
+    fromOptionGuid: 
+    toNodeGuid: 7fb1fad9-cc4e-44dc-8d41-985d31159fb5
+  isOneShot: 0
+  payload: 

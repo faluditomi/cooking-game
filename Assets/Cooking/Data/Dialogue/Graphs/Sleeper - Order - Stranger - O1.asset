@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Sleeper - Order - Stranger - O1
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: 6499335a-8711-4b44-80dc-2faf0bb1dbcc
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: a48c57b1-0134-4db0-9a9f-4bd03cd14151
+    kind: 0
+    line:
+      text: Is that a thing people eat?
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: 275cbbbf-48c6-49a3-92a9-952b93afb09e
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 520, y: 0}
+  edges:
+  - fromNodeGuid: 6499335a-8711-4b44-80dc-2faf0bb1dbcc
+    fromOptionGuid: 
+    toNodeGuid: a48c57b1-0134-4db0-9a9f-4bd03cd14151
+  - fromNodeGuid: a48c57b1-0134-4db0-9a9f-4bd03cd14151
+    fromOptionGuid: 
+    toNodeGuid: 275cbbbf-48c6-49a3-92a9-952b93afb09e
+  isOneShot: 0
+  payload: 

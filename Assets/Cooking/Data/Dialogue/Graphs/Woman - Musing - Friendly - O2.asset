@@ -1,0 +1,87 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Woman - Musing - Friendly - O2
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: 458b7cca-c5d8-417c-82e3-9b22a1419f5f
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: 344eb83a-4783-4b36-b76c-281869871f9a
+    kind: 0
+    line:
+      text: Catch this, I got a lead on [name of her lover].
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: 9a200010-31b5-47c6-a343-534b273de53e
+    kind: 0
+    line:
+      text: She hitched a ride on a cargo run that still comes around today. It's coming out of an agriculture sector not far from here.
+      delaySeconds: 2.7
+    editorPosition: {x: 520, y: 0}
+  - guid: d1b1e65f-53c8-4418-8610-56352e4e1148
+    kind: 0
+    line:
+      text: Dunno where she headed from there, but hey, it's a start.
+      delaySeconds: 5.4
+    editorPosition: {x: 780, y: 0}
+  - guid: cade4e07-6d4c-463b-9774-01eac2d6531e
+    kind: 0
+    line:
+      text: Maybe I'll even see how your precious potatoes are created.
+      delaySeconds: 3
+    editorPosition: {x: 1040, y: 0}
+  - guid: 63ee51a2-6954-4251-b61c-db9a59534519
+    kind: 0
+    line:
+      text: Or... Maybe it's a beef factory...
+      delaySeconds: 3.1
+    editorPosition: {x: 1300, y: 0}
+  - guid: 96135818-45ad-4792-9505-2b7ccf776ad5
+    kind: 0
+    line:
+      text: Fuck, I didn't think of that!
+      delaySeconds: 2.2
+    editorPosition: {x: 1560, y: 0}
+  - guid: 175c70ab-fcfb-40de-a323-367c985f526d
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 1820, y: 0}
+  edges:
+  - fromNodeGuid: 458b7cca-c5d8-417c-82e3-9b22a1419f5f
+    fromOptionGuid: 
+    toNodeGuid: 344eb83a-4783-4b36-b76c-281869871f9a
+  - fromNodeGuid: 344eb83a-4783-4b36-b76c-281869871f9a
+    fromOptionGuid: 
+    toNodeGuid: 9a200010-31b5-47c6-a343-534b273de53e
+  - fromNodeGuid: 9a200010-31b5-47c6-a343-534b273de53e
+    fromOptionGuid: 
+    toNodeGuid: d1b1e65f-53c8-4418-8610-56352e4e1148
+  - fromNodeGuid: d1b1e65f-53c8-4418-8610-56352e4e1148
+    fromOptionGuid: 
+    toNodeGuid: cade4e07-6d4c-463b-9774-01eac2d6531e
+  - fromNodeGuid: cade4e07-6d4c-463b-9774-01eac2d6531e
+    fromOptionGuid: 
+    toNodeGuid: 63ee51a2-6954-4251-b61c-db9a59534519
+  - fromNodeGuid: 63ee51a2-6954-4251-b61c-db9a59534519
+    fromOptionGuid: 
+    toNodeGuid: 96135818-45ad-4792-9505-2b7ccf776ad5
+  - fromNodeGuid: 96135818-45ad-4792-9505-2b7ccf776ad5
+    fromOptionGuid: 
+    toNodeGuid: 175c70ab-fcfb-40de-a323-367c985f526d
+  isOneShot: 0
+  payload: 

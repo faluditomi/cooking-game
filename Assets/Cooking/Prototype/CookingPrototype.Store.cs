@@ -23,6 +23,9 @@ namespace Cooking.Prototype
         private readonly ShoppingCart cart = new ShoppingCart();
         private readonly List<ShelfCard> shelfCards = new List<ShelfCard>();
         private RectTransform cartContent;
+        private RectTransform bundleGrid;
+        /// <summary>The menu names the bundle tiles were built for, to rebuild them when it changes.</summary>
+        private string bundleKey;
         private Text cartTotalText;
         private Button checkoutButton;
         private Button clearCartButton;
@@ -110,11 +113,11 @@ namespace Cooking.Prototype
 
             RectTransform grid = UIFactory.Rect(shelf, "Grid");
             GridLayoutGroup gridLayout = grid.gameObject.AddComponent<GridLayoutGroup>();
-            gridLayout.cellSize = new Vector2(292f, 100f);
-            gridLayout.spacing = new Vector2(9f, 9f);
+            gridLayout.cellSize = new Vector2(236f, 92f);
+            gridLayout.spacing = new Vector2(8f, 8f);
             gridLayout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
             gridLayout.constraintCount = 4;
-            UIFactory.Size(grid, -1f, 1f);
+            UIFactory.Size(grid, 5 * 100f, 0f);
 
             foreach(IngredientDefinition ingredient in pantry)
             {
@@ -140,6 +143,35 @@ namespace Cooking.Prototype
                 card.MoreFive = UIFactory.Button(buttons, "+5", () => AddToCart(captured, 5), null, 17);
 
                 shelfCards.Add(card);
+            }
+
+            // Bundles: everything one menu dish needs, in one tap.
+            Header(shelf, "BUNDLES  <color=#77736d>all the ingredients for one serving</color>");
+            bundleGrid = UIFactory.Rect(shelf, "Bundles");
+            GridLayoutGroup bundleLayout = bundleGrid.gameObject.AddComponent<GridLayoutGroup>();
+            bundleLayout.cellSize = new Vector2(236f, 64f);
+            bundleLayout.spacing = new Vector2(8f, 8f);
+            bundleLayout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+            bundleLayout.constraintCount = 4;
+            UIFactory.Size(bundleGrid, -1f, 1f);
+        }
+
+        private void RebuildBundles()
+        {
+            List<RecipeDefinition> visible = VisibleMenu();
+            StringBuilder key = new StringBuilder();
+            foreach(RecipeDefinition recipe in visible) key.Append(recipe.GetHashCode()).Append(recipe.DisplayName).Append('|');
+            if(key.ToString() == bundleKey) return;
+
+            bundleKey = key.ToString();
+            UIFactory.ClearChildren(bundleGrid);
+
+            foreach(RecipeDefinition recipe in visible)
+            {
+                RecipeDefinition captured = recipe;
+                string label = recipe.DisplayName + "\n<size=14><color=#a6a199>$" + recipe.CalculateIngredientCost().ToString("0.00") + " · " + DishType(recipe) + "</color></size>";
+                Button button = UIFactory.Button(bundleGrid, label, () => AddServingToCart(captured), new Color(0.24f, 0.27f, 0.36f, 1f), 17);
+                button.interactable = phase == Phase.Morning;
             }
         }
 
@@ -175,7 +207,12 @@ namespace Cooking.Prototype
                 card.MoreFive.interactable = open;
             }
 
-            if(area == Area.Store) RebuildCartList();
+            if(area == Area.Store)
+            {
+                RebuildCartList();
+                RebuildBundles();
+                foreach(Button bundle in bundleGrid.GetComponentsInChildren<Button>()) bundle.interactable = open;
+            }
 
             float total = cart.TotalCost;
             bool affordable = total <= money + 0.0001f;

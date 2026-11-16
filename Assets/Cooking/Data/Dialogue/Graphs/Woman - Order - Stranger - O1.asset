@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Woman - Order - Stranger - O1
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: 4bca0e63-2580-4403-a7a7-21799f0ba184
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: 7aa6acb3-b4a7-49cd-abfc-428e93c8bab4
+    kind: 0
+    line:
+      text: Whip me up an MSBeef rice real quick!
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: becca868-1f9f-4878-aaaf-429e5c33ba0b
+    kind: 0
+    line:
+      text: "And none of that beef shit, you hear me? I only eat Real Beef\u2122!"
+      delaySeconds: 2.3
+    editorPosition: {x: 520, y: 0}
+  - guid: 683421fc-8287-402e-8d0c-f58a86cc1aa1
+    kind: 0
+    line:
+      text: Fuck knows what they put in those animals...
+      delaySeconds: 3.2
+    editorPosition: {x: 780, y: 0}
+  - guid: 4a51bf56-a64d-42b9-b98d-a8421bff7679
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 1040, y: 0}
+  edges:
+  - fromNodeGuid: 4bca0e63-2580-4403-a7a7-21799f0ba184
+    fromOptionGuid: 
+    toNodeGuid: 7aa6acb3-b4a7-49cd-abfc-428e93c8bab4
+  - fromNodeGuid: 7aa6acb3-b4a7-49cd-abfc-428e93c8bab4
+    fromOptionGuid: 
+    toNodeGuid: becca868-1f9f-4878-aaaf-429e5c33ba0b
+  - fromNodeGuid: becca868-1f9f-4878-aaaf-429e5c33ba0b
+    fromOptionGuid: 
+    toNodeGuid: 683421fc-8287-402e-8d0c-f58a86cc1aa1
+  - fromNodeGuid: 683421fc-8287-402e-8d0c-f58a86cc1aa1
+    fromOptionGuid: 
+    toNodeGuid: 4a51bf56-a64d-42b9-b98d-a8421bff7679
+  isOneShot: 0
+  payload: MSBeef fried rice

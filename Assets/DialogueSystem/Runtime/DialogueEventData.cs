@@ -17,6 +17,9 @@ namespace DialogueSystem
 
         /// <summary>0-based index of the delivered line within this dialogue.</summary>
         public int LineNumber;
+
+        /// <summary>The graph being played (for its <see cref="DialogueGraph.payload"/>, name or one-shot flag).</summary>
+        public DialogueGraph Graph;
     }
 
     /// <summary>
@@ -38,5 +41,8 @@ namespace DialogueSystem
 
         /// <summary>False when the dialogue was aborted (for example by a Replace policy).</summary>
         public bool Completed;
+
+        /// <summary>The graph that was playing.</summary>
+        public DialogueGraph Graph;
     }
 }

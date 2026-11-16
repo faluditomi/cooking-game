@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Woman - WrongOrderTasty - Friendly - O3
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: 1db52659-ccad-41ae-b134-5e2d04b808e7
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: 145579d0-7656-4de3-8dff-959b69a0cedc
+    kind: 0
+    line:
+      text: All this taste... Obliterating my mouth right now.
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: b0217b95-110b-4731-8111-ac116dcc0fb0
+    kind: 0
+    line:
+      text: I fuckin' love it.
+      delaySeconds: 2.8
+    editorPosition: {x: 520, y: 0}
+  - guid: 4b015924-00e2-4f2e-a63b-208b4cd593f8
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 780, y: 0}
+  edges:
+  - fromNodeGuid: 1db52659-ccad-41ae-b134-5e2d04b808e7
+    fromOptionGuid: 
+    toNodeGuid: 145579d0-7656-4de3-8dff-959b69a0cedc
+  - fromNodeGuid: 145579d0-7656-4de3-8dff-959b69a0cedc
+    fromOptionGuid: 
+    toNodeGuid: b0217b95-110b-4731-8111-ac116dcc0fb0
+  - fromNodeGuid: b0217b95-110b-4731-8111-ac116dcc0fb0
+    fromOptionGuid: 
+    toNodeGuid: 4b015924-00e2-4f2e-a63b-208b4cd593f8
+  isOneShot: 0
+  payload: 

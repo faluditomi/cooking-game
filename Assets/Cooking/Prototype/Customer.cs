@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Cooking.Prototype
 {
@@ -11,16 +12,25 @@ namespace Cooking.Prototype
         public string name = "Eyesider";
         [Tooltip("Which NPC this is in the DialogueSystem catalog. None uses the fallback lines below.")]
         public DialogueSystem.DialogueNpcId dialogueId;
-        [Tooltip("Happy meals before they warm up to you (Dejected → Warmed up). The design doc says 2–3.")]
-        [Min(1)] public int happyMealsToWarmUp = 2;
+        [Tooltip("Liked meals (exact or very close) before they become Familiar.")]
+        [FormerlySerializedAs("happyMealsToWarmUp")]
+        [Min(1)] public int likedMealsToFamiliar = 3;
         [Tooltip("Dishes they order at first. Empty means anything on the menu. Liked dishes get added as you go.")]
         public List<RecipeDefinition> orders = new List<RecipeDefinition>();
         [Tooltip("Hitting this zone is their dream meal. Optional.")]
         public FlavourZone secretDesire;
-        [Tooltip("They refuse any dish containing these.")]
+        [Tooltip("The dream meal also needs all of these on the plate. They win over refusals: a dream meal is eaten even with something they'd otherwise refuse.")]
+        public List<IngredientDefinition> dreamNeeds = new List<IngredientDefinition>();
+        [Tooltip("They refuse any dish containing these (unless it's their dream meal).")]
         public List<IngredientDefinition> refuses = new List<IngredientDefinition>();
 
-        [Header("Order line ({0} is the dish name). Other lines are fallbacks for when the dialogue catalog has none.")]
+        [Header("Timing (seconds)")]
+        [Tooltip("They hurry you this long after arriving, and again each time this long passes.")]
+        [Min(5f)] public float hurryAfter = 50f;
+        [Tooltip("Once per order, they muse after a random delay in this range.")]
+        public Vector2 musingAfter = new Vector2(8f, 20f);
+
+        [Header("Fallback lines, for when the dialogue catalog has none. {0} is the dish name.")]
         public List<string> orderLines = new List<string>();
         public string likedLine = "...";
         public string dislikedLine = "...";

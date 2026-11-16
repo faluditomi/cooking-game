@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Woman - WrongOrderNasty - Friendly - O1
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: 5c53ae7b-1f59-4700-8776-53fbf708d308
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: eda09eba-b81e-4934-9d26-e74edf840d32
+    kind: 0
+    line:
+      text: Is this your evil twin, or what?
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: 07f64815-2b04-4b05-a698-961008e1e719
+    kind: 0
+    line:
+      text: Did you sleep alright? I see some bad energies under your eyes.
+      delaySeconds: 2.1
+    editorPosition: {x: 520, y: 0}
+  - guid: e435df58-8323-4800-9c8c-147d6c6134eb
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 780, y: 0}
+  edges:
+  - fromNodeGuid: 5c53ae7b-1f59-4700-8776-53fbf708d308
+    fromOptionGuid: 
+    toNodeGuid: eda09eba-b81e-4934-9d26-e74edf840d32
+  - fromNodeGuid: eda09eba-b81e-4934-9d26-e74edf840d32
+    fromOptionGuid: 
+    toNodeGuid: 07f64815-2b04-4b05-a698-961008e1e719
+  - fromNodeGuid: 07f64815-2b04-4b05-a698-961008e1e719
+    fromOptionGuid: 
+    toNodeGuid: e435df58-8323-4800-9c8c-147d6c6134eb
+  isOneShot: 0
+  payload: 

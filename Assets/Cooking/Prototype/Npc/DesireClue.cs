@@ -54,8 +54,11 @@ namespace Cooking.Prototype
             return worst > 0f;
         }
 
-        /// <summary>A short, in-character-enough hint: warmth plus the most-off flavour.</summary>
-        public static string Describe(FlavourProfile dish, FlavourZone desire, Warmth warmth)
+        /// <summary>
+        /// A short, in-character-enough hint: warmth plus the most-off flavour. When the flavour is
+        /// right but the dish misses an ingredient their dream needs, they say that instead.
+        /// </summary>
+        public static string Describe(FlavourProfile dish, FlavourZone desire, Warmth warmth, bool missingNeed = false)
         {
             string lead;
 
@@ -67,7 +70,11 @@ namespace Cooking.Prototype
                 default: lead = "It's not what I'm after. "; break;
             }
 
-            if(desire == null || !MostOff(dish, desire, out FlavourAxis axis, out bool needsMore)) return lead.TrimEnd();
+            if(desire == null || !MostOff(dish, desire, out FlavourAxis axis, out bool needsMore))
+            {
+                return missingNeed ? lead + "It tastes right. But something in it isn't what it should be." : lead.TrimEnd();
+            }
+
             return lead + Hint(axis, needsMore);
         }
 

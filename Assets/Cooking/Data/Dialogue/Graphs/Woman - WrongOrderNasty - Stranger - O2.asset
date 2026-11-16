@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Woman - WrongOrderNasty - Stranger - O2
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: e2b8c51a-303f-4050-bd0e-5019cc9d5145
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: 13d04a67-1abe-47c8-8348-39abecfcf8a7
+    kind: 0
+    line:
+      text: What even is this, Pot Boy?
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: a4806ecd-f234-4649-ab11-1b6bee47c13a
+    kind: 0
+    line:
+      text: You call this cooking?
+      delaySeconds: 2
+    editorPosition: {x: 520, y: 0}
+  - guid: a8048609-602d-4a95-8028-79fc991b36cf
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 780, y: 0}
+  edges:
+  - fromNodeGuid: e2b8c51a-303f-4050-bd0e-5019cc9d5145
+    fromOptionGuid: 
+    toNodeGuid: 13d04a67-1abe-47c8-8348-39abecfcf8a7
+  - fromNodeGuid: 13d04a67-1abe-47c8-8348-39abecfcf8a7
+    fromOptionGuid: 
+    toNodeGuid: a4806ecd-f234-4649-ab11-1b6bee47c13a
+  - fromNodeGuid: a4806ecd-f234-4649-ab11-1b6bee47c13a
+    fromOptionGuid: 
+    toNodeGuid: a8048609-602d-4a95-8028-79fc991b36cf
+  isOneShot: 0
+  payload: 

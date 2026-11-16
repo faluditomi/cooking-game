@@ -81,7 +81,10 @@ namespace Cooking.Prototype.EditorTools
 
             foreach(string guid in AssetDatabase.FindAssets("t:FlavourZone", new[] { DataRoot + "/Zones" }))
             {
-                zones.Add(AssetDatabase.LoadAssetAtPath<FlavourZone>(AssetDatabase.GUIDToAssetPath(guid)));
+                // Secret desire zones belong to the regulars, not the zones the game shows.
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                if(path.Contains("/Desires/")) continue;
+                zones.Add(AssetDatabase.LoadAssetAtPath<FlavourZone>(path));
             }
 
             return zones;
@@ -196,14 +199,18 @@ namespace Cooking.Prototype.EditorTools
                 new Customer
                 {
                     name = "The Woman",
-                    orders = new List<RecipeDefinition> { recipes["Calorice"], recipes["Synthetic soup"] },
+                    // Miro board: she orders MSBeef fried rice (Real Beef™ only) and won't touch the beef
+                    // animal, except in her lost love's sweet and sour soup, which needs it.
+                    orders = new List<RecipeDefinition> { recipes["MSBeef fried rice"] },
                     secretDesire = desires["The Woman"],
-                    refuses = new List<IngredientDefinition> { Ingredient("Beef"), Ingredient("Real Beef") },
-                    orderLines = new List<string> { "{0}. And hurry, the flux won't wait for anyone.", "{0}. Fried, greasy, salty. You know.", "{0}. No beef. Don't even look at the beef." },
-                    likedLine = "Fine. That's fine.",
-                    dislikedLine = "Is this what passes for food now?",
-                    refusedLine = "I said no beef.",
-                    dreamLine = "...I used to make this. For someone.",
+                    dreamNeeds = new List<IngredientDefinition> { Ingredient("Beef") },
+                    refuses = new List<IngredientDefinition> { Ingredient("Beef") },
+                    hurryAfter = 45f,
+                    orderLines = new List<string> { "{0}. Get on it!" },
+                    likedLine = "That hits the spot.",
+                    dislikedLine = "What even is this, Pot Boy?",
+                    refusedLine = "None of that beef shit, you hear me?",
+                    dreamLine = "This... This is...",
                 },
                 new Customer
                 {

@@ -11,7 +11,7 @@ namespace Cooking.Prototype.EditorTools
     /// </summary>
     /// <remarks>
     /// Built around a dish from the design doc that isn't on the menu:
-    /// The Woman: the sweet and sour (tofu) soup she made for her love.
+    /// The Woman: the sweet and sour soup with beef she made for her love (Miro board).
     /// The Man: an honest, filling broth with something to chew and nothing synthetic (e.g. pak choi).
     /// The Sleeper: something fiery and savoury, not sweet: a parent's cooking for dull sensors.
     /// </remarks>
@@ -36,9 +36,11 @@ namespace Cooking.Prototype.EditorTools
                 new Spec
                 {
                     Customer = "The Woman", Name = "Their lost love's soup", Color = new Color(0.95f, 0.45f, 0.7f),
-                    Description = "Sweet and sour, soft, a soup. What she used to make for the one who left.",
-                    Min = new FlavourProfile { savoury = 1.5f, salty = 0f, sweet = 3.2f, bitter = 0f, sour = 2.3f, pain = 0f, nutrition = 2.5f, texture = 0f },
-                    Max = new FlavourProfile { savoury = 5f, salty = 3f, sweet = 6f, bitter = 1.5f, sour = 5f, pain = 1.5f, nutrition = 6.5f, texture = 3f },
+                    // Hit by e.g. a soup cube, sliced beef, 2 sugar and 2 citric acid, boiled. Real Beef lands
+                    // here too, but her dream needs the beef animal (Customer.dreamNeeds).
+                    Description = "Sweet and sour, a hearty beef soup. What she used to make for the one who left.",
+                    Min = new FlavourProfile { savoury = 5.5f, salty = 0f, sweet = 4f, bitter = 0f, sour = 3.5f, pain = 0f, nutrition = 3.5f, texture = 0f },
+                    Max = new FlavourProfile { savoury = 8f, salty = 3.5f, sweet = 7f, bitter = 1.5f, sour = 6.5f, pain = 1.5f, nutrition = 7f, texture = 3f },
                 },
                 new Spec
                 {
@@ -58,7 +60,8 @@ namespace Cooking.Prototype.EditorTools
         }
 
         /// <summary>Desire zones by customer name, creating any that are missing.</summary>
-        public static Dictionary<string, FlavourZone> EnsureDesireZones()
+        /// <param name="force">Reset existing zones to the values here (after retuning them in code).</param>
+        public static Dictionary<string, FlavourZone> EnsureDesireZones(bool force = false)
         {
             if(!AssetDatabase.IsValidFolder(Folder)) AssetDatabase.CreateFolder("Assets/Cooking/Data/Zones", "Desires");
 
@@ -69,16 +72,21 @@ namespace Cooking.Prototype.EditorTools
                 string path = Folder + "/" + spec.Name.Replace("'", "") + ".asset";
                 FlavourZone zone = AssetDatabase.LoadAssetAtPath<FlavourZone>(path);
 
-                if(zone == null)
+                if(zone == null || force)
                 {
-                    zone = ScriptableObject.CreateInstance<FlavourZone>();
+                    if(zone == null)
+                    {
+                        zone = ScriptableObject.CreateInstance<FlavourZone>();
+                        AssetDatabase.CreateAsset(zone, path);
+                    }
+
                     zone.Configure(spec.Name, spec.Min, spec.Max);
-                    AssetDatabase.CreateAsset(zone, path);
 
                     SerializedObject so = new SerializedObject(zone);
                     so.FindProperty("color").colorValue = spec.Color;
                     so.FindProperty("description").stringValue = spec.Description;
                     so.ApplyModifiedPropertiesWithoutUndo();
+                    EditorUtility.SetDirty(zone);
                 }
 
                 zones[spec.Customer] = zone;
@@ -91,7 +99,17 @@ namespace Cooking.Prototype.EditorTools
         [MenuItem("Custom Tools/Cooking Prototype/Build Desire Zones")]
         public static void BuildDesireZones()
         {
-            Dictionary<string, FlavourZone> desires = EnsureDesireZones();
+            AssignDesireZones(EnsureDesireZones());
+        }
+
+        [MenuItem("Custom Tools/Cooking Prototype/Reset Desire Zones")]
+        public static void ResetDesireZones()
+        {
+            AssignDesireZones(EnsureDesireZones(force: true));
+        }
+
+        private static void AssignDesireZones(Dictionary<string, FlavourZone> desires)
+        {
             CookingPrototype prototype = Object.FindAnyObjectByType<CookingPrototype>();
 
             if(prototype == null)

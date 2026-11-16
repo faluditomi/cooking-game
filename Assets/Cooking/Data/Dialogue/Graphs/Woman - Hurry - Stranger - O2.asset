@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Woman - Hurry - Stranger - O2
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: a5decfcb-562f-413c-bb15-4931e89e4b69
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: f4e9b1bf-190c-40d9-81ca-c401e00dc854
+    kind: 0
+    line:
+      text: Did you hear they found one of the stall owners in peaces recently?
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: 277fdc7e-a8d0-4de0-ae8d-059dfa430715
+    kind: 0
+    line:
+      text: Cut up in tiny little pieces... Behind that alley actually.
+      delaySeconds: 3.4
+    editorPosition: {x: 520, y: 0}
+  - guid: e58199a7-6afa-4633-9f6d-b331f0ccb4d6
+    kind: 0
+    line:
+      text: Come to think of it, wasn't that your neighbour?
+      delaySeconds: 3.1
+    editorPosition: {x: 780, y: 0}
+  - guid: 2a53b22a-204c-4d45-a1f9-a1d9dfe1d06f
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 1040, y: 0}
+  edges:
+  - fromNodeGuid: a5decfcb-562f-413c-bb15-4931e89e4b69
+    fromOptionGuid: 
+    toNodeGuid: f4e9b1bf-190c-40d9-81ca-c401e00dc854
+  - fromNodeGuid: f4e9b1bf-190c-40d9-81ca-c401e00dc854
+    fromOptionGuid: 
+    toNodeGuid: 277fdc7e-a8d0-4de0-ae8d-059dfa430715
+  - fromNodeGuid: 277fdc7e-a8d0-4de0-ae8d-059dfa430715
+    fromOptionGuid: 
+    toNodeGuid: e58199a7-6afa-4633-9f6d-b331f0ccb4d6
+  - fromNodeGuid: e58199a7-6afa-4633-9f6d-b331f0ccb4d6
+    fromOptionGuid: 
+    toNodeGuid: 2a53b22a-204c-4d45-a1f9-a1d9dfe1d06f
+  isOneShot: 0
+  payload: 
