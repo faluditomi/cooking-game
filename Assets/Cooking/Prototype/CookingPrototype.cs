@@ -333,7 +333,7 @@ namespace Cooking.Prototype
             order = recipe;
             orderIn = true;
             orderProfile = order != null ? order.CalculateProfile(rules) : FlavourProfile.Zero;
-            orderKnown = order != null && KnownRecipes().Contains(order);
+            orderKnown = IsOnMenu(order);
             OnOrderIn();
 
             Say(customer.name + " wants " + DishName(order) + ".", UIFactory.Accent);
@@ -567,6 +567,14 @@ namespace Cooking.Prototype
                 return;
             }
 
+            // Leaving the prep board puts what's on it back in stock, prepped as far as it got.
+            if(area == Area.Prep && target != Area.Prep && boardUnit != null)
+            {
+                string done = Describe(boardUnit, true);
+                ReturnBoardToStock();
+                Say(done + " → stock.");
+            }
+
             area = target;
             if(recipeBookOverlay != null) recipeBookOverlay.SetActive(false);
             foreach(KeyValuePair<Area, GameObject> pair in areaRoots) pair.Value.SetActive(pair.Key == target);
@@ -740,10 +748,14 @@ namespace Cooking.Prototype
         {
             if(recipe == null) return "<color=#a6a199>Nothing on the menu.</color>";
 
-            // A dish only they know: just the name. Working out what goes in it is up to you.
-            if(!KnownRecipes().Contains(recipe))
+            // Not in the book: just the name. A dish you made them before is in the cooking history;
+            // one only they know, you have to work out.
+            if(!IsOnMenu(recipe))
             {
-                return "<size=24><b>" + recipe.DisplayName + "</b></size>\n<color=#a6a199>Not in your recipe book. You'll have to work out what goes in it.</color>";
+                string hint = IsPlayerDish(recipe)
+                    ? "Not in your recipe book: it's something you made for them before. Find it in the cooking history."
+                    : "Not in your recipe book. You'll have to work out what goes in it.";
+                return "<size=24><b>" + recipe.DisplayName + "</b></size>\n<color=#a6a199>" + hint + "</color>";
             }
 
             StringBuilder sb = new StringBuilder();

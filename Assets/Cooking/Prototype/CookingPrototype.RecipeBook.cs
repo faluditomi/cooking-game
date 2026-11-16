@@ -72,7 +72,7 @@ namespace Cooking.Prototype
             }
 
             // Open on the dish being cooked, if there is one.
-            List<RecipeDefinition> known = KnownRecipes();
+            List<RecipeDefinition> known = VisibleMenu();
             if(orderIn && order != null && known.Contains(order)) bookRecipe = order;
             else if(bookRecipe == null || !known.Contains(bookRecipe)) bookRecipe = known.Count > 0 ? known[0] : null;
 
@@ -88,7 +88,7 @@ namespace Cooking.Prototype
 
             deletedDishes.Add(bookRecipe);
             Say("\"" + bookRecipe.DisplayName + "\" is off the menu.");
-            List<RecipeDefinition> known = KnownRecipes();
+            List<RecipeDefinition> known = VisibleMenu();
             if(!known.Contains(bookRecipe)) bookRecipe = known.Count > 0 ? known[0] : null;
             RefreshAll();
         }
@@ -185,21 +185,13 @@ namespace Cooking.Prototype
         private void RebuildBookList()
         {
             UIFactory.ClearChildren(bookList);
-            List<RecipeDefinition> known = KnownRecipes();
-            bool learnedHeader = false;
 
+            // Only the menu. Dishes you didn't save (or took off) live in the cooking history.
             Text menuHeader = Header(bookList, "MENU");
             UIFactory.Size(menuHeader, 24f, 0f);
 
-            foreach(RecipeDefinition recipe in known)
+            foreach(RecipeDefinition recipe in VisibleMenu())
             {
-                if(!learnedHeader && !IsOnMenu(recipe))
-                {
-                    learnedHeader = true;
-                    Text header = Header(bookList, "NOT ON THE MENU");
-                    UIFactory.Size(header, 30f, 0f);
-                }
-
                 RecipeDefinition captured = recipe;
                 bool selected = recipe == bookRecipe;
                 bool ordered = orderIn && recipe == order;
