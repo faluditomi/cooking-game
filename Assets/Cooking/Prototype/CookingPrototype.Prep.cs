@@ -141,10 +141,30 @@ namespace Cooking.Prototype
             gestureBoard = -1;
             prepGesture = null;
 
-            CreateGhost(screen, 120f, 44f);
-            ghost.GetComponent<Image>().color = new Color(0.62f, 0.64f, 0.7f, 0.95f);
-            Text label = UIFactory.Label(ghost, ToolName(step).ToUpperInvariant(), 18, TextAnchor.MiddleCenter, FontStyle.Bold, new Color(0.1f, 0.1f, 0.12f, 1f));
-            UIFactory.Stretch(label.rectTransform);
+            Sprite toolSprite = ToolSprite(step);
+
+            if(toolSprite != null)
+            {
+                CreateGhost(screen, 170f, 170f);
+                Image picture = UIFactory.Icon(ghost, toolSprite, 0f);
+                UIFactory.Stretch(picture.rectTransform);
+
+                if(step != PrepSteps.Grated)
+                {
+                    // Knife and peeler hang upright but are held flat: blade to the left, edge down,
+                    // with the pointer on the handle.
+                    picture.rectTransform.localRotation = Quaternion.Euler(0f, 0f, -90f);
+                    ghost.pivot = new Vector2(0.86f, 0.5f);
+                    MoveGhost(screen);
+                }
+            }
+            else
+            {
+                CreateGhost(screen, 120f, 44f);
+                ghost.GetComponent<Image>().color = new Color(0.62f, 0.64f, 0.7f, 0.95f);
+                Text label = UIFactory.Label(ghost, ToolName(step).ToUpperInvariant(), 18, TextAnchor.MiddleCenter, FontStyle.Bold, new Color(0.1f, 0.1f, 0.12f, 1f));
+                UIFactory.Stretch(label.rectTransform);
+            }
 
             toolHooks[step].alpha = 0.25f;
             foreach(CuttingBoard board in boards) board.Pad.SetGuide(ToolGuide(step), new Color(1f, 0.85f, 0.6f, 0.6f));
@@ -245,13 +265,15 @@ namespace Cooking.Prototype
         private void BuildBoards(RectTransform desk)
         {
             RectTransform section = UIFactory.Rect(desk, "Prep Section");
-            UIFactory.Place(section, 0.415f, 0.04f, 0.79f, 0.34f);
+            UIFactory.Place(section, 0.395f, 0.03f, 0.785f, 0.34f);
 
             for(int i = 0; i < 2; i++)
             {
                 int index = i;
                 CuttingBoard board = new CuttingBoard();
-                Image wood = UIFactory.Panel(section, "Cutting Board", new Color(0.56f, 0.41f, 0.27f, 1f));
+                Image wood = UIFactory.Panel(section, "Cutting Board", boardSprite != null ? Color.white : new Color(0.56f, 0.41f, 0.27f, 1f));
+                wood.sprite = boardSprite;
+                wood.preserveAspect = true;
                 UIFactory.Place(wood.rectTransform, i * 0.5f, 0f, (i + 1) * 0.5f, 1f, 5f);
                 board.Rect = wood.rectTransform;
 
@@ -296,12 +318,35 @@ namespace Cooking.Prototype
             AddTool(rail, PrepSteps.Grated, "GRATER", "grate", 0.7f, 0.94f);
         }
 
+        private Sprite ToolSprite(PrepSteps step)
+        {
+            return step == PrepSteps.Sliced ? knifeSprite : step == PrepSteps.Peeled ? peelerSprite : step == PrepSteps.Grated ? graterSprite : null;
+        }
+
         private void AddTool(RectTransform rail, PrepSteps step, string name, string verb, float xMin, float xMax)
         {
+            Sprite sprite = ToolSprite(step);
+            float centre = (xMin + xMax) * 0.5f;
+
             Image hook = UIFactory.Panel(rail, "Hook", new Color(0.5f, 0.5f, 0.55f, 1f));
             hook.raycastTarget = false;
-            float centre = (xMin + xMax) * 0.5f;
-            UIFactory.Place(hook.rectTransform, centre - 0.004f, 0.62f, centre + 0.004f, 0.92f);
+            UIFactory.Place(hook.rectTransform, centre - 0.004f, sprite != null ? 0.84f : 0.62f, centre + 0.004f, 0.92f);
+
+            if(sprite != null)
+            {
+                // The tool itself hangs from the hook; its name sits small beside it.
+                Image picture = UIFactory.Panel(rail, name, Color.white);
+                picture.sprite = sprite;
+                picture.preserveAspect = true;
+                UIFactory.Place(picture.rectTransform, xMin, -0.05f, xMax, 0.86f);
+                picture.gameObject.AddComponent<DragHandle>().Began = screen => GrabTool(step, screen);
+                toolHooks[step] = picture.gameObject.AddComponent<CanvasGroup>();
+
+                Text caption = UIFactory.Label(rail, name + "\n<size=11><color=#a6a199>hold to " + verb + "</color></size>", 13, TextAnchor.LowerLeft,
+                    FontStyle.Bold, UIFactory.TextColor);
+                UIFactory.Place(caption.rectTransform, xMax - 0.02f, 0f, xMax + 0.1f, 0.4f);
+                return;
+            }
 
             Image tag = UIFactory.Panel(rail, name, new Color(0.62f, 0.64f, 0.7f, 1f));
             UIFactory.Place(tag.rectTransform, xMin, 0.08f, xMax, 0.64f);
