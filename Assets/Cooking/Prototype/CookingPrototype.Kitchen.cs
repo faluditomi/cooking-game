@@ -546,6 +546,18 @@ namespace Cooking.Prototype
                 return;
             }
 
+            // Grouped: raw ingredients, prepped ones, and seasonings (which can also go on a cooked dish).
+            AddKitchenStockGroup("RAW", entries.FindAll(e => !e.Ingredient.IsSeasoning && e.Prep == PrepSteps.None));
+            AddKitchenStockGroup("PREPPED", entries.FindAll(e => !e.Ingredient.IsSeasoning && e.Prep != PrepSteps.None));
+            AddKitchenStockGroup("SEASONING", entries.FindAll(e => e.Ingredient.IsSeasoning));
+        }
+
+        private void AddKitchenStockGroup(string title, List<Inventory.Entry> entries)
+        {
+            if(entries.Count == 0) return;
+
+            Text header = Header(kitchenStockContent, title);
+            UIFactory.Size(header, 26f, 0f);
             Color selectedColor = new Color(0.55f, 0.33f, 0.14f, 1f);
 
             foreach(Inventory.Entry entry in entries)

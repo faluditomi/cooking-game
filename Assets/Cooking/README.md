@@ -111,14 +111,17 @@ Everything you buy goes into your stock (`Inventory`), which tracks units per pr
    shuffled order, 1–6 s (`arrivalDelay`) after the last one leaves. They order as they arrive:
    their order dialogue names the dish, and the ticket fills in.
    On the **Prep** board, prep stock one unit at a time (as in the design doc): put a unit on the
-   board, pick up a tool, do its gesture, then put it back. It goes back into stock prepped.
+   board, pick up a tool, do its gesture, then put it back. It goes back into stock prepped
+   (switching to another area puts it back too).
    **Peeling comes first**: something sliced or grated can't be peeled. When the unit on the board
    is the last of its kind, it goes back to the pile by itself after slicing or grating (after a
    peel it stays, in case you slice it next).
    The ticket (on the Prep and Kitchen areas) shows the recipe with each ingredient marked ready /
    needs prep / short. If they order something that isn't in your recipe book (like the Sleeper's
    boiled synthetic chicken), it only shows the name: working out what goes in it is up to you.
-   In the **Kitchen**, select stock (each click on a row adds one unit, − takes one back). **A dish
+   For a dish you made them before but didn't save, it says to look in the cooking history.
+   In the **Kitchen**, stock is grouped into **raw**, **prepped** and **seasoning**; select some
+   (each click on a row adds one unit, − takes one back). **A dish
    is one batch**: send everything for it to the wok or the pot at once (a station takes one batch
    until it's emptied), cook it, and take it off onto the plate. You can't add more cooked food to
    a plate that has a dish on it. A batch for the pot can include the soup cube; it goes in first,
@@ -203,8 +206,8 @@ and needs the Input System UI module (the setup adds one). `FlavourRadarGraphic`
 
 ### Recipe book (`CookingPrototype.RecipeBook.cs`, `RecipeGuide.cs`)
 
-The **Recipe book** button in the top bar opens it from any area, any time. It lists the menu plus
-your own dishes that aren't on it. For the selected dish it shows:
+The **Recipe book** button in the top bar opens it from any area, any time. It lists the menu only;
+dishes you didn't save (or took off) are in the cooking history. For the selected dish it shows:
 
 - **Steps** (`RecipeGuide`): what to buy (with how many you have), what to prep with which tool
   ("peel (peeler), then slice (knife)"), which station cooks what and how (pot: the soup cube
@@ -293,12 +296,13 @@ built around dishes from the design doc that aren't on the menu; one way to hit 
   regulars can order it by name.
 - **Unlocking.** Hitting the desire is their dream meal (the dream order scene, and they become
   Friendly) and the dish becomes a new recipe: the result screen asks you to **name it** and save
-  it to the menu. Unnamed, it stays "Nameless" in the book's "Not on the menu" section.
+  it to the menu. Unnamed, it stays "Nameless" and lives only in the cooking history, where you
+  can still save it.
 
 ### The recipe book's menu
 
-The book lists the menu, then "Not on the menu": dishes regulars order that you never saved or took
-off. Each dish shows whether it's a soup, fried, or neither. **Remove from the menu** soft-deletes a
+The book lists only the menu. Dishes regulars order that you never saved, or took off, aren't in it:
+find them in the cooking history. Each dish shows whether it's a soup, fried, or neither. **Remove from the menu** soft-deletes a
 dish you saved: it leaves the menu and the bundles, regulars can still order it, and their lines
 stop naming it. The default recipes can't be removed (meeting decision: regulars would be left with
 nothing they like, or nothing to name).
