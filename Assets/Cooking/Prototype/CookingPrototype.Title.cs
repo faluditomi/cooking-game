@@ -64,8 +64,11 @@ namespace Cooking.Prototype
 
             RectTransform startRow = UIFactory.Row(panel, 64f);
             UIFactory.Button(startRow, "Start", StartGame, new Color(0.75f, 0.42f, 0.15f, 1f), 30);
+#if !UNITY_WEBGL
+            // A browser tab can't be quit from the game, so WebGL has no Quit.
             RectTransform quitRow = UIFactory.Row(panel, 48f);
             UIFactory.Button(quitRow, "Quit", QuitGame, null, 22);
+#endif
 
             titleOverlay.SetActive(false);
         }

@@ -97,8 +97,15 @@ The game opens on a **title screen** (`CookingPrototype.Title.cs`): **Start** be
 
 ### Building
 
-The build settings contain only `Prototype/CookingPrototype.unity`. **File → Build Profiles →
-Windows → Build** (or Build And Run) into `Builds/`, which git ignores. Zip the folder for itch.
+The build settings contain only `Prototype/CookingPrototype.unity`. Build from **Custom Tools →
+Cooking Prototype**, into `Builds/` (git-ignored):
+
+- **Build Windows** → `Builds/Windows/EmphisStall.exe`. It always runs full screen (it forces a
+  full-screen window at startup, so a windowed launch isn't remembered). Zip the folder for itch.
+- **Build WebGL** → `Builds/WebGL`. Needs the WebGL Build Support module for this Unity version
+  (Unity Hub → Installs → ⚙ → Add modules). It's gzip-compressed with a decompression fallback, so it
+  runs on itch.io without server setup; zip the folder's contents and upload as an HTML game
+  (1280×720). There's no Quit button in the browser.
 
 ### The cycle
 

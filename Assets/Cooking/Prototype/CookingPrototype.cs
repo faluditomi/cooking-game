@@ -176,6 +176,11 @@ namespace Cooking.Prototype
 
         private void Start()
         {
+#if UNITY_STANDALONE && !UNITY_EDITOR
+            // Always full screen. Unity remembers the last window mode per machine, so one windowed
+            // launch (say with -screen-fullscreen 0) would otherwise stick.
+            Screen.SetResolution(Display.main.systemWidth, Display.main.systemHeight, FullScreenMode.FullScreenWindow);
+#endif
             random = randomSeed != 0 ? new System.Random(randomSeed) : new System.Random();
             money = startingMoney;
             startingMenu = new List<RecipeDefinition>(menu);
