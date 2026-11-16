@@ -147,6 +147,15 @@ MonoBehaviour:
     - graph: {fileID: 11400000, guid: c8f61bfe12f526c4a93d2ebfe329f96f, type: 2}
       eventType: 3
       npcState: 3
+    - graph: {fileID: 11400000, guid: ab9a24d0fe009d741878934df8808446, type: 2}
+      eventType: 2
+      npcState: 1
+    - graph: {fileID: 11400000, guid: 70589090b60809643801c51aa0a9b689, type: 2}
+      eventType: 2
+      npcState: 1
+    - graph: {fileID: 11400000, guid: f4c00e99a6cbedb43810b94c2b8f9699, type: 2}
+      eventType: 2
+      npcState: 1
   - npcId: 2
     entries:
     - graph: {fileID: 11400000, guid: fd8af997b96b0214e8c5d943664df780, type: 2}

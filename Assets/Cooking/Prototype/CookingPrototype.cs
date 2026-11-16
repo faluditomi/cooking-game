@@ -189,6 +189,7 @@ namespace Cooking.Prototype
             BuildUI();
             InitNpcs();
             StartDay();
+            ShowTitle();
         }
 
         private void Update()
@@ -456,7 +457,7 @@ namespace Cooking.Prototype
                 sb.Append("\n\n<color=#e5594d><b>You can't pay the rent.</b> You have $").Append(money.ToString("0.00"))
                   .Append(" and the rent is $").Append(stallRent.ToString("0.00")).Append(". The stall is gone.</color>");
                 summaryTitle.text = "Game over";
-                UIFactory.SetButtonText(summaryButton, "Start again");
+                UIFactory.SetButtonText(summaryButton, "Back to the main menu");
             }
             else
             {
@@ -474,9 +475,11 @@ namespace Cooking.Prototype
 
         private void NextDay()
         {
+            // Game over goes back to the main menu; Start there begins a new game.
             if(gameOver)
             {
-                RestartGame();
+                summaryOverlay.SetActive(false);
+                ShowTitle();
                 return;
             }
 
@@ -925,6 +928,7 @@ namespace Cooking.Prototype
             BuildRecipeBook(root);
             BuildResultOverlay(root);
             BuildSummaryOverlay(root);
+            BuildTitle(root);
         }
 
         private static RectTransform AreaRoot(RectTransform parent, string name)

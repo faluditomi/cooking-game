@@ -99,6 +99,10 @@ namespace Cooking.Prototype.EditorTools
                 "Cut up in tiny little pieces... Behind that alley actually.",
                 "Come to think of it, wasn't that your neighbour?");
             b.Add(woman, Hurry, Stranger, "aaaaaaaaAAAAAAHHHHH!!!", "What is even taking you this long!?");
+            // O1 is "[Nothing]" on the board: she takes it and says nothing.
+            b.Add(woman, Correct, Stranger);
+            b.Add(woman, Correct, Stranger, "Be here tomorrow.", "Not like I got options.");
+            b.Add(woman, Correct, Stranger, "Alright.");
             b.Add(woman, Tasty, Stranger, "You fucked up, Pot Boy.", "But I'll let you live...");
             b.Add(woman, Tasty, Stranger, "It'll do.", "But get it right next time.");
             b.Add(woman, Nasty, Stranger, "Can't read, can't cook.", "You're lucky you're the only food stall in the Bright Market.");

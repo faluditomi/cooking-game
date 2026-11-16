@@ -207,7 +207,8 @@ namespace Cooking.Prototype.EditorTools
                     name = "The Woman",
                     // Miro board: she orders MSBeef fried rice (Real Beef™ only) and won't touch the beef
                     // animal, except in her lost love's sweet and sour soup, which needs it.
-                    orders = new List<RecipeDefinition> { recipes["MSBeef fried rice"] },
+                    // Her initial liked meals, from the board.
+                    orders = new List<RecipeDefinition> { recipes["MSBeef fried rice"], recipes["Synthetic soup"], recipes["Calorice"] },
                     secretDesire = desires["The Woman"],
                     dreamNeeds = new List<IngredientDefinition> { Ingredient("Beef") },
                     refuses = new List<IngredientDefinition> { Ingredient("Beef") },
