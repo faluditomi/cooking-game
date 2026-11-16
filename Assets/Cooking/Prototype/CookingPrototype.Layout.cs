@@ -14,9 +14,9 @@ namespace Cooking.Prototype
     public partial class CookingPrototype
     {
         /// <summary>Share of the screen width the conversation takes on the left.</summary>
-        private const float ConversationWidth = 0.26f;
+        private const float ConversationWidth = 0.22f;
         /// <summary>Share of the screen height the workbench takes at the bottom right.</summary>
-        private const float DeskShare = 0.53f;
+        private const float DeskShare = 0.56f;
         private const float TabletBarHeight = 42f;
         private static readonly Color Orange = new Color(0.75f, 0.42f, 0.15f, 1f);
 
@@ -33,6 +33,16 @@ namespace Cooking.Prototype
         [SerializeField] private List<Sprite> billboardAds = new List<Sprite>();
         [Tooltip("The billboard frame the ads sit in (134 × 70 pixels, the ad 4 pixels in).")]
         [SerializeField] private Sprite billboardFrame;
+
+        [Header("Cookware art")]
+        [Tooltip("Rendered from the CC0 3D Cooking Assets pack by Custom Tools → Cooking Prototype → Render Cookware Sprites.")]
+        [SerializeField] private Sprite knifeSprite;
+        [SerializeField] private Sprite peelerSprite;
+        [SerializeField] private Sprite graterSprite;
+        [SerializeField] private Sprite panSprite;
+        [SerializeField] private Sprite potSprite;
+        [SerializeField] private Sprite boardSprite;
+        [SerializeField] private Sprite plateSprite;
 
         private RectTransform canvasRect;
         private RectTransform deskRect;
@@ -62,6 +72,18 @@ namespace Cooking.Prototype
         {
             billboardAds = new List<Sprite>(ads);
             billboardFrame = frame;
+        }
+
+        /// <summary>Sets the cookware sprites. Used by the editor's Render Cookware Sprites menu.</summary>
+        public void SetCookwareArt(Sprite knife, Sprite peeler, Sprite grater, Sprite pan, Sprite pot, Sprite board, Sprite plateArt)
+        {
+            knifeSprite = knife;
+            peelerSprite = peeler;
+            graterSprite = grater;
+            panSprite = pan;
+            potSprite = pot;
+            boardSprite = board;
+            plateSprite = plateArt;
         }
 
         // ------------------------------------------------------------------ Tablet
@@ -145,7 +167,7 @@ namespace Cooking.Prototype
                 else
                 {
                     // Where the mock-up has it: bottom left of the workbench.
-                    UIFactory.Place(tablet, ConversationWidth + width * 0.015f, DeskShare * 0.04f, ConversationWidth + width * 0.4f, DeskShare * 0.59f);
+                    UIFactory.Place(tablet, ConversationWidth + width * 0.012f, DeskShare * 0.03f, ConversationWidth + width * 0.385f, DeskShare * 0.62f);
                 }
             }
 

@@ -140,6 +140,17 @@ and needs the Input System UI module (the setup adds one). A held item follows t
 **Custom Tools → Cooking Prototype → Assign Market Art** puts the billboard sprites on the scene's
 prototype and sets them to point filtering.
 
+The cookware (knife, peeler, box grater, wok, pot, cutting board, plate) is rendered from the CC0
+[3D Cooking Assets](https://milkandbanana.itch.io/) pack by MilkAndBanana:
+**Custom Tools → Cooking Prototype → Render Cookware Sprites** (`CookwareSprites.cs`) renders each
+model into a trimmed, transparent PNG in `Assets/Art Assets/Cookware` and assigns them to the
+prototype. The pack's FBX files import without colour, so the tool reads the shared palette from
+one of its GLB files. Only the rendered PNGs are in git; the 3D pack is needed just to re-render
+(say, with a different angle in the tool's item list). Without the sprites the game falls back to
+plain shapes. The pot and pan are drawn with what's in them heaped inside, and water over the
+pieces once a soup is cooking. Lifting one takes just the pot or pan (its bar stays on the station); the
+knife and peeler hang upright but are held flat by the handle, blade to the left.
+
 ### The cycle
 
 The game runs in cycles (days). Everything you buy goes into your stock (`Inventory`), which tracks

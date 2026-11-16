@@ -55,13 +55,22 @@ namespace Cooking.Prototype
         {
             public CookingStation Station;
             public RectTransform Rect;
-            public RectTransform Icons;
+            /// <summary>The pot or pan picture with what's in it; hidden while it's lifted off.</summary>
+            public Cookware Pot;
             public Text Contents;
             public Text Status;
             public TimingBar Bar;
             public Button EmptyButton;
             /// <summary>Ingredient cost of what's in it, passed on to the plate.</summary>
             public float Cost;
+        }
+
+        /// <summary>A drawn pot or pan: the picture, the pieces inside, and water for a soup.</summary>
+        private class Cookware
+        {
+            public GameObject Root;
+            public RectTransform Inside;
+            public Image Water;
         }
 
         private enum Held
@@ -265,17 +274,10 @@ namespace Cooking.Prototype
             heldStation = view;
             stirredThisLift = false;
 
-            CreateGhost(screen, 220f, 92f);
-            VerticalLayoutGroup layout = UIFactory.Vertical(ghost.gameObject, 4f, 8);
-            layout.childForceExpandHeight = false;
-            ghost.GetComponent<Image>().color = new Color(0.13f, 0.12f, 0.14f, 0.95f);
-            Text title = UIFactory.Label(ghost, station.Name.ToUpperInvariant() + " (off the heat)", 15, TextAnchor.MiddleLeft, FontStyle.Bold, UIFactory.Accent);
-            UIFactory.Size(title, 20f, 0f);
-            // The status bar stays with the pan while it's off the stove.
-            ghostBar = new TimingBar(ghost, station, 18f);
-            ghostStatus = UIFactory.Label(ghost, "", 14, TextAnchor.MiddleLeft);
-            UIFactory.Size(ghostStatus, 20f, 0f);
-            UpdateGhostStation();
+            // Just the pot or pan; its bar stays on the station.
+            CreateGhost(screen, 240f, 250f);
+            Cookware lifted = BuildCookware(ghost, station);
+            FillCookware(lifted, station);
 
             if(station.Stirs) shakeGesture.Begin(CanvasPoint(screen));
             Say(station.Stirs ? "Pan off the heat. Shake it side to side in the green to stir one unit. Drop it on a plate to dish up, anywhere else to put it back."
@@ -855,6 +857,85 @@ namespace Cooking.Prototype
 
         // ------------------------------------------------------------------ UI
 
+        /// <summary>
+        /// The pot or pan, drawn to fit <paramref name="area"/>: its picture, a dark inside (the pot),
+        /// the pieces in it, and water over them once a soup is cooking.
+        /// </summary>
+        private Cookware BuildCookware(RectTransform area, CookingStation station)
+        {
+            bool isPan = station == wok;
+            Sprite sprite = isPan ? panSprite : potSprite;
+            Cookware cookware = new Cookware();
+
+            // Keeps the picture's shape, so the inside lines up with the drawing.
+            RectTransform root = UIFactory.Rect(area, isPan ? "Pan" : "Pot");
+            UIFactory.Stretch(root);
+            AspectRatioFitter fitter = root.gameObject.AddComponent<AspectRatioFitter>();
+            fitter.aspectMode = AspectRatioFitter.AspectMode.FitInParent;
+            fitter.aspectRatio = sprite != null ? sprite.rect.width / sprite.rect.height : 1f;
+            cookware.Root = root.gameObject;
+
+            Image picture = UIFactory.Panel(root, "Picture", sprite != null ? Color.white : new Color(0.3f, 0.31f, 0.35f, 1f));
+            picture.sprite = sprite != null ? sprite : UIFactory.Circle;
+            picture.raycastTarget = false;
+            UIFactory.Stretch(picture.rectTransform);
+
+            // Where the bowl is in each drawing (the handle sticks out at the bottom left).
+            Vector4 inside = sprite == null ? new Vector4(0.15f, 0.15f, 0.85f, 0.85f)
+                : isPan ? new Vector4(0.14f, 0.36f, 0.86f, 0.9f)
+                : new Vector4(0.1f, 0.36f, 0.9f, 0.94f);
+
+            if(!isPan)
+            {
+                // The renders are flat-lit, so the pot's opening is drawn in.
+                Image hollow = UIFactory.Panel(root, "Inside", new Color(0.2f, 0.21f, 0.25f, 1f));
+                hollow.sprite = UIFactory.Circle;
+                hollow.raycastTarget = false;
+                UIFactory.Place(hollow.rectTransform, inside.x, inside.y, inside.z, inside.w);
+            }
+
+            cookware.Inside = UIFactory.Rect(root, "Pieces");
+            UIFactory.Place(cookware.Inside, inside.x + 0.06f, inside.y + 0.06f, inside.z - 0.06f, inside.w - 0.06f);
+
+            cookware.Water = UIFactory.Panel(root, "Water", new Color(0.45f, 0.62f, 0.78f, 0.5f));
+            cookware.Water.sprite = UIFactory.Circle;
+            cookware.Water.raycastTarget = false;
+            UIFactory.Place(cookware.Water.rectTransform, inside.x + 0.02f, inside.y + 0.02f, inside.z - 0.02f, inside.w - 0.02f);
+            cookware.Water.gameObject.SetActive(false);
+            return cookware;
+        }
+
+        /// <summary>The station's ingredients, heaped and overlapping inside the pot or pan.</summary>
+        private static void FillCookware(Cookware cookware, CookingStation station)
+        {
+            UIFactory.ClearChildren(cookware.Inside);
+
+            List<Sprite> pieces = new List<Sprite>();
+            foreach(IngredientPortion portion in station.Contents)
+            {
+                for(int i = 0; i < portion.quantity && pieces.Count < 12; i++) pieces.Add(portion.ingredient.Icon);
+            }
+
+            // A sunflower spiral spreads them out evenly; each is tipped a little, so it looks piled in.
+            for(int i = 0; i < pieces.Count; i++)
+            {
+                float radius = pieces.Count == 1 ? 0f : 0.36f * Mathf.Sqrt((i + 0.5f) / pieces.Count);
+                float angle = i * 2.39996f;
+                Vector2 centre = new Vector2(0.5f + Mathf.Cos(angle) * radius, 0.5f + Mathf.Sin(angle) * radius * 0.8f);
+                float size = pieces.Count <= 3 ? 0.5f : pieces.Count <= 6 ? 0.4f : 0.32f;
+
+                Image piece = UIFactory.Panel(cookware.Inside, "Piece", pieces[i] != null ? Color.white : Color.clear);
+                piece.sprite = pieces[i];
+                piece.preserveAspect = true;
+                piece.raycastTarget = false;
+                UIFactory.Place(piece.rectTransform, centre.x - size * 0.5f, centre.y - size * 0.5f, centre.x + size * 0.5f, centre.y + size * 0.5f);
+                piece.rectTransform.localRotation = Quaternion.Euler(0f, 0f, ((i * 47) % 50) - 25f);
+            }
+
+            cookware.Water.gameObject.SetActive(station.IsSoup && station.IsCooking);
+            cookware.Water.transform.SetAsLastSibling();
+        }
+
         private void BuildDesk(Transform root)
         {
             Image desk = UIFactory.Panel(root, "Workbench", new Color(0.23f, 0.17f, 0.13f, 1f));
@@ -876,14 +957,14 @@ namespace Cooking.Prototype
             {
                 for(int column = 0; column < DeskSlotColumns; column++)
                 {
-                    float x0 = 0.16f + column * (0.26f / DeskSlotColumns);
+                    float x0 = 0.14f + column * (0.245f / DeskSlotColumns);
                     float y1 = 0.97f - row * (0.35f / DeskSlotRows);
-                    deskSlots.Add(BuildDeskSlot(deskRect, x0, y1 - 0.35f / DeskSlotRows, x0 + 0.26f / DeskSlotColumns, y1));
+                    deskSlots.Add(BuildDeskSlot(deskRect, x0, y1 - 0.35f / DeskSlotRows, x0 + 0.245f / DeskSlotColumns, y1));
                 }
             }
 
-            potView = BuildStationTile(deskRect, pot, "COOKING (POT)", 0.43f, 0.59f);
-            wokView = BuildStationTile(deskRect, wok, "FRYING (PAN)", 0.61f, 0.77f);
+            potView = BuildStationTile(deskRect, pot, "COOKING (POT)", 0.395f, 0.585f);
+            wokView = BuildStationTile(deskRect, wok, "FRYING (PAN)", 0.595f, 0.785f);
             BuildPlateStack(deskRect);
             BuildBoards(deskRect);
             BuildPantry(deskRect);
@@ -893,7 +974,7 @@ namespace Cooking.Prototype
         {
             Image area = UIFactory.Panel(desk, "Food Delivery", new Color(0f, 0f, 0f, 0.25f));
             deliveryRect = area.rectTransform;
-            UIFactory.Place(deliveryRect, 0.03f, 0.71f, 0.15f, 0.97f);
+            UIFactory.Place(deliveryRect, 0.02f, 0.69f, 0.13f, 0.97f);
             deliveryOutline = UIFactory.Outline(deliveryRect, new Color(1f, 1f, 1f, 0.5f), 3f);
             deliveryLabel = UIFactory.Label(deliveryRect, "", 15, TextAnchor.MiddleCenter, FontStyle.Bold, UIFactory.MutedText);
             UIFactory.Stretch(deliveryLabel.rectTransform, 8f);
@@ -917,7 +998,7 @@ namespace Cooking.Prototype
             StationView view = new StationView { Station = station };
             Image tile = UIFactory.Panel(desk, station.Name, new Color(0.12f, 0.11f, 0.13f, 1f));
             view.Rect = tile.rectTransform;
-            UIFactory.Place(view.Rect, xMin, 0.38f, xMax, 0.77f, 4f);
+            UIFactory.Place(view.Rect, xMin, 0.36f, xMax, 0.81f, 4f);
             DragHandle handle = tile.gameObject.AddComponent<DragHandle>();
             handle.Began = screen => GrabStation(view, screen);
             handle.Clicked = () => StartStation(view);
@@ -929,19 +1010,18 @@ namespace Cooking.Prototype
             UIFactory.FitText(header);
             view.Bar = new TimingBar(tile.transform, station, 16f);
             view.Status = UIFactory.Label(tile.transform, "", 14, TextAnchor.MiddleLeft, FontStyle.Bold);
-            UIFactory.Size(view.Status, 36f, 0f);
+            UIFactory.Size(view.Status, 30f, 0f);
             UIFactory.FitText(view.Status);
 
-            view.Icons = UIFactory.Row(tile.transform, 40f, 2f);
-            HorizontalLayoutGroup iconLayout = view.Icons.GetComponent<HorizontalLayoutGroup>();
-            iconLayout.childForceExpandWidth = false;
-            iconLayout.childAlignment = TextAnchor.MiddleCenter;
+            RectTransform potArea = UIFactory.Rect(tile.transform, "Stove");
+            UIFactory.Size(potArea, 80f, 1f);
+            view.Pot = BuildCookware(potArea, station);
 
             view.Contents = UIFactory.Label(tile.transform, "", 13);
-            UIFactory.Size(view.Contents, 20f, 1f);
+            UIFactory.Size(view.Contents, 16f, 0f);
             UIFactory.FitText(view.Contents);
 
-            RectTransform row = UIFactory.Row(tile.transform, 24f);
+            RectTransform row = UIFactory.Row(tile.transform, 22f);
             view.EmptyButton = UIFactory.Button(row, "Take it all out", () => EmptyStation(view), new Color(0.3f, 0.22f, 0.22f, 1f), 13);
             return view;
         }
@@ -950,13 +1030,13 @@ namespace Cooking.Prototype
         {
             Image stack = UIFactory.Panel(desk, "Clean Plates", new Color(0f, 0f, 0f, 0.15f));
             plateStack = stack.rectTransform;
-            UIFactory.Place(plateStack, 0.66f, 0.8f, 0.78f, 0.97f, 2f);
+            UIFactory.Place(plateStack, 0.66f, 0.82f, 0.785f, 0.98f, 2f);
             stack.gameObject.AddComponent<DragHandle>().Began = GrabCleanPlate;
 
             for(int i = 0; i < 3; i++)
             {
-                Image disc = UIFactory.Panel(plateStack, "Plate", new Color(0.86f, 0.84f, 0.79f, 1f));
-                disc.sprite = UIFactory.Circle;
+                Image disc = UIFactory.Panel(plateStack, "Plate", plateSprite != null ? Color.white : new Color(0.86f, 0.84f, 0.79f, 1f));
+                disc.sprite = plateSprite != null ? plateSprite : UIFactory.Circle;
                 disc.preserveAspect = true;
                 disc.raycastTarget = false;
                 UIFactory.Place(disc.rectTransform, 0.08f, 0.22f + i * 0.06f, 0.6f, 0.92f + i * 0.06f);
@@ -971,7 +1051,7 @@ namespace Cooking.Prototype
         {
             Image pantry = UIFactory.Panel(desk, "Pantry", new Color(0.12f, 0.11f, 0.13f, 1f));
             pantryRect = pantry.rectTransform;
-            UIFactory.Place(pantryRect, 0.8f, 0.04f, 0.985f, 0.96f);
+            UIFactory.Place(pantryRect, 0.8f, 0.03f, 0.988f, 0.97f);
             VerticalLayoutGroup layout = UIFactory.Vertical(pantry.gameObject, 4f, 8);
             layout.childForceExpandHeight = false;
             Text header = Header(pantry.transform, "PANTRY  <color=#77736d>hold to take one</color>");
@@ -998,8 +1078,8 @@ namespace Cooking.Prototype
         /// <summary>A plate: a disc with what's on it.</summary>
         private void BuildPlateVisual(RectTransform parent, Plate target)
         {
-            Image disc = UIFactory.Panel(parent, "Plate", new Color(0.86f, 0.84f, 0.79f, 1f));
-            disc.sprite = UIFactory.Circle;
+            Image disc = UIFactory.Panel(parent, "Plate", plateSprite != null ? Color.white : new Color(0.86f, 0.84f, 0.79f, 1f));
+            disc.sprite = plateSprite != null ? plateSprite : UIFactory.Circle;
             disc.preserveAspect = true;
             disc.raycastTarget = false;
             UIFactory.Place(disc.rectTransform, 0f, 0.12f, 1f, 1f);
@@ -1133,14 +1213,14 @@ namespace Cooking.Prototype
 
         private void RefreshStationContents(StationView view)
         {
-            UIFactory.ClearChildren(view.Icons);
-            foreach(IngredientPortion portion in view.Station.Contents) UIFactory.Icon(view.Icons, portion.ingredient.Icon, 36f);
+            FillCookware(view.Pot, view.Station);
 
             if(view.Station.IsEmpty)
             {
+                // Short, so it doesn't cover the pot or pan picture.
                 view.Contents.text = view.Station.OneIngredientWithoutStock
-                    ? "<color=#a6a199>Empty. Without a stock cube it boils one ingredient at a time.</color>"
-                    : "<color=#a6a199>Empty. Drop ingredients in.</color>";
+                    ? "<color=#a6a199>One ingredient, or anything with a stock cube</color>"
+                    : "<color=#a6a199>Drop ingredients in</color>";
             }
             else
             {
@@ -1159,6 +1239,9 @@ namespace Cooking.Prototype
 
             CookingStation station = view.Station;
             view.Bar.Set(station.Progress, station.IsCooking);
+            view.Pot.Root.SetActive(heldStation != view);
+            bool soup = station.IsSoup && station.IsCooking;
+            if(view.Pot.Water.gameObject.activeSelf != soup) view.Pot.Water.gameObject.SetActive(soup);
 
             if(heldStation == view)
             {
