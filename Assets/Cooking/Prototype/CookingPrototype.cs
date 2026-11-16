@@ -153,6 +153,7 @@ namespace Cooking.Prototype
         private GameObject resultOverlay;
         private Text resultTitle;
         private Text resultBody;
+        private RectTransform resultScroll;
         private FlavourRadarGraphic resultRadar;
         private Button resultButton;
         private GameObject summaryOverlay;
@@ -805,6 +806,7 @@ namespace Cooking.Prototype
             overlayOpen = true;
             if(recipeBookOverlay != null) recipeBookOverlay.SetActive(false);
             resultOverlay.SetActive(true);
+            resultScroll.anchoredPosition = Vector2.zero;
 
             string title;
             string line;
@@ -1060,9 +1062,11 @@ namespace Cooking.Prototype
             layout.childForceExpandHeight = false;
 
             resultTitle = UIFactory.Label(right, "", 30, TextAnchor.UpperLeft, FontStyle.Bold);
-            resultSpeech = UIFactory.Label(right, "", 20, TextAnchor.UpperLeft, FontStyle.Italic);
-            resultBody = UIFactory.Label(right, "", 18);
-            UIFactory.Size(resultBody, -1f, 1f);
+
+            // What they say and the report scroll; the title, name field and Continue stay put.
+            resultScroll = UIFactory.ScrollList(right, 14f);
+            resultSpeech = UIFactory.Label(resultScroll, "", 20, TextAnchor.UpperLeft, FontStyle.Italic);
+            resultBody = UIFactory.Label(resultScroll, "", 18);
 
             BuildNamingRow(right);
 
