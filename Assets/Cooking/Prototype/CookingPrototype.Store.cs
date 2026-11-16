@@ -29,6 +29,8 @@ namespace Cooking.Prototype
         private Text cartTotalText;
         private Button checkoutButton;
         private Button clearCartButton;
+        private Button dayTimerButton;
+        private Text regularsText;
 
         // ------------------------------------------------------------------ Actions
 
@@ -189,6 +191,11 @@ namespace Cooking.Prototype
             checkoutButton = UIFactory.Button(buyRow, "Buy everything", Checkout, new Color(0.75f, 0.42f, 0.15f, 1f), 22);
             RectTransform clearRow = UIFactory.Row(column, 36f);
             clearCartButton = UIFactory.Button(clearRow, "Clear cart", ClearCart, new Color(0.35f, 0.2f, 0.2f, 1f), 17);
+
+            // For planning the day: the timer setting and who's coming.
+            RectTransform timerRow = UIFactory.Row(column, 36f);
+            dayTimerButton = UIFactory.Button(timerRow, "", ToggleDayTimer, null, 16);
+            regularsText = UIFactory.Label(column, "", 15);
         }
 
         private void RefreshStore()
@@ -223,6 +230,10 @@ namespace Cooking.Prototype
                       ? "<color=#a6a199>You'll have $" + (money - total).ToString("0.00") + " left.</color>"
                       : "<color=#e5594d>$" + (total - money).ToString("0.00") + " more than you have.</color>");
             checkoutButton.interactable = open && !cart.IsEmpty && affordable;
+            dayTimerButton.interactable = open;
+            UIFactory.SetButtonText(dayTimerButton, dayTimer ? "Day timer: on (" + FormatTime(daySeconds) + ")" : "Day timer: off");
+            regularsText.text = DescribeRegulars().TrimStart('\n') + "<color=#a6a199>Rent at the end of the cycle: $" + stallRent.ToString("0.00")
+                                + ". Prepped stock spoils overnight; raw keeps.</color>";
             clearCartButton.interactable = !cart.IsEmpty;
         }
 

@@ -205,7 +205,17 @@ namespace Cooking.Prototype
 
             Band(background.transform, 0f, station.PerfectStart, new Color(0.35f, 0.35f, 0.4f, 1f));
             Band(background.transform, station.PerfectStart, station.PerfectEnd, new Color(0.3f, 0.6f, 0.3f, 1f));
-            Band(background.transform, station.DangerStart, 1f, new Color(0.7f, 0.25f, 0.2f, 1f));
+
+            if(station.Stirs)
+            {
+                // Wok: red overcooks a stir, black burns.
+                Band(background.transform, station.PerfectEnd, station.BlackStart, new Color(0.7f, 0.25f, 0.2f, 1f));
+                Band(background.transform, station.BlackStart, 1f, new Color(0.02f, 0.02f, 0.02f, 1f));
+            }
+            else
+            {
+                Band(background.transform, station.DangerStart, 1f, new Color(0.7f, 0.25f, 0.2f, 1f));
+            }
 
             fill = UIFactory.Panel(background.transform, "Fill", new Color(1f, 1f, 1f, 0.18f)).rectTransform;
             UIFactory.Place(fill, 0f, 0f, 0f, 1f);

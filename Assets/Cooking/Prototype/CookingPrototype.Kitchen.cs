@@ -6,8 +6,9 @@ using UnityEngine.UI;
 namespace Cooking.Prototype
 {
     /// <summary>
-    /// The Kitchen area (service only): move stock into the wok, the pot or straight onto the plate,
-    /// cook, plate and serve against the order timer.
+    /// The Kitchen area (service only). A dish is one batch: everything goes into the wok or the pot
+    /// at once and comes off together. Afterwards, seasonings (salt, pepper, sugar, MSG2, citric acid,
+    /// chilli) can go on the plate to adjust the flavour. Nothing else goes on raw.
     /// </summary>
     public partial class CookingPrototype
     {
@@ -53,7 +54,7 @@ namespace Cooking.Prototype
 
         private void CreateKitchenState()
         {
-            wok = CookingStation.CreateWok(wokSeconds, shakeKnockback);
+            wok = CookingStation.CreateWok(wokSeconds);
             pot = CookingStation.CreatePot(potSeconds);
             shakeGesture = new BackAndForthGesture(vertical: false, requiredStrokes: int.MaxValue, minTravel: 45f);
         }
@@ -167,6 +168,23 @@ namespace Cooking.Prototype
                 return;
             }
 
+            // Straight onto the plate: only seasonings, and only on a cooked dish.
+            if(station == null)
+            {
+                foreach(IngredientPortion portion in batch)
+                {
+                    if(portion.ingredient.IsSeasoning) continue;
+                    Say(portion.ingredient.DisplayName + " can't go on raw. Everything for a dish goes into the wok or pot at once; only seasonings go on after.", UIFactory.Bad);
+                    return;
+                }
+
+                if(!PlateHasDish)
+                {
+                    Say("Cook the dish first, then season it on the plate.", UIFactory.Bad);
+                    return;
+                }
+            }
+
             float cost = 0f;
             int units = 0;
 
@@ -186,8 +204,8 @@ namespace Cooking.Prototype
             else
             {
                 foreach(IngredientPortion portion in batch) AddToPlate(portion);
-                Say(units + (units == 1 ? " unit" : " units") + " → plate, raw.");
-                LogCooking("Plate", "Raw onto the plate: " + ListPortions(batch) + ".");
+                Say("Seasoned the dish with " + ListPortions(batch) + ".");
+                LogCooking("Plate", "Seasoned with " + ListPortions(batch) + ".");
             }
 
             dishCost += cost;
@@ -200,7 +218,6 @@ namespace Cooking.Prototype
             if(view.Station.StartCooking())
             {
                 Say(view.Station.Name + " on. Watch the bar.");
-                if(view.Station == wok) shakesThisCook = 0;
                 LogCooking(view.Station.Name, "Started" + (view.Station.IsSoup ? " the soup." : "."));
             }
 
@@ -209,18 +226,55 @@ namespace Cooking.Prototype
 
         private void TakeOff(StationView view)
         {
-            Doneness doneness = view.Station.CurrentDoneness;
-            float progress = view.Station.Progress;
-            List<IngredientPortion> cooked = view.Station.TakeOff();
+            // One dish per plate: you can't add more cooked food to it afterwards.
+            if(PlateHasDish)
+            {
+                Say("There's already a dish on the plate. Serve it or bin it first.", UIFactory.Bad);
+                return;
+            }
+
+            CookingStation station = view.Station;
+            Doneness doneness = station.CurrentDoneness;
+            float progress = station.Progress;
+            string wokSummary = station.Stirs ? WokSummary(station) : null;
+            bool allPerfect = station.Stirs ? station.StirredCount - station.OverdoneCount == station.UnitCount : doneness == Doneness.Perfect;
+            List<IngredientPortion> cooked = station.TakeOff();
             if(cooked.Count == 0) return;
 
             foreach(IngredientPortion portion in cooked) AddToPlate(portion);
 
-            string shakes = view.Station == wok && shakesThisCook > 0 ? ", after " + shakesThisCook + (shakesThisCook == 1 ? " shake" : " shakes") : "";
-            LogCooking(view.Station.Name, "Took it off at " + (progress * 100f).ToString("0") + "%: " + DonenessLabel(doneness) + shakes + ".");
+            if(wokSummary != null)
+            {
+                LogCooking(station.Name, "Took it off: " + wokSummary + ".");
+                Say(station.Name + " → plate: " + wokSummary + ".", allPerfect ? UIFactory.Good : UIFactory.Bad);
+            }
+            else
+            {
+                LogCooking(station.Name, "Took it off at " + (progress * 100f).ToString("0") + "%: " + DonenessLabel(doneness) + ".");
+                Say(station.Name + " → plate: " + DonenessLabel(doneness) + ".", allPerfect ? UIFactory.Good : UIFactory.Bad);
+            }
 
-            Say(view.Station.Name + " → plate: " + DonenessLabel(doneness) + ".", doneness == Doneness.Perfect ? UIFactory.Good : UIFactory.Bad);
             RefreshAll();
+        }
+
+        /// <summary>True once a cooked batch is on the plate.</summary>
+        private bool PlateHasDish
+        {
+            get
+            {
+                foreach(IngredientPortion portion in plate) if(!portion.IsRaw) return true;
+                return false;
+            }
+        }
+
+        /// <summary>"3/4 stirred (1 overcooked), 1 burnt, 0 not stirred".</summary>
+        private static string WokSummary(CookingStation station)
+        {
+            string text = station.StirredCount + "/" + station.UnitCount + " stirred";
+            if(station.OverdoneCount > 0) text += " (" + station.OverdoneCount + " overcooked)";
+            if(station.BurntCount > 0) text += ", " + station.BurntCount + " burnt";
+            if(station.UnstirredCount > 0) text += ", " + station.UnstirredCount + " not stirred";
+            return text;
         }
 
         private void BinStation(StationView view)
@@ -303,20 +357,29 @@ namespace Cooking.Prototype
             wokPad.AddTrailPoint(position);
             if(!shakeGesture.Move(position)) return;
 
-            if(wok.Shake())
+            switch(wok.Shake())
             {
-                shakesThisCook++;
-                Say("Wok magic!", UIFactory.Accent);
+                case ShakeResult.Stirred:
+                    Say("Stirred one in the green. " + WokSummary(wok) + ".", UIFactory.Good);
+                    break;
+                case ShakeResult.StirredOverdone:
+                    Say("Stirred one, but in the red: a bit burned. " + WokSummary(wok) + ".", UIFactory.Accent);
+                    break;
+                case ShakeResult.TooEarly:
+                    Say("Too early: the bar went back to the start. Shake in the green.", UIFactory.Bad);
+                    break;
+                case ShakeResult.KnockedBack:
+                    Say(wok.UnstirredCount == 0 ? "Everything's stirred. Take it off." : "Knocked back. Shake in the green to stir.");
+                    break;
             }
-            else if(wok.IsCooking && wok.Progress < wok.DangerStart - 0.1f) Say("No need to shake yet. Wait for the red.");
+
+            RefreshAll();
         }
 
         private void OnWokReleased()
         {
             shakeGesture.End();
         }
-
-        private int shakesThisCook;
 
         /// <summary>"2× Rice, 1× Onion (peeled, sliced)" for the history.</summary>
         private static string ListPortions(IReadOnlyList<IngredientPortion> portions)
@@ -362,7 +425,7 @@ namespace Cooking.Prototype
             RectTransform stations = Column(root, "Stations", 0.37f, 0.65f, false);
             VerticalLayoutGroup layout = UIFactory.Vertical(stations.gameObject, 10f, 0);
             layout.childForceExpandHeight = false;
-            wokView = BuildStation(stations, wok, "WOK  <color=#77736d>take it off in the green, shake in the red</color>");
+            wokView = BuildStation(stations, wok, "WOK  <color=#77736d>shake in the green, once per unit</color>");
             potView = BuildStation(stations, pot, "POT  <color=#77736d>take it off on the green line</color>");
 
             BuildPlateColumn(Column(root, "Plate", 0.65f, 1f));
@@ -466,7 +529,7 @@ namespace Cooking.Prototype
 
             plateRadar.ClearProfiles();
             // The order only when it's a recipe you know (in the recipe book).
-            if(orderIn && order != null && KnownRecipes().Contains(order)) plateRadar.AddProfile(orderProfile, new Color(0.85f, 0.85f, 0.85f, 0.7f), false);
+            if(orderIn && orderKnown) plateRadar.AddProfile(orderProfile, new Color(0.85f, 0.85f, 0.85f, 0.7f), false);
             if(livePreview && plate.Count > 0) plateRadar.AddProfile(FlavourCalculator.Calculate(plate, rules), UIFactory.Accent, true);
         }
 
@@ -496,7 +559,7 @@ namespace Cooking.Prototype
 
                 string label = Describe(new IngredientPortion(entry.Ingredient, entry.Quantity, entry.Prep), true);
                 if(selected > 0) label = "<b>" + selected + "/</b>" + label;
-                Color color = selected > 0 ? selectedColor : entry.Prep == PrepSteps.None ? UIFactory.ButtonColor : new Color(0.24f, 0.3f, 0.24f, 1f);
+                Color color = selected > 0 ? selectedColor : UIFactory.ButtonColor;
 
                 Button pick = UIFactory.Button(row, label, () => SelectMore(captured), color, 17);
                 Text text = pick.GetComponentInChildren<Text>();
@@ -532,7 +595,15 @@ namespace Cooking.Prototype
             CookingStation station = view.Station;
             view.Bar.Set(station.Progress, station.IsCooking);
 
-            if(station.IsCooking)
+            if(station.IsCooking && station.Stirs)
+            {
+                string zone = station.IsInBlack ? "BURNING! Shake it" : station.Progress > station.PerfectEnd ? "red: a stir now overcooks"
+                    : station.Progress >= station.PerfectStart ? "green: shake to stir" : "heating up";
+                view.Status.text = zone + "   <size=17>" + WokSummary(station) + "</size>";
+                view.Status.color = station.IsInBlack ? UIFactory.Bad : station.Progress > station.PerfectEnd ? UIFactory.Accent
+                    : station.Progress >= station.PerfectStart ? UIFactory.Good : UIFactory.MutedText;
+            }
+            else if(station.IsCooking)
             {
                 Doneness doneness = station.CurrentDoneness;
                 string label = DonenessLabel(doneness);
@@ -553,14 +624,14 @@ namespace Cooking.Prototype
 
             if(view.PadHint != null)
             {
-                bool danger = station.IsInDanger && station.Progress < 1f;
+                bool cooking = station.IsCooking;
 
-                if(view.WasInDanger != danger)
+                if(view.WasInDanger != cooking)
                 {
-                    view.WasInDanger = danger;
-                    // In the red the pad shows the side-to-side guide; otherwise just how to use it.
-                    wokPad.SetGuide(danger ? GestureGuide.SideToSide : GestureGuide.None, UIFactory.Accent);
-                    view.PadHint.text = danger ? "" : "Shake pad: when the bar hits red, hold and drag side to side here.";
+                    view.WasInDanger = cooking;
+                    // While it fries the pad shows the side-to-side guide; otherwise just how to use it.
+                    wokPad.SetGuide(cooking ? GestureGuide.SideToSide : GestureGuide.None, UIFactory.Accent);
+                    view.PadHint.text = cooking ? "" : "Shake pad: hold and drag side to side here. One shake in the green stirs one unit.";
                     view.PadHint.color = UIFactory.MutedText;
                 }
             }

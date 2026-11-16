@@ -10,11 +10,12 @@ namespace Cooking.Prototype
     /// <summary>
     /// Playable cycle loop on top of the flavour system.
     /// <list type="number">
-    /// <item><b>Morning</b>: fill the cart in the <b>Store</b> and prep on the <b>Prep</b> board.
-    /// Nothing is timed. "Buy ingredients and start the day" pays for the cart and opens the stall.</item>
+    /// <item><b>Morning</b>: fill the cart in the <b>Store</b>. Nothing is timed. "Buy ingredients
+    /// and start the day" pays for the cart, starts the timer and opens the stall.</item>
     /// <item><b>Service</b>: the store closes and the day timer runs. Every regular comes once, in a
     /// shuffled order, a few seconds apart. They order as they arrive (their order dialogue names the
-    /// dish) and the ticket fills in. Cook in the <b>Kitchen</b>; you can still prep.</item>
+    /// dish) and the ticket fills in. Prep on the <b>Prep</b> board while they come, and cook in the
+    /// <b>Kitchen</b>.</item>
     /// <item><b>After each order</b>: their reaction, the dish's flavour profile, and, for a dish
     /// that isn't on the menu, a chance to name it and save it to the menu.</item>
     /// <item><b>End of the cycle</b>: when everyone has been or the timer runs out. A summary of
@@ -60,10 +61,9 @@ namespace Cooking.Prototype
         [SerializeField, Range(0f, 1f)] private float closeEnoughPay = 0.6f;
 
         [Header("Stations")]
+        [Tooltip("Seconds for the wok bar to go from empty to the end. Each counted shake sends it back to the middle of the grey.")]
         [SerializeField, Min(1f)] private float wokSeconds = 8f;
         [SerializeField, Min(1f)] private float potSeconds = 10f;
-        [Tooltip("How far each wok shake (one change of direction) knocks the bar back.")]
-        [SerializeField, Range(0.01f, 0.3f)] private float shakeKnockback = 0.06f;
 
         [Header("Prep minigames (strokes per unit)")]
         [SerializeField, Min(1)] private int sliceStrokes = 6;
@@ -73,6 +73,8 @@ namespace Cooking.Prototype
         [Header("Debug")]
         [Tooltip("Show the plate's flavour on the radar while cooking. The design reveals it only after serving; this is for tuning.")]
         [SerializeField] private bool livePreview = true;
+        [Tooltip("Show how close a dish came to the customer's secret desire on the result screen. Tuning only; it gives the secret away.")]
+        [SerializeField] private bool showDesireDebug;
         [Tooltip("0 picks a random seed.")]
         [SerializeField] private int randomSeed;
 
@@ -103,7 +105,6 @@ namespace Cooking.Prototype
             public GameObject TimerBar;
             public RectTransform TimerFill;
             public Image TimerFillImage;
-            public Button TimerToggle;
         }
 
         // Cycle state
@@ -133,7 +134,8 @@ namespace Cooking.Prototype
         private Customer customer;
         private RecipeDefinition order;
         private FlavourProfile orderProfile;
-        private FlavourZone orderZone;
+        /// <summary>The order is a recipe in your book, so you may see what's in it.</summary>
+        private bool orderKnown;
         private string orderLine;
         /// <summary>True once the customer has said what they want.</summary>
         private bool orderIn;
@@ -151,6 +153,7 @@ namespace Cooking.Prototype
         private GameObject resultOverlay;
         private Text resultTitle;
         private Text resultBody;
+        private RectTransform resultScroll;
         private FlavourRadarGraphic resultRadar;
         private Button resultButton;
         private GameObject summaryOverlay;
@@ -245,7 +248,7 @@ namespace Cooking.Prototype
             }
 
             ShowArea(Area.Store);
-            Say("Cycle " + day + ". Fill the cart for " + customers.Count + " regulars, prep what you can, then buy and start the day.");
+            Say("Cycle " + day + ". Fill the cart for " + customers.Count + " regulars, then buy and start the day. Prepping starts with the day.");
         }
 
         /// <summary>The morning button: pays for the cart and opens the stall.</summary>
@@ -315,7 +318,7 @@ namespace Cooking.Prototype
             orderIn = false;
             orderLine = null;
             orderProfile = FlavourProfile.Zero;
-            orderZone = null;
+            orderKnown = false;
 
             Say(customer.name + " is at the counter (" + (servedToday + 1) + " of " + customers.Count + ").");
             BeginVisit();
@@ -330,7 +333,7 @@ namespace Cooking.Prototype
             order = recipe;
             orderIn = true;
             orderProfile = order != null ? order.CalculateProfile(rules) : FlavourProfile.Zero;
-            orderZone = FlavourEvaluator.FindBestZone(orderProfile, zones, Falloff).Zone;
+            orderKnown = order != null && KnownRecipes().Contains(order);
             OnOrderIn();
 
             Say(customer.name + " wants " + DishName(order) + ".", UIFactory.Accent);
@@ -548,7 +551,8 @@ namespace Cooking.Prototype
             switch(target)
             {
                 case Area.Store: return phase == Phase.Morning;
-                case Area.Prep: return phase != Phase.DayOver;
+                // Prepping is part of the timed day, while the regulars arrive.
+                case Area.Prep: return phase == Phase.Service;
                 case Area.Kitchen: return phase == Phase.Service;
                 default: return false;
             }
@@ -558,7 +562,8 @@ namespace Cooking.Prototype
         {
             if(!IsAreaOpen(target))
             {
-                Say(target == Area.Store ? "The store is closed until tomorrow morning." : "The kitchen opens when the day starts.", UIFactory.Bad);
+                Say(target == Area.Store ? "The store is closed until tomorrow morning."
+                    : target == Area.Prep ? "Prepping starts when the day starts." : "The kitchen opens when the day starts.", UIFactory.Bad);
                 return;
             }
 
@@ -606,8 +611,6 @@ namespace Cooking.Prototype
                 bool timer = dayTimer && phase == Phase.Service;
                 ticket.TimerBar.SetActive(timer);
                 ticket.Timer.gameObject.SetActive(timer);
-                ticket.TimerToggle.transform.parent.gameObject.SetActive(phase == Phase.Morning);
-                UIFactory.SetButtonText(ticket.TimerToggle, dayTimer ? "Day timer: on (" + FormatTime(daySeconds) + ")" : "Day timer: off");
 
                 if(phase == Phase.Morning)
                 {
@@ -737,6 +740,12 @@ namespace Cooking.Prototype
         {
             if(recipe == null) return "<color=#a6a199>Nothing on the menu.</color>";
 
+            // A dish only they know: just the name. Working out what goes in it is up to you.
+            if(!KnownRecipes().Contains(recipe))
+            {
+                return "<size=24><b>" + recipe.DisplayName + "</b></size>\n<color=#a6a199>Not in your recipe book. You'll have to work out what goes in it.</color>";
+            }
+
             StringBuilder sb = new StringBuilder();
             sb.Append("<size=24><b>").Append(recipe.DisplayName).Append("</b></size>\n");
             sb.Append("<color=#a6a199>").Append(DishType(recipe));
@@ -761,12 +770,6 @@ namespace Cooking.Prototype
             sb.Append("<color=#a6a199>Steps are in the Recipe book.</color>\n");
             sb.Append("\nMenu price <b>$").Append(DishJudge.MenuPrice(recipe, margin).ToString("0.00")).Append("</b>");
 
-            if(orderZone != null)
-            {
-                sb.Append("\nTastes like <color=#").Append(ColorUtility.ToHtmlStringRGB(orderZone.Color)).Append(">")
-                  .Append(orderZone.DisplayName).Append("</color>");
-            }
-
             return sb.ToString();
         }
 
@@ -788,20 +791,12 @@ namespace Cooking.Prototype
                 : "<color=#e5594d>too different</color>";
 
             return "Similar to the order: <b>" + Percent(s.Combined) + "</b> " + tier
-                   + "\n<color=#a6a199>  flavour " + Percent(s.Flavour) + ", ingredients " + Percent(s.Ingredients)
-                   + ". Very close from " + Percent(veryCloseAt) + ", close enough from " + Percent(closeEnoughAt) + ".</color>";
+                   + "\n<color=#a6a199>  flavour " + Percent(s.Flavour) + ", ingredients " + Percent(s.Ingredients) + "</color>";
         }
 
         private static string Percent(float value)
         {
             return (value * 100f).ToString("0") + "%";
-        }
-
-        private static string ZoneText(FlavourZoneMatch match)
-        {
-            if(!match.IsMatch) return "<color=#a6a199>none</color>";
-            return "<color=#" + ColorUtility.ToHtmlStringRGB(match.Zone.Color) + ">" + match.Zone.DisplayName + "</color> "
-                   + (match.Score * 100f).ToString("0") + "%";
         }
 
         // ------------------------------------------------------------------ Result
@@ -811,6 +806,7 @@ namespace Cooking.Prototype
             overlayOpen = true;
             if(recipeBookOverlay != null) recipeBookOverlay.SetActive(false);
             resultOverlay.SetActive(true);
+            resultScroll.anchoredPosition = Vector2.zero;
 
             string title;
             string line;
@@ -847,9 +843,8 @@ namespace Cooking.Prototype
 
             sb.Append("\n<b>Flavour profile</b>\n<size=17>").Append(result.Dish.ToString()).Append("</size>\n\n");
             sb.Append(DescribeSimilarity(result)).Append('\n');
-            sb.Append("Best zone: ").Append(ZoneText(result.BestZone)).Append('\n');
             if(result.RefusedIngredient != null) sb.Append("Won't eat: <color=#e5594d>").Append(result.RefusedIngredient.DisplayName).Append("</color>\n");
-            if(result.DesireScore >= 0f) sb.Append("<color=#a6a199>Secret desire (debug): ").Append((result.DesireScore * 100f).ToString("0")).Append("%</color>\n");
+            if(showDesireDebug && result.DesireScore >= 0f) sb.Append("<color=#a6a199>Secret desire (debug): ").Append((result.DesireScore * 100f).ToString("0")).Append("%</color>\n");
 
             float profit = result.Payment + result.Tip - dishCost;
             sb.Append("\nPaid <b>$").Append(result.Payment.ToString("0.00")).Append("</b>");
@@ -859,9 +854,9 @@ namespace Cooking.Prototype
             sb.Append("\nProfit <b><color=#").Append(profit >= 0f ? "73cc73" : "e5594d").Append(">$").Append(profit.ToString("0.00")).Append("</color></b>");
             resultBody.text = sb.ToString();
 
-            resultRadar.SetHighlight(result.BestZone.Zone);
+            // Only your dish, and the order when you knew what it was.
             resultRadar.ClearProfiles();
-            resultRadar.AddProfile(result.Ordered, new Color(0.85f, 0.85f, 0.85f, 0.7f), false);
+            if(orderKnown) resultRadar.AddProfile(result.Ordered, new Color(0.85f, 0.85f, 0.85f, 0.7f), false);
             resultRadar.AddProfile(result.Dish, UIFactory.Accent, true);
 
             ShowNaming(currentEntry != null ? currentEntry.Dish : null);
@@ -986,9 +981,6 @@ namespace Cooking.Prototype
             ticket.Customer = UIFactory.Label(column, "", 28, TextAnchor.UpperLeft, FontStyle.Bold, UIFactory.Accent);
             ticket.Line = UIFactory.Label(column, "", 18, TextAnchor.UpperLeft, FontStyle.Italic);
 
-            RectTransform toggleRow = UIFactory.Row(column, 40f);
-            ticket.TimerToggle = UIFactory.Button(toggleRow, "", ToggleDayTimer, null, 17);
-
             Image timerBack = UIFactory.Panel(column, "Timer", new Color(0.08f, 0.08f, 0.09f, 1f));
             UIFactory.Size(timerBack, 16f, 0f);
             ticket.TimerBar = timerBack.gameObject;
@@ -1038,8 +1030,8 @@ namespace Cooking.Prototype
             {
                 Inventory.Entry captured = entry;
                 string label = Describe(new IngredientPortion(entry.Ingredient, entry.Quantity, entry.Prep), true);
-                Color color = entry.Prep == PrepSteps.None ? UIFactory.ButtonColor : new Color(0.24f, 0.3f, 0.24f, 1f);
-                Button button = UIFactory.Button(content, label, () => onClick(captured), color, 17);
+                // Prepped and raw stock look the same: colour would suggest only prepped stock goes in a dish.
+                Button button = UIFactory.Button(content, label, () => onClick(captured), UIFactory.ButtonColor, 17);
                 Text text = button.GetComponentInChildren<Text>();
                 text.alignment = TextAnchor.MiddleLeft;
                 text.rectTransform.offsetMin = new Vector2(12f, 0f);
@@ -1062,7 +1054,6 @@ namespace Cooking.Prototype
             UIFactory.Place(radarArea, 0f, 0f, 0.45f, 1f, 30f);
             resultRadar = radarArea.gameObject.AddComponent<FlavourRadarGraphic>();
             resultRadar.raycastTarget = false;
-            resultRadar.SetZones(zones);
             resultRadar.CreateLabels(UIFactory.Font, 18, UIFactory.MutedText);
 
             RectTransform right = UIFactory.Rect(panel, "Details");
@@ -1071,9 +1062,11 @@ namespace Cooking.Prototype
             layout.childForceExpandHeight = false;
 
             resultTitle = UIFactory.Label(right, "", 30, TextAnchor.UpperLeft, FontStyle.Bold);
-            resultSpeech = UIFactory.Label(right, "", 20, TextAnchor.UpperLeft, FontStyle.Italic);
-            resultBody = UIFactory.Label(right, "", 18);
-            UIFactory.Size(resultBody, -1f, 1f);
+
+            // What they say and the report scroll; the title, name field and Continue stay put.
+            resultScroll = UIFactory.ScrollList(right, 14f);
+            resultSpeech = UIFactory.Label(resultScroll, "", 20, TextAnchor.UpperLeft, FontStyle.Italic);
+            resultBody = UIFactory.Label(resultScroll, "", 18);
 
             BuildNamingRow(right);
 

@@ -30,6 +30,8 @@ namespace Cooking.Prototype
         public string Ordered;
         public string OrderLine;
         public FlavourProfile OrderedFlavour;
+        /// <summary>The order was in your recipe book. If not, its flavour stays hidden.</summary>
+        public bool OrderKnown;
         /// <summary>Seconds from the order coming in to serving.</summary>
         public float TimeTaken;
 

@@ -58,11 +58,11 @@ MonoBehaviour:
     nutrition: -0.5
     texture: 2
   undercooked:
-    savoury: 0
-    salty: 0
-    sweet: 0
-    bitter: 1
-    sour: 0
+    savoury: -1.5
+    salty: -0.5
+    sweet: -0.5
+    bitter: 0.5
+    sour: -0.5
     pain: 0
     nutrition: -2
     texture: 2
@@ -70,7 +70,7 @@ MonoBehaviour:
     savoury: -1
     salty: 0
     sweet: 0
-    bitter: 0
+    bitter: 2.5
     sour: 0
     pain: 0
     nutrition: -1

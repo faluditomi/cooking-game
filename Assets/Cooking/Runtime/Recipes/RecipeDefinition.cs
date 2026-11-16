@@ -96,11 +96,12 @@ namespace Cooking
                 IngredientPortion portion = list[i];
                 if(portion == null || !portion.IsValid) continue;
 
-                (IngredientDefinition, PrepSteps, CookMethods) key = (portion.ingredient, portion.prep, portion.cooking);
+                // A seasoning counts the same whether it was cooked in or added afterwards.
+                (IngredientDefinition, PrepSteps, CookMethods) key = (portion.ingredient, portion.prep, portion.ingredient.RecipeCooking(portion.cooking));
                 counts.TryGetValue(key, out int existing);
                 counts[key] = existing + portion.quantity;
 
-                if(!portion.IsRaw && portion.doneness != Doneness.Perfect) allPerfect = false;
+                if(!portion.IsRaw && portion.doneness != Doneness.Perfect && !portion.ingredient.IsSeasoning) allPerfect = false;
             }
 
             return counts;

@@ -102,30 +102,46 @@ Everything you buy goes into your stock (`Inventory`), which tracks units per pr
 1. **Morning** (untimed). The **Store** is open. Fill a cart (`ShoppingCart`): ingredients one at a
    time from the shelf (−, +1, +5), a whole dish from the **Bundles** tiles under the shelf (one
    serving of a menu dish), or from the **Recipe book** (**+ One serving**, **+ What's missing**).
-   Nothing is bought until you pay. On the **Prep** board, prep stock one unit at a time (as in the
-   design doc): put a unit on the board, pick up a tool, do its gesture, then put it back. It goes
-   back into stock prepped. The Kitchen is locked.
-2. **Buy ingredients and start the day** (top bar) pays for the cart and opens the stall. The Store
-   closes until the next morning.
+   Nothing is bought until you pay. The cart column also has the day-timer switch and who's coming
+   today. Prep and Kitchen are locked: prepping is part of the timed day (meeting decision, so the
+   day doesn't get boring once everything is prepped in the morning).
+2. **Buy ingredients and start the day** (top bar) pays for the cart, starts the timer and opens
+   the stall. The Store closes until the next morning.
 3. **Service.** The day timer runs (`daySeconds`, 6 minutes). Every regular comes **once**, in a
    shuffled order, 1–6 s (`arrivalDelay`) after the last one leaves. They order as they arrive:
    their order dialogue names the dish, and the ticket fills in.
+   On the **Prep** board, prep stock one unit at a time (as in the design doc): put a unit on the
+   board, pick up a tool, do its gesture, then put it back. It goes back into stock prepped.
+   **Peeling comes first**: something sliced or grated can't be peeled. When the unit on the board
+   is the last of its kind, it goes back to the pile by itself after slicing or grating (after a
+   peel it stays, in case you slice it next).
    The ticket (on the Prep and Kitchen areas) shows the recipe with each ingredient marked ready /
-   needs prep / short. In the **Kitchen**, select stock (each click on a row adds one unit, − takes
-   one back), then send the whole selection at once with → Wok, → Pot or → Plate. Cook and serve.
-   A batch for the pot can include the soup cube; it goes in first, so the rest joins the soup. You
-   can still prep, and the wok and pot keep cooking while you're away.
-   - **Wok**: Start, then take it off in the green. In the red, shake it on the shake pad. If it
-     reaches the end, it's burnt.
+   needs prep / short. If they order something that isn't in your recipe book (like the Sleeper's
+   boiled synthetic chicken), it only shows the name: working out what goes in it is up to you.
+   In the **Kitchen**, select stock (each click on a row adds one unit, − takes one back). **A dish
+   is one batch**: send everything for it to the wok or the pot at once (a station takes one batch
+   until it's emptied), cook it, and take it off onto the plate. You can't add more cooked food to
+   a plate that has a dish on it. A batch for the pot can include the soup cube; it goes in first,
+   so the rest joins the soup. The wok and pot keep cooking while you're prepping.
+   - **Wok**: every unit needs one stir, a shake on the shake pad (3× tofu + 1× rice: 4 stirs).
+     The bar has four zones. **Grey**: a shake is too early and sends the bar back to the start.
+     **Green**: stirs one unit perfectly. **Red**: stirs one unit, a bit burned (overcooked:
+     bitter). Each counted shake sends the bar back to the middle of the grey. Reaching the
+     **black** burns one unit, and leaving it at the end burns another every 2 s. Take it off
+     yourself; units never stirred come off undercooked, which costs flavour.
    - **Pot**: take it off on the narrow green line, or it overcooks. Without a stock cube it boils
-     one ingredient at a time; with one, it's a soup and takes anything.
-   - Everything in a station comes off at once with the same doneness.
+     one ingredient at a time; with one, it's a soup and takes anything. Everything in it comes
+     off with the same doneness.
+   - **Seasoning**: once the dish is on the plate, **→ Plate** adds seasonings to it: salt, pepper,
+     sugar, MSG2, citric acid and chilli (`IngredientDefinition.isSeasoning`). Nothing else goes on
+     raw. Chilli and MSG2 give their full taste grated, half unprepped (`fullFlavourPrep`). For a
+     recipe, a seasoning counts the same whether it was cooked in or added after.
    - **Serve**: the dish is judged (`DishJudge`). The result screen plays their reaction and shows
-     the dish's flavour profile against the order. If the dish isn't on the menu, it offers a name
+     the dish's flavour profile, with the order's outline when it's a recipe you know. If the dish isn't on the menu, it offers a name
      field (20 letters): **Save dish** adds it to the menu (origin Emphis); **Continue** leaves it
      "Nameless". Continue sends the customer off (anything they were still saying stops).
    - **Day timer off**: to compare the "time trial gauntlet" and "zen social kitchen" vibes
-     (design doc TODO), switch it off on the ticket in the morning, or untick `dayTimer` on the
+     (design doc TODO), switch it off in the Store in the morning, or untick `dayTimer` on the
      `Cooking Prototype` object. The day then ends when everyone has been.
 4. **End of the cycle**, when everyone has been or the timer runs out (whoever is still waiting
    leaves without eating): a summary of each dish and who it was for, income, expenses, the
@@ -143,9 +159,9 @@ that feeds a `Gesture`. The pad draws a guide for the current tool and a fading 
 | Knife → sliced | `BackAndForthGesture` (vertical) | each change of direction after 70 px | 6 |
 | Peeler → peeled | `HalfCircleDownGesture` | a half circle from the top down to the bottom, either side. Bottom to top, straight lines and reversals don't count | 3 |
 | Grater → grated | `SwipeRightGesture` | 110 px to the right. Going back left earns nothing | 5 |
-| Wok shake | `BackAndForthGesture` (horizontal) | each change of direction after 45 px. Only works in the red, and knocks the bar back by `shakeKnockback` | n/a |
+| Wok shake | `BackAndForthGesture` (horizontal) | each change of direction after 45 px. One shake = one stir (see the wok above) | one per unit |
 
-Stroke counts, knockback, station speeds, the day timer and the rent are on the
+Stroke counts, station speeds, the day timer and the rent are on the
 `Cooking Prototype` object. Stock is a flag on the ingredient (`IngredientDefinition.IsStock`, set
 on Soup Cube).
 
@@ -175,7 +191,7 @@ Price is the **ordered** dish's ingredient cost × `margin`. Customers come from
 
 - **The Woman**: orders MSBeef fried rice (Real Beef™ only) and refuses Beef. Secretly craves *Their lost love's soup*, a sweet and sour beef soup: her dream needs Beef, and wins over the refusal.
 - **The Man**: refuses synthetic chicken. Craves *An honest broth* (filling, a little to chew, a touch sweet).
-- **The Sleeper**: orders boiled synthetic chicken. Craves *Mother's fire* (very hot, savoury, not sweet).
+- **The Sleeper**: orders boiled synthetic chicken, a recipe only NPCs know (it's not on the menu or in the book). Craves *Mother's fire* (very hot, savoury, not sweet).
 - **A generic Eyesider**: orders anything on the menu, craves nothing.
 
 Customer lines and other settings (margin, station speed, live preview) are on the
@@ -188,12 +204,13 @@ and needs the Input System UI module (the setup adds one). `FlavourRadarGraphic`
 ### Recipe book (`CookingPrototype.RecipeBook.cs`, `RecipeGuide.cs`)
 
 The **Recipe book** button in the top bar opens it from any area, any time. It lists the menu plus
-dishes learned from customers (their specials and dream meals). For the selected dish it shows:
+your own dishes that aren't on it. For the selected dish it shows:
 
 - **Steps** (`RecipeGuide`): what to buy (with how many you have), what to prep with which tool
   ("peel (peeler), then slice (knife)"), which station cooks what and how (pot: the soup cube
   makes it a soup; wok: take it off in the green, shake in the red; raw straight to the plate), and serving.
-- **Flavour**: the dish on the radar against the zones, and which zone it tastes like.
+- **Flavour**: the dish alone on the radar. No zones, and no "tastes like", which could give away
+  what customers want.
 - **Shopping**: have/need per ingredient (stock + cart), with **+ One serving** and **+ What's
   missing** to fill the store cart. These only work in the morning.
 
@@ -266,12 +283,14 @@ built around dishes from the design doc that aren't on the menu; one way to hit 
   - **What was said:** every line with a timestamp, labelled Order, Musing, Hurrying, Reaction or Clue.
   - **What was cooked:** a timestamped log of units put into the wok/pot/plate, stations started
     and taken off (at what %, doneness, wok shakes), anything binned, and prep done during the order.
-  - **Served**, **to make it again** (the dish's name or "Nameless", and its recipe steps), the dish's **flavour profile** per axis next to the order's (orange = more, blue
-    = less), the zone it tastes like, and the **result** (verdict, similarity breakdown, pay,
-    ingredient cost, profit).
+  - **Served**, **to make it again** (the dish's name or "Nameless", and its recipe steps), the
+    dish's **flavour profile** per axis next to the order's when you knew the order (orange = more,
+    blue = less), and the **result** (verdict, similarity breakdown, pay, ingredient cost, profit).
 
-  On the right is that dish on the radar against the order's outline, plus what you know about
-  that regular's secret desire (their clues so far, or the recipe you found).
+  On the right is that dish on the radar (with the order's outline when you knew it), plus what you
+  know about that regular's secret desire (their clues so far, or the recipe you found). For a dish
+  that isn't on the menu there's a name field: **Save dish** saves it as your own recipe, so
+  regulars can order it by name.
 - **Unlocking.** Hitting the desire is their dream meal (the dream order scene, and they become
   Friendly) and the dish becomes a new recipe: the result screen asks you to **name it** and save
   it to the menu. Unnamed, it stays "Nameless" in the book's "Not on the menu" section.
@@ -280,8 +299,17 @@ built around dishes from the design doc that aren't on the menu; one way to hit 
 
 The book lists the menu, then "Not on the menu": dishes regulars order that you never saved or took
 off. Each dish shows whether it's a soup, fried, or neither. **Remove from the menu** soft-deletes a
-dish: it leaves the menu and the bundles, regulars can still order it, and their lines stop
-naming it.
+dish you saved: it leaves the menu and the bundles, regulars can still order it, and their lines
+stop naming it. The default recipes can't be removed (meeting decision: regulars would be left with
+nothing they like, or nothing to name).
+
+### Radars and secret desires
+
+The radars only show what you made, plus the order's outline when the order is a recipe in your
+book. They draw no zones. The regulars' secret desire zones are undiscovered recipes, so the game
+never draws, lists or names them; they're only used to judge the dream meal and give clues.
+`showDesireDebug` on the `Cooking Prototype` object shows the desire score on the result screen
+for tuning.
 
 ## Tests
 

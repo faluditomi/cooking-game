@@ -6,8 +6,8 @@ namespace Cooking.Prototype
 {
     /// <summary>
     /// The Prep area: one unit at a time on the board (as in the design doc). Pick up a tool and do
-    /// its gesture; finished units go back into stock prepped. Open in the morning and during service,
-    /// where the time it takes comes off the order timer.
+    /// its gesture; finished units go back into stock prepped. Peeling comes first. Open once the day
+    /// starts, while the regulars arrive.
     /// </summary>
     public partial class CookingPrototype
     {
@@ -123,6 +123,12 @@ namespace Cooking.Prototype
                 return;
             }
 
+            if(!CanPrep(boardUnit, step))
+            {
+                Say("Peel it first: you can't peel something that's already sliced or grated.", UIFactory.Bad);
+                return;
+            }
+
             if(activeTool == step)
             {
                 PutDownTool();
@@ -143,6 +149,13 @@ namespace Cooking.Prototype
 
             Say("Picked up the " + ToolName(step) + ". " + ToolInstruction(step));
             RefreshAll();
+        }
+
+        /// <summary>Peeling has to come first: once sliced or grated, it can't be peeled.</summary>
+        private static bool CanPrep(IngredientPortion unit, PrepSteps step)
+        {
+            if(unit == null || (unit.prep & step) != 0) return false;
+            return step != PrepSteps.Peeled || (unit.prep & (PrepSteps.Sliced | PrepSteps.Grated)) == 0;
         }
 
         private void PutDownTool()
@@ -182,6 +195,19 @@ namespace Cooking.Prototype
             boardUnit.prep |= done;
             PutDownTool();
             LogCooking("Prep", done + " 1× " + boardUnit.ingredient.DisplayName + " during the order.");
+
+            // The last one of its kind goes back by itself once it's sliced or grated (nothing comes
+            // after those; after a peel it stays, in case you slice it next).
+            bool last = inventory.Count(boardUnit.ingredient, boardSourcePrep) == 0;
+            if(last && done != PrepSteps.Peeled)
+            {
+                string finished = Describe(boardUnit, true);
+                ReturnBoardToStock();
+                Say(finished + " → stock. That was the last one.", UIFactory.Good);
+                RefreshAll();
+                return;
+            }
+
             Say(done + " " + boardUnit.ingredient.DisplayName + ". Another step, or put it back in stock.", UIFactory.Good);
             RefreshAll();
         }
@@ -254,8 +280,7 @@ namespace Cooking.Prototype
 
             foreach(KeyValuePair<PrepSteps, Button> pair in toolButtons)
             {
-                bool done = boardUnit != null && (boardUnit.prep & pair.Key) != 0;
-                pair.Value.interactable = boardUnit != null && !done;
+                pair.Value.interactable = CanPrep(boardUnit, pair.Key);
                 pair.Value.GetComponent<Image>().color = activeTool == pair.Key ? new Color(0.75f, 0.42f, 0.15f, 1f) : UIFactory.ButtonColor;
             }
 
