@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Man - Order - Friendly - O1
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: 2d17a29b-6719-4c82-9c71-68c3531bc83e
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: 2b344966-1070-4761-9f81-198662cd3b6f
+    kind: 0
+    line:
+      text: I made it for the kids three times this week. They asked for it again.
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: 01fa8c54-917a-4942-8873-0821e91f3697
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 520, y: 0}
+  edges:
+  - fromNodeGuid: 2d17a29b-6719-4c82-9c71-68c3531bc83e
+    fromOptionGuid: 
+    toNodeGuid: 2b344966-1070-4761-9f81-198662cd3b6f
+  - fromNodeGuid: 2b344966-1070-4761-9f81-198662cd3b6f
+    fromOptionGuid: 
+    toNodeGuid: 01fa8c54-917a-4942-8873-0821e91f3697
+  isOneShot: 0
+  payload: 

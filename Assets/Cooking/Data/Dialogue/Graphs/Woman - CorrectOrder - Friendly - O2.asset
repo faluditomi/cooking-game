@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Woman - CorrectOrder - Friendly - O2
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: 7217c552-aea6-4c5d-b5e3-c7af2e0791a6
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: 495b6ddb-0355-49b4-ac53-828f2fdbf180
+    kind: 0
+    line:
+      text: Mmm...
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: 51fdf304-d62c-4545-9343-c2dbcfb93280
+    kind: 0
+    line:
+      text: Maybe I should take you with me, ey?
+      delaySeconds: 1.2
+    editorPosition: {x: 520, y: 0}
+  - guid: 53408357-3c29-4130-a6f8-c9b23989b7eb
+    kind: 0
+    line:
+      text: Yeah, I'll miss this.
+      delaySeconds: 2.3
+    editorPosition: {x: 780, y: 0}
+  - guid: b3f6b14b-2d35-4322-8a18-b95d4c34e3bb
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 1040, y: 0}
+  edges:
+  - fromNodeGuid: 7217c552-aea6-4c5d-b5e3-c7af2e0791a6
+    fromOptionGuid: 
+    toNodeGuid: 495b6ddb-0355-49b4-ac53-828f2fdbf180
+  - fromNodeGuid: 495b6ddb-0355-49b4-ac53-828f2fdbf180
+    fromOptionGuid: 
+    toNodeGuid: 51fdf304-d62c-4545-9343-c2dbcfb93280
+  - fromNodeGuid: 51fdf304-d62c-4545-9343-c2dbcfb93280
+    fromOptionGuid: 
+    toNodeGuid: 53408357-3c29-4130-a6f8-c9b23989b7eb
+  - fromNodeGuid: 53408357-3c29-4130-a6f8-c9b23989b7eb
+    fromOptionGuid: 
+    toNodeGuid: b3f6b14b-2d35-4322-8a18-b95d4c34e3bb
+  isOneShot: 0
+  payload: 

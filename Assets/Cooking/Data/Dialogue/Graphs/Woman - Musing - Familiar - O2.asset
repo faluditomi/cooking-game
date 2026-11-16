@@ -1,0 +1,78 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Woman - Musing - Familiar - O2
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: 6a401f48-176d-46cf-8146-76a1b0a34ce9
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: 0ae380c9-c214-497d-a111-ce1a7cc4599e
+    kind: 0
+    line:
+      text: Been here long, Pot Boy?
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: 6d38be78-c5b5-419d-8c42-48a4225ed1f1
+    kind: 0
+    line:
+      text: Build a life here, I assume. Like anyone with a sliver of perseverance in their guts.
+      delaySeconds: 1.9
+    editorPosition: {x: 520, y: 0}
+  - guid: 4b29eb8c-d1c0-4dc1-aad8-71467ef30a3c
+    kind: 0
+    line:
+      text: Lost some people too, ey?
+      delaySeconds: 4
+    editorPosition: {x: 780, y: 0}
+  - guid: 39d980cf-6c49-4c86-b3dd-d1d48e91b1c5
+    kind: 0
+    line:
+      text: Didn't we all?
+      delaySeconds: 1.9
+    editorPosition: {x: 1040, y: 0}
+  - guid: 57a2d1ec-fe36-4c1f-8502-563b4237f046
+    kind: 0
+    line:
+      text: The Flux sours all sweetness before long.
+      delaySeconds: 1.5
+    editorPosition: {x: 1300, y: 0}
+  - guid: 934f00f1-f065-476d-8d97-fc802d07a38b
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 1560, y: 0}
+  edges:
+  - fromNodeGuid: 6a401f48-176d-46cf-8146-76a1b0a34ce9
+    fromOptionGuid: 
+    toNodeGuid: 0ae380c9-c214-497d-a111-ce1a7cc4599e
+  - fromNodeGuid: 0ae380c9-c214-497d-a111-ce1a7cc4599e
+    fromOptionGuid: 
+    toNodeGuid: 6d38be78-c5b5-419d-8c42-48a4225ed1f1
+  - fromNodeGuid: 6d38be78-c5b5-419d-8c42-48a4225ed1f1
+    fromOptionGuid: 
+    toNodeGuid: 4b29eb8c-d1c0-4dc1-aad8-71467ef30a3c
+  - fromNodeGuid: 4b29eb8c-d1c0-4dc1-aad8-71467ef30a3c
+    fromOptionGuid: 
+    toNodeGuid: 39d980cf-6c49-4c86-b3dd-d1d48e91b1c5
+  - fromNodeGuid: 39d980cf-6c49-4c86-b3dd-d1d48e91b1c5
+    fromOptionGuid: 
+    toNodeGuid: 57a2d1ec-fe36-4c1f-8502-563b4237f046
+  - fromNodeGuid: 57a2d1ec-fe36-4c1f-8502-563b4237f046
+    fromOptionGuid: 
+    toNodeGuid: 934f00f1-f065-476d-8d97-fc802d07a38b
+  isOneShot: 0
+  payload: 

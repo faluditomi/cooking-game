@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Woman - Hurry - Familiar - O2
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: 12116828-e9fc-4a07-b3d5-ec09d3d3f6c5
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: f5cc19d1-831b-44fd-bb57-38d0dbdd8bba
+    kind: 0
+    line:
+      text: I haven't been here much, but even I know better how your kitchen-eque patchwork station functions.
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: 1fd3e7c0-2a90-4096-bf45-c24b094cc943
+    kind: 0
+    line:
+      text: Need help finding something?
+      delaySeconds: 4.5
+    editorPosition: {x: 520, y: 0}
+  - guid: ac62a556-6e9b-4079-806e-78d897b9ff33
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 780, y: 0}
+  edges:
+  - fromNodeGuid: 12116828-e9fc-4a07-b3d5-ec09d3d3f6c5
+    fromOptionGuid: 
+    toNodeGuid: f5cc19d1-831b-44fd-bb57-38d0dbdd8bba
+  - fromNodeGuid: f5cc19d1-831b-44fd-bb57-38d0dbdd8bba
+    fromOptionGuid: 
+    toNodeGuid: 1fd3e7c0-2a90-4096-bf45-c24b094cc943
+  - fromNodeGuid: 1fd3e7c0-2a90-4096-bf45-c24b094cc943
+    fromOptionGuid: 
+    toNodeGuid: ac62a556-6e9b-4079-806e-78d897b9ff33
+  isOneShot: 0
+  payload: 

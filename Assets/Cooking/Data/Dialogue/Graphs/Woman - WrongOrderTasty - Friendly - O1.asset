@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Woman - WrongOrderTasty - Friendly - O1
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: 0f8f0ca2-fee6-4067-9908-499d166a65d3
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: 2dc3d0ba-5f91-4dde-9627-0035db4e53c2
+    kind: 0
+    line:
+      text: Dunno how you does it, and to be honest, I don't care either.
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: d33cb19b-c592-40cb-b14b-4c84916bac05
+    kind: 0
+    line:
+      text: Just keep doing what you're doing.
+      delaySeconds: 3.2
+    editorPosition: {x: 520, y: 0}
+  - guid: 98d765be-7ddc-47fe-85e7-48de5221a531
+    kind: 0
+    line:
+      text: Same time tomorrow.
+      delaySeconds: 2.2
+    editorPosition: {x: 780, y: 0}
+  - guid: 4a31b140-e2c3-418d-a538-30ac339f95a8
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 1040, y: 0}
+  edges:
+  - fromNodeGuid: 0f8f0ca2-fee6-4067-9908-499d166a65d3
+    fromOptionGuid: 
+    toNodeGuid: 2dc3d0ba-5f91-4dde-9627-0035db4e53c2
+  - fromNodeGuid: 2dc3d0ba-5f91-4dde-9627-0035db4e53c2
+    fromOptionGuid: 
+    toNodeGuid: d33cb19b-c592-40cb-b14b-4c84916bac05
+  - fromNodeGuid: d33cb19b-c592-40cb-b14b-4c84916bac05
+    fromOptionGuid: 
+    toNodeGuid: 98d765be-7ddc-47fe-85e7-48de5221a531
+  - fromNodeGuid: 98d765be-7ddc-47fe-85e7-48de5221a531
+    fromOptionGuid: 
+    toNodeGuid: 4a31b140-e2c3-418d-a538-30ac339f95a8
+  isOneShot: 0
+  payload: 

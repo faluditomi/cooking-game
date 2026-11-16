@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Sleeper - Order - Friendly - O1
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: 33454074-9165-42c2-b118-efdc083e783e
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: 8ea151e4-a302-417f-9458-f8f3ba5b901e
+    kind: 0
+    line:
+      text: I found her. She cooks like you do. Hotter, actually.
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: c5660bea-58bb-446b-bfeb-6e81cda4533b
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 520, y: 0}
+  edges:
+  - fromNodeGuid: 33454074-9165-42c2-b118-efdc083e783e
+    fromOptionGuid: 
+    toNodeGuid: 8ea151e4-a302-417f-9458-f8f3ba5b901e
+  - fromNodeGuid: 8ea151e4-a302-417f-9458-f8f3ba5b901e
+    fromOptionGuid: 
+    toNodeGuid: c5660bea-58bb-446b-bfeb-6e81cda4533b
+  isOneShot: 0
+  payload: 

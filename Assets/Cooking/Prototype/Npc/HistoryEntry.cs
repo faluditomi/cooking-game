@@ -25,12 +25,12 @@ namespace Cooking.Prototype
         public NpcStage Stage;
 
         // Order
+        public RecipeDefinition Order;
+        /// <summary>The ordered dish's name when the order came in.</summary>
         public string Ordered;
         public string OrderLine;
         public FlavourProfile OrderedFlavour;
-        public bool Timed;
-        public float TimeAllowed;
-        /// <summary>Seconds from taking the order to serving.</summary>
+        /// <summary>Seconds from the order coming in to serving.</summary>
         public float TimeTaken;
 
         // What happened
@@ -38,6 +38,11 @@ namespace Cooking.Prototype
         public List<VisitEvent> Cooking = new List<VisitEvent>();
 
         // Result
+        /// <summary>
+        /// What was served as a recipe (cooked perfectly): the menu dish it makes, or a dish of its own,
+        /// "Nameless" until the player names it. Its steps recreate the dish.
+        /// </summary>
+        public RecipeDefinition Dish;
         public List<IngredientPortion> Served = new List<IngredientPortion>();
         public FlavourProfile Flavour;
         public string BestZone;
@@ -49,9 +54,8 @@ namespace Cooking.Prototype
         public float Payment;
         public float Tip;
         public float IngredientCost;
-        public bool Late;
 
-        /// <summary>The desire clue they gave, or null if they didn't (not warmed up yet, or no desire).</summary>
+        /// <summary>The desire clue they gave, or null if they didn't (still a stranger, or no desire).</summary>
         public string Clue;
         public Warmth Warmth = Warmth.First;
         /// <summary>Radar distance to their secret desire; hidden from the player, used to find the closest dish.</summary>

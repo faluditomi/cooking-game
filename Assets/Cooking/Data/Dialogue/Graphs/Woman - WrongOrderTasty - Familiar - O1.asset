@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Woman - WrongOrderTasty - Familiar - O1
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: 6c99dfb5-bf99-4772-9d73-49fe22b09a74
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: ac433b32-6f35-4f94-ab24-4a2bf3cb8827
+    kind: 0
+    line:
+      text: Alright! Pot Boy got skills.
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: 5510577e-085f-4684-a946-7466b7d449ab
+    kind: 0
+    line:
+      text: Why you tryna hide these recipes from me, ey?
+      delaySeconds: 2
+    editorPosition: {x: 520, y: 0}
+  - guid: aa99256f-27f5-44ee-a28c-4d2f6d90ccd7
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 780, y: 0}
+  edges:
+  - fromNodeGuid: 6c99dfb5-bf99-4772-9d73-49fe22b09a74
+    fromOptionGuid: 
+    toNodeGuid: ac433b32-6f35-4f94-ab24-4a2bf3cb8827
+  - fromNodeGuid: ac433b32-6f35-4f94-ab24-4a2bf3cb8827
+    fromOptionGuid: 
+    toNodeGuid: 5510577e-085f-4684-a946-7466b7d449ab
+  - fromNodeGuid: 5510577e-085f-4684-a946-7466b7d449ab
+    fromOptionGuid: 
+    toNodeGuid: aa99256f-27f5-44ee-a28c-4d2f6d90ccd7
+  isOneShot: 0
+  payload: 

@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Woman - WrongOrderNasty - Familiar - O2
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: f0a9e589-bc53-4812-ac24-38c0f0851add
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: b733245d-9221-42ce-ae5d-63c5b177c17d
+    kind: 0
+    line:
+      text: You and me will pretend this never happened.
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: 88cb35ae-9a4c-4c74-8839-83a3252fe8e9
+    kind: 0
+    line:
+      text: I'll giving you another chance.
+      delaySeconds: 2.6
+    editorPosition: {x: 520, y: 0}
+  - guid: 8da287de-6d50-440c-bc53-3c32ee21f2f7
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 780, y: 0}
+  edges:
+  - fromNodeGuid: f0a9e589-bc53-4812-ac24-38c0f0851add
+    fromOptionGuid: 
+    toNodeGuid: b733245d-9221-42ce-ae5d-63c5b177c17d
+  - fromNodeGuid: b733245d-9221-42ce-ae5d-63c5b177c17d
+    fromOptionGuid: 
+    toNodeGuid: 88cb35ae-9a4c-4c74-8839-83a3252fe8e9
+  - fromNodeGuid: 88cb35ae-9a4c-4c74-8839-83a3252fe8e9
+    fromOptionGuid: 
+    toNodeGuid: 8da287de-6d50-440c-bc53-3c32ee21f2f7
+  isOneShot: 0
+  payload: 

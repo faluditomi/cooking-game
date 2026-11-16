@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Man - WrongOrderNasty - Any - O2
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: b3ec5377-e040-4ff6-b4d7-3406137afdff
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: 73238a4f-6241-4ee4-a2ac-499354604575
+    kind: 0
+    line:
+      text: Don't even get me started on the synthetic chicken.
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: b32a2214-d4bb-4ce8-867a-98c378c14702
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 520, y: 0}
+  edges:
+  - fromNodeGuid: b3ec5377-e040-4ff6-b4d7-3406137afdff
+    fromOptionGuid: 
+    toNodeGuid: 73238a4f-6241-4ee4-a2ac-499354604575
+  - fromNodeGuid: 73238a4f-6241-4ee4-a2ac-499354604575
+    fromOptionGuid: 
+    toNodeGuid: b32a2214-d4bb-4ce8-867a-98c378c14702
+  isOneShot: 0
+  payload: 

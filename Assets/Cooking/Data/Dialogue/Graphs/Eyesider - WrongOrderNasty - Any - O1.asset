@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Eyesider - WrongOrderNasty - Any - O1
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: d7b1d7d2-4fe4-4853-b41e-60291b94821c
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: fb8cda4e-68b9-4349-820f-8f00fe4d43f6
+    kind: 0
+    line:
+      text: Tch.
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: 838e30ad-86f5-4a66-8800-005d0d63b458
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 520, y: 0}
+  edges:
+  - fromNodeGuid: d7b1d7d2-4fe4-4853-b41e-60291b94821c
+    fromOptionGuid: 
+    toNodeGuid: fb8cda4e-68b9-4349-820f-8f00fe4d43f6
+  - fromNodeGuid: fb8cda4e-68b9-4349-820f-8f00fe4d43f6
+    fromOptionGuid: 
+    toNodeGuid: 838e30ad-86f5-4a66-8800-005d0d63b458
+  isOneShot: 0
+  payload: 

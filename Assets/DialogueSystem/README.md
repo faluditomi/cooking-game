@@ -212,15 +212,20 @@ When a trigger starts a dialogue:
    duplicate groups are ignored at runtime (the catalog window warns about them).
 2. Every entry whose `eventType` and `npcState` both equal the trigger's pair contributes its
    graph. Duplicate graph references within one exact set count once.
-3. That exact set is a **play-once bag**: each pick is uniform random over the distinct graphs
-   not yet played for the set. The selected graph is marked played and starts from its Entry
-   node. Different sets track their plays independently.
-4. When every graph in the set has played, that set resets and picking resumes with all graphs
-   eligible again.
+3. That exact set is a **play-once bag**: the first time through, graphs play **in authored
+   order** (the order of the entries in the group), each once. The selected graph is marked
+   played and starts from its Entry node. Different sets track their plays independently.
+4. When every graph in the set has played, picking becomes uniform random over the set.
+5. A graph with **`isOneShot`** plays at most once per session (until `ResetPlayed()`), across
+   every set it belongs to. After it has played it is never picked again, even in the random
+   phase. A set made only of spent one-shots plays nothing.
 
 There are no conditions and no weights on candidates: an entry either matches the exact
-(npc, eventType, npcState) set or it does not, and every distinct graph in the set is eligible
-exactly once per cycle.
+(npc, eventType, npcState) set or it does not.
+
+Each graph also has a free-text **`payload`** the package never reads. The game can use it to
+tag a graph (for example, the dish an order dialogue names); it arrives with every line and
+ended event through `Graph`.
 
 If no group or entry matches, nothing plays (enable `verboseLogging` on the director to see
 why). Played state is session-only `[System.NonSerialized]` bookkeeping on the catalog instance,
@@ -243,6 +248,13 @@ the director's `policyOnNewTrigger` setting:
 | `Queue`   | The trigger is queued. When the current dialogue ends, the oldest queued trigger starts and its catalog matching (NPC + event-type/state pair) is re-evaluated at start. |
 | `Ignore`  | The trigger is dropped.                                                                        |
 | `Replace` | Catalog matching is evaluated first. If a graph is eligible, the active dialogue is aborted (`DialogueEnded.Completed == false`) and the new one starts in the same frame. If nothing matches, the current dialogue continues. |
+| `FinishThenQueue` | The current dialogue always finishes. Queued triggers start one at a time, each `queuedDialogueDelaySeconds` after the previous dialogue ended. A trigger raised with `priority: true` clears the queue and starts right after the current dialogue (no delay); while it waits, ordinary triggers are dropped. |
+
+`Dialogue.Trigger(npc, eventType, npcState, priority)` sets the priority flag; the other
+policies ignore it.
+
+`Dialogue.StopAll()` aborts the playing dialogue (`DialogueEnded.Completed == false`) and drops
+every queued trigger, for when the scene moves on (a customer leaving, a day ending).
 
 While idle, queued dialogues start before a fresh trigger is considered. If a fresh trigger
 arrives in the same drain after a queued dialogue starts, it is handled by the policy above.
@@ -420,6 +432,7 @@ Otherwise it queues the enum triple for the director's next `Update`.
 | `EventType` | `DialogueEventType` from the raising trigger event. |
 | `NpcState` | `DialogueNpcState` from the raising trigger event. |
 | `Completed` | `true` when the graph finished (after the last line); `false` when aborted, for example by a `Replace` policy. |
+| `Graph` | The graph that was playing (also on `DialogueLineEventArgs`), for its `payload`, name or `isOneShot`. |
 
 `DialogueEnded` fires after the last line is delivered or on abort. It is the recommended way
 for listeners to know a dialogue ended.
@@ -431,6 +444,7 @@ for listeners to know a dialogue ended.
 | `catalog` | none | The `DialogueCatalog` asset (NPC groups and play-once bags) to use. |
 | `defaultLineDelaySeconds` | 1.2 | Used when a line's delay is negative. |
 | `policyOnNewTrigger` | `Queue` | See 4.3. |
+| `queuedDialogueDelaySeconds` | 1.5 | `FinishThenQueue` only: pause before a queued, non-priority dialogue starts. |
 | `persistAcrossScenes` | true | `DontDestroyOnLoad`; duplicate directors are destroyed. |
 | `verboseLogging` | false | Logs selection and policy details. |
 
@@ -552,6 +566,6 @@ Key invariants (do not break them when extending):
 | Several End nodes, but only one seems to work | With single-fanout outputs there is only one route. End nodes off that route are unreachable; Validate Graph reports them. |
 | Dialogue ends earlier than expected | A Line with no outgoing edge also ends the dialogue by design, or the step budget detected a loop. Add an End node on the route for clarity and run Validate Graph. |
 | A trigger is ignored mid-dialogue | `policyOnNewTrigger` is `Ignore`, or no catalog entry matches. |
-| A graph seems skipped or repeats unexpectedly | Play-once bags pick uniformly among unplayed graphs per exact (npc, event type, NPC state) set; the set resets only after every distinct graph has played. Call `ResetPlayed()` on the catalog asset on a new game/load if played state should start fresh. |
+| A graph seems skipped or repeats unexpectedly | Play-once bags play each graph of an exact (npc, event type, NPC state) set once in authored order, then pick randomly; spent one-shots are skipped for good. Call `ResetPlayed()` on the catalog asset on a new game/load if played state should start fresh. |
 | Can't connect ports in the editor | Use the package editor window (Custom Tools > Dialogue Graph Editor); its GraphView overrides port compatibility for Unity 6. Inputs are multi, outputs are single. |
 | Played dialogues unexpectedly persist between play sessions | Domain reload is disabled; call `ResetPlayed()` on the catalog asset on game start. |

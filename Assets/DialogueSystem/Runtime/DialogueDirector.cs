@@ -18,11 +18,15 @@ namespace DialogueSystem
         /// <summary>NPC state used to match catalog entries.</summary>
         public readonly DialogueNpcState NpcState;
 
-        public DialogueEvent(DialogueNpcId npc, DialogueEventType eventType, DialogueNpcState npcState)
+        /// <summary>Jumps the queue under <see cref="DialoguePolicyOnNewTrigger.FinishThenQueue"/>.</summary>
+        public readonly bool Priority;
+
+        public DialogueEvent(DialogueNpcId npc, DialogueEventType eventType, DialogueNpcState npcState, bool priority = false)
         {
             Npc = npc;
             EventType = eventType;
             NpcState = npcState;
+            Priority = priority;
         }
     }
 
@@ -47,6 +51,8 @@ namespace DialogueSystem
         [Header("Behaviour")]
         [Tooltip("What happens when a trigger with a matching catalog group arrives while a dialogue is playing.")]
         [SerializeField] private DialoguePolicyOnNewTrigger policyOnNewTrigger = DialoguePolicyOnNewTrigger.Queue;
+        [Tooltip("FinishThenQueue only: pause after a dialogue ends before a queued (non-priority) one starts.")]
+        [SerializeField, Min(0f)] private float queuedDialogueDelaySeconds = 1.5f;
         [Tooltip("Keep this director alive across scene loads.")]
         [SerializeField] private bool persistAcrossScenes = true;
         [SerializeField] private bool verboseLogging = false;
@@ -61,6 +67,7 @@ namespace DialogueSystem
         private DialogueRunner runner;
         private readonly Queue<DialogueEvent> pendingTriggers = new Queue<DialogueEvent>();
         private readonly Queue<DialogueEvent> waitingDialogues = new Queue<DialogueEvent>();
+        private float lastEndedTime = float.NegativeInfinity;
 
         private void Awake()
         {
@@ -119,6 +126,14 @@ namespace DialogueSystem
             }
 
             pendingTriggers.Enqueue(triggerEvent);
+        }
+
+        /// <summary>Aborts the active dialogue and clears every queued trigger.</summary>
+        internal void StopAll()
+        {
+            pendingTriggers.Clear();
+            waitingDialogues.Clear();
+            if(runner != null && runner.IsActive) runner.Abort();
         }
 
         private void DrainTriggers()
@@ -184,6 +199,23 @@ namespace DialogueSystem
                     return;
                 }
 
+                case DialoguePolicyOnNewTrigger.FinishThenQueue:
+                {
+                    // A priority trigger plays next and drops everything else that was waiting.
+                    // While one waits, ordinary triggers are dropped too.
+                    if(triggerEvent.Priority)
+                    {
+                        waitingDialogues.Clear();
+                        waitingDialogues.Enqueue(triggerEvent);
+                    }
+                    else if(!HasPriorityWaiting())
+                    {
+                        waitingDialogues.Enqueue(triggerEvent);
+                    }
+
+                    return;
+                }
+
                 case DialoguePolicyOnNewTrigger.Queue:
                 default:
                     waitingDialogues.Enqueue(triggerEvent);
@@ -191,10 +223,27 @@ namespace DialogueSystem
             }
         }
 
+        private bool HasPriorityWaiting()
+        {
+            foreach(DialogueEvent waiting in waitingDialogues)
+            {
+                if(waiting.Priority) return true;
+            }
+
+            return false;
+        }
+
         private void TryStartQueued()
         {
             while(!runner.IsActive && waitingDialogues.Count > 0)
             {
+                // FinishThenQueue: queued dialogues wait a beat after the last one, unless it's priority.
+                if(policyOnNewTrigger == DialoguePolicyOnNewTrigger.FinishThenQueue && !waitingDialogues.Peek().Priority
+                   && Time.time < lastEndedTime + queuedDialogueDelaySeconds)
+                {
+                    return;
+                }
+
                 DialogueEvent triggerEvent = waitingDialogues.Dequeue();
                 if(catalog != null && catalog.HasRule(triggerEvent.Npc, triggerEvent.EventType, triggerEvent.NpcState)) StartTrigger(triggerEvent);
             }
@@ -228,7 +277,8 @@ namespace DialogueSystem
                 TriggerNpc = runner.TriggerNpc,
                 EventType = runner.EventType,
                 NpcState = runner.NpcState,
-                LineNumber = Mathf.Max(0, runner.LinesDelivered - 1)
+                LineNumber = Mathf.Max(0, runner.LinesDelivered - 1),
+                Graph = runner.Graph
             };
 
             Dialogue.RaiseLine(args);
@@ -236,23 +286,27 @@ namespace DialogueSystem
 
         private void HandleFinished()
         {
+            lastEndedTime = Time.time;
             Dialogue.RaiseEnded(new DialogueEndedEventArgs
             {
                 TriggerNpc = runner.TriggerNpc,
                 EventType = runner.EventType,
                 NpcState = runner.NpcState,
-                Completed = true
+                Completed = true,
+                Graph = runner.Graph
             });
         }
 
         private void HandleAborted()
         {
+            lastEndedTime = Time.time;
             Dialogue.RaiseEnded(new DialogueEndedEventArgs
             {
                 TriggerNpc = runner.TriggerNpc,
                 EventType = runner.EventType,
                 NpcState = runner.NpcState,
-                Completed = false
+                Completed = false,
+                Graph = runner.Graph
             });
         }
     }

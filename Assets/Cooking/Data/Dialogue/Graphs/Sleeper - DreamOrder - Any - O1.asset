@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Sleeper - DreamOrder - Any - O1
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: eb105629-7ba0-4968-ad25-58071e9a7c6b
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: 8a59be66-0f2f-4ec6-b430-737eb457d6b8
+    kind: 0
+    line:
+      text: That burn...
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: c94d70b8-190a-417c-af37-eb4017324d90
+    kind: 0
+    line:
+      text: I remember a kitchen. Someone's hands.
+      delaySeconds: 1.4
+    editorPosition: {x: 520, y: 0}
+  - guid: 84aac9e5-e59b-4027-a8f6-972c80fdac59
+    kind: 0
+    line:
+      text: I have to go. I know where she is.
+      delaySeconds: 2.4
+    editorPosition: {x: 780, y: 0}
+  - guid: fe400ae5-5896-4246-982e-3dbac6fb3f2d
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 1040, y: 0}
+  edges:
+  - fromNodeGuid: eb105629-7ba0-4968-ad25-58071e9a7c6b
+    fromOptionGuid: 
+    toNodeGuid: 8a59be66-0f2f-4ec6-b430-737eb457d6b8
+  - fromNodeGuid: 8a59be66-0f2f-4ec6-b430-737eb457d6b8
+    fromOptionGuid: 
+    toNodeGuid: c94d70b8-190a-417c-af37-eb4017324d90
+  - fromNodeGuid: c94d70b8-190a-417c-af37-eb4017324d90
+    fromOptionGuid: 
+    toNodeGuid: 84aac9e5-e59b-4027-a8f6-972c80fdac59
+  - fromNodeGuid: 84aac9e5-e59b-4027-a8f6-972c80fdac59
+    fromOptionGuid: 
+    toNodeGuid: fe400ae5-5896-4246-982e-3dbac6fb3f2d
+  isOneShot: 1
+  payload: 

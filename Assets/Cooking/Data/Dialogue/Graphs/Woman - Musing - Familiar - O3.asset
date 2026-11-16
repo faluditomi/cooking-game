@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Woman - Musing - Familiar - O3
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: aa158fd6-d75d-4dd0-986e-11cd44b2cef4
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: 8724c4e5-f0e4-49e4-ab87-6062bbae38a5
+    kind: 0
+    line:
+      text: You know, I've been meaning to tell you. Even the sour notes hit right in your cooking.
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: f84c6708-4377-4c5a-b868-27dbf3a7e45f
+    kind: 0
+    line:
+      text: That's hard to do, Pot Boy. You should be proud.
+      delaySeconds: 4.1
+    editorPosition: {x: 520, y: 0}
+  - guid: e1e3f2ec-412d-431a-ab15-aabdc0e45e3b
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 780, y: 0}
+  edges:
+  - fromNodeGuid: aa158fd6-d75d-4dd0-986e-11cd44b2cef4
+    fromOptionGuid: 
+    toNodeGuid: 8724c4e5-f0e4-49e4-ab87-6062bbae38a5
+  - fromNodeGuid: 8724c4e5-f0e4-49e4-ab87-6062bbae38a5
+    fromOptionGuid: 
+    toNodeGuid: f84c6708-4377-4c5a-b868-27dbf3a7e45f
+  - fromNodeGuid: f84c6708-4377-4c5a-b868-27dbf3a7e45f
+    fromOptionGuid: 
+    toNodeGuid: e1e3f2ec-412d-431a-ab15-aabdc0e45e3b
+  isOneShot: 0
+  payload: 

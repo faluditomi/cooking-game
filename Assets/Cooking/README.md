@@ -83,7 +83,7 @@ All values are **placeholders** tuned so the Notion recipes behave sensibly:
 | Mushroom soup | Hearty Broth |
 | Synthetic soup | near Hearty Broth |
 | Soup on the rock | **no zone**: salty 8.2. Lower its salt or accept it as a rough dish. |
-| Sweet & sour tofu soup (the woman's dream meal) | Sweet & Sour only |
+| Sweet & sour tofu soup | Sweet & Sour only (the Woman's dream is now a beef version, see below) |
 | Burnt or raw dishes | no zone |
 
 ## Cooking prototype (`Prototype/`)
@@ -92,40 +92,46 @@ A playable loop to try the flavour system with. **Custom Tools → Cooking Proto
 creates `Prototype/CookingPrototype.unity` and the design-doc recipes in `Data/Recipes/`. It keeps
 recipe assets that already exist, so hand tuning survives a rebuild. Then press Play.
 
-### The day
+### The cycle
 
-The game runs in days, and there are three areas you switch between with the tabs at the top:
-**Store**, **Prep** and **Kitchen**. Everything you buy goes into your stock (`Inventory`), which
-tracks units per prep state ("3× Onion raw", "1× Onion peeled, sliced").
+The game runs in cycles (days), and there are three areas you switch between with the tabs at the
+top: **Store**, **Prep** and **Kitchen**. What customers say types out in the sidebar on the right.
+Everything you buy goes into your stock (`Inventory`), which tracks units per prep state
+("3× Onion raw", "1× Onion peeled, sliced").
 
-1. **Morning** (untimed). The **Store** is open. Fill a cart (`ShoppingCart`) and pay for it all
-   at once with **Buy everything**; nothing is bought before that. Add ingredients one at a time
-   from the shelf (−, +1, +5), or by dish from the **Recipe book**: **+ One serving** adds a full
-   set of that dish's ingredients, and **+ What's missing** adds only what your stock plus cart
-   doesn't already cover for one serving. You can't open the stall with an unpaid cart. On the **Prep** board, prep
-   stock one unit at a time (as in the design doc): put a unit on the board, pick up a tool, do its
-   gesture, then put it back. It goes back into stock prepped. The Kitchen is locked.
-2. **Open the stall** (top bar). The Store closes until tomorrow.
-3. **Service**, `customersPerDay` customers (5). A customer comes to the counter, and **Take order**
-   starts the timer: `orderBaseSeconds` + per unit + per prep step the recipe needs. The ticket
-   (on the Prep and Kitchen areas) shows the recipe with each ingredient marked ready / needs
-   prep / short. In the **Kitchen**, select stock (each click on a row adds one unit, − takes one
-   back), then send the whole selection at once with → Wok, → Pot or → Plate. Cook and serve.
-   A batch for the pot can include the soup cube; it goes in first, so the rest joins the soup. You can still prep, but that time comes off the timer, and
-   the wok and pot keep cooking while you're away.
+1. **Morning** (untimed). The **Store** is open. Fill a cart (`ShoppingCart`): ingredients one at a
+   time from the shelf (−, +1, +5), a whole dish from the **Bundles** tiles under the shelf (one
+   serving of a menu dish), or from the **Recipe book** (**+ One serving**, **+ What's missing**).
+   Nothing is bought until you pay. On the **Prep** board, prep stock one unit at a time (as in the
+   design doc): put a unit on the board, pick up a tool, do its gesture, then put it back. It goes
+   back into stock prepped. The Kitchen is locked.
+2. **Buy ingredients and start the day** (top bar) pays for the cart and opens the stall. The Store
+   closes until the next morning.
+3. **Service.** The day timer runs (`daySeconds`, 6 minutes). Every regular comes **once**, in a
+   shuffled order, 1–6 s (`arrivalDelay`) after the last one leaves. They order as they arrive:
+   their order dialogue names the dish, the ticket fills in, and the recipe book opens on it.
+   The ticket (on the Prep and Kitchen areas) shows the recipe with each ingredient marked ready /
+   needs prep / short. In the **Kitchen**, select stock (each click on a row adds one unit, − takes
+   one back), then send the whole selection at once with → Wok, → Pot or → Plate. Cook and serve.
+   A batch for the pot can include the soup cube; it goes in first, so the rest joins the soup. You
+   can still prep, and the wok and pot keep cooking while you're away.
    - **Wok**: Start, then take it off in the green. In the red, shake it on the shake pad. If it
      reaches the end, it's burnt.
    - **Pot**: take it off on the narrow green line, or it overcooks. Without a stock cube it boils
      one ingredient at a time; with one, it's a soup and takes anything.
    - Everything in a station comes off at once with the same doneness.
-   - **Serve**: the dish is judged (`DishJudge`) and its flavour is revealed on the radar next to
-     the order. **Late** (timer at zero) still pays, but never tips, and the customer isn't happy.
-   - **Untimed orders**: to compare the "time trial gauntlet" and "zen social kitchen" vibes
-     (design doc TODO), switch **Timed orders** off on the ticket in the morning, or untick
-     `timedOrders` on the `Cooking Prototype` object. With it off, there's no countdown and nothing
-     is ever late. It can only change in the morning, so a whole day plays one way.
-4. **End of day**: a summary of what you earned and spent, and who left happy. Anything left in
-   the stations or on the board is binned. **Prepped stock spoils; raw stock carries over.**
+   - **Serve**: the dish is judged (`DishJudge`). The result screen plays their reaction and shows
+     the dish's flavour profile against the order. If the dish isn't on the menu, it offers a name
+     field (20 letters): **Save dish** adds it to the menu (origin Emphis); **Continue** leaves it
+     "Nameless". Continue sends the customer off (anything they were still saying stops).
+   - **Day timer off**: to compare the "time trial gauntlet" and "zen social kitchen" vibes
+     (design doc TODO), switch it off on the ticket in the morning, or untick `dayTimer` on the
+     `Cooking Prototype` object. The day then ends when everyone has been.
+4. **End of the cycle**, when everyone has been or the timer runs out (whoever is still waiting
+   leaves without eating): a summary of each dish and who it was for, income, expenses, the
+   **stall rent** (`stallRent`, $10) and the profit. If you can't pay the rent, it's **game over**
+   and you start again from cycle 1. Anything left in the stations or on the board is binned.
+   **Prepped stock spoils; raw stock carries over.**
 
 ### Minigames (`Prototype/Minigames/`)
 
@@ -139,21 +145,22 @@ that feeds a `Gesture`. The pad draws a guide for the current tool and a fading 
 | Grater → grated | `SwipeRightGesture` | 110 px to the right. Going back left earns nothing | 5 |
 | Wok shake | `BackAndForthGesture` (horizontal) | each change of direction after 45 px. Only works in the red, and knocks the bar back by `shakeKnockback` | n/a |
 
-Stroke counts, knockback, station speeds, customers per day and the order timer are on the
+Stroke counts, knockback, station speeds, the day timer and the rent are on the
 `Cooking Prototype` object. Stock is a flag on the ingredient (`IngredientDefinition.IsStock`, set
 on Soup Cube).
 
-The code is split by area: `CookingPrototype.cs` (day loop, top bar, ticket, overlays) and
-`CookingPrototype.Store.cs`, `.Prep.cs`, `.Kitchen.cs`.
+The code is split by area: `CookingPrototype.cs` (cycle loop, top bar, ticket, overlays) and
+`CookingPrototype.Store.cs`, `.Prep.cs`, `.Kitchen.cs`, `.RecipeBook.cs`, `.History.cs`, `.Npcs.cs`
+(customers, dialogue, sidebar) and `.Discovery.cs` (naming dishes).
 
-| Verdict | When | Pay | Happy? |
-|---|---|---|---|
-| Dream meal | inside the customer's secret desire zone | price + 100% tip | yes |
-| Ordered | `RecipeDefinition.Matches`: same portions, prep and cooking, nothing badly cooked | 100% | yes |
-| Very close | similarity ≥ `veryCloseAt` (80%) | `veryClosePay` (80%) | yes |
-| Close enough | similarity ≥ `closeEnoughAt` (55%) | `closeEnoughPay` (60%) | no, lukewarm |
-| Refused | contains something they won't eat | nothing | no |
-| Too different | anything else | nothing | no |
+| Verdict | When | Pay | Liked? | Their reaction |
+|---|---|---|---|---|
+| Dream meal | inside their secret desire zone, with everything in `dreamNeeds`. Beats a refusal | price + 100% tip | yes | `DreamOrder` the first time, then `CorrectOrder` |
+| Ordered | `RecipeDefinition.Matches`: same portions, prep and cooking, nothing badly cooked | 100% | yes | `CorrectOrder` |
+| Very close | similarity ≥ `veryCloseAt` (80%) | `veryClosePay` (80%) | yes | `WrongOrderTasty` |
+| Close enough | similarity ≥ `closeEnoughAt` (55%) | `closeEnoughPay` (60%) | no | `WrongOrderTasty` |
+| Refused | contains something they won't eat | nothing | no | `WrongOrderNasty` |
+| Too different | anything else | nothing | no | `WrongOrderNasty` |
 
 **Similarity** (`DishSimilarity`) blends flavour and ingredients, weighted by `flavourWeight` (50/50):
 flavour is 1 at the same point on the radar and 0 at `flavourRange` (6) apart; ingredients counts
@@ -161,12 +168,12 @@ units that went in as written (right ingredient with the wrong prep, cooking or 
 half), over the larger of ordered and served units, so missing and extra units both cost. As a
 guide with the placeholder data: forgetting the pepper or not grating the MSG2 is very close;
 1 mushroom instead of 3, overcooking or leaving out the tofu is close enough; a burnt fried rice,
-Hellchick without chilli, or a different dish is refused. Late dishes pay the same but never tip
-and aren't happy; a very close dish they didn't order is added to what they like.
+Hellchick without chilli, or a different dish isn't paid for. A very close dish they didn't order
+is added to what they like.
 
 Price is the **ordered** dish's ingredient cost × `margin`. Customers come from the design doc's NPC notes:
 
-- **The Woman**: refuses beef. Secretly craves *Their lost love's soup* (sweet, sour, soft).
+- **The Woman**: orders MSBeef fried rice (Real Beef™ only) and refuses Beef. Secretly craves *Their lost love's soup*, a sweet and sour beef soup: her dream needs Beef, and wins over the refusal.
 - **The Man**: refuses synthetic chicken. Craves *An honest broth* (filling, a little to chew, a touch sweet).
 - **The Sleeper**: orders boiled synthetic chicken. Craves *Mother's fire* (very hot, savoury, not sweet).
 - **A generic Eyesider**: orders anything on the menu, craves nothing.
@@ -190,73 +197,91 @@ dishes learned from customers (their specials and dream meals). For the selected
 - **Shopping**: have/need per ingredient (stock + cart), with **+ One serving** and **+ What's
   missing** to fill the store cart. These only work in the morning.
 
-During service it opens on the dish being ordered. The kitchen keeps running while it's open, so
+When an order comes in it opens on that dish. The kitchen keeps running while it's open, so
 looking something up costs time. Switching tabs closes it.
 
 ### Regulars and dialogue (`Prototype/Npc/`, `CookingPrototype.Npcs.cs`)
 
-From the design doc's Conversation section. Each regular has a `CustomerRelationship` for the session:
+Stages and lines follow the Cooking Game Miro board. Each regular has a `CustomerRelationship` for
+the session:
 
 | Stage | How they get there | What changes |
 |---|---|---|
-| Dejected | where everyone starts | terse lines, no thank-yous |
-| Warmed up | `happyMealsToWarmUp` happy meals (2; late or disliked dishes don't count) | they start dropping clues about their secret desire |
-| Eureka | their dream meal (secret desire zone hit, even if late) | they always order that dish from now on |
+| Stranger | where everyone starts | short, rude lines |
+| Familiar | `likedMealsToFamiliar` liked meals (3): their exact order or very close to it | they chat while you cook and drop clues about their secret desire |
+| Friendly | their dream meal | friends; they often order it |
 
-- **Liked meals:** what a regular orders. It starts with their usual orders; a dish they didn't
-  order but liked is added as "Emphis's special for …" (origin Emphis), so they can ask for it back
-  and it's judged as an exact order when you recreate it.
-- **Dialogue:** lines come from your DialogueSystem. The prototype triggers
-  `(NPC, event, stage)` at each moment of a visit: `Order` (taking the order), `GoodDish`, `BadDish`,
-  `Refused`, `LateDish`, `DreamMeal` (serving) and `Hurry` (25% of the timer left, timed orders
-  only). It prefers lines authored for the current stage and falls back to entries with state
-  `None`. If neither exists, the customer's fallback line on the `Cooking Prototype` object is used.
-  Lines stream into the ticket and the result screen.
-- **Content:** **Custom Tools → Cooking Prototype → Build Dialogue** generates one placeholder graph
-  per (NPC, event, stage) in `Data/Dialogue/Graphs/` and the catalog
+- **Liked meals:** what a regular orders. It starts with their usual orders; a very close dish
+  they didn't order is added (as the menu dish it makes, or as a new "Nameless" dish), so they can
+  ask for it back and it's judged as an exact order when you recreate it.
+- **A visit**, as DialogueSystem triggers `(NPC, event, stage)`:
+  - `Order` when they arrive. The order graph's `payload` names the dish ("MSBeef fried rice"), or
+    is a token: `[liked meal]` / `[liked dish]` (one of their liked meals) or `[dream dish]`. In the
+    text, tokens become the dish's name, or "the thing you made me the other day" / "the regular"
+    when it isn't on the menu (never saved, or deleted). `[name of her lover]` stays as written.
+  - `Musing` once per order, `musingAfter` (8–20 s) after they order.
+  - `Hurry` every `hurryAfter` seconds (per regular) while they wait.
+  - On serving, with priority: `CorrectOrder`, `WrongOrderTasty`, `WrongOrderNasty`, or
+    `DreamOrder` (once per game).
+  It prefers lines authored for the current stage and falls back to entries with state `None`. If
+  neither exists, the customer's fallback line on the `Cooking Prototype` object is used.
+- **Director policy:** `FinishThenQueue`. Whatever is being said finishes; the next dialogue
+  waits a beat; a dish reaction jumps the queue. Options of a set play in order (O1, O2, O3) the
+  first time, then at random; one-shots (like her Friendly O1 musing) play once.
+- **Content:** **Custom Tools → Cooking Prototype → Build Dialogue** generates one graph per option
+  in `Data/Dialogue/Graphs/` ("Woman - Order - Stranger - O1") and the catalog
   `Data/Dialogue/CookingDialogueCatalog.asset` through the DialogueSystem's editor API, then wires
-  the open prototype scene: the catalog, each regular's `dialogueId`, and a `DialogueDirector` with
-  the Replace policy (a new trigger cuts off the last one). Existing graphs are kept, so rewrite the
-  text in **Custom Tools → Dialogue Graph Editor**; rerunning only adds what's missing. Build Scene
-  runs it too.
-- The day summary lists who warmed up or had their dream meal; the morning ticket shows each
-  regular's stage and what they order now.
+  the open prototype scene (catalog, each regular's `dialogueId`, a `DialogueDirector`). The Woman's
+  lines are the board's, as written; the Man has the board's MSG line and otherwise placeholders, as
+  do the Sleeper and Eyesiders. Existing graphs are kept, so rewrite the text in
+  **Custom Tools → Dialogue Graph Editor**; rerunning only adds what's missing. Build Scene runs it too.
+- The cycle summary lists who became familiar or had their dream meal; the morning ticket shows
+  each regular's stage and what they order now.
 
 ### Discovering a regular's recipe (`DesireClue`, `CookingPrototype.Discovery.cs`, `.History.cs`)
 
 Each regular has an order (what they ask for), dishes they like, and a **secret desire**: their
 own flavour zone in `Data/Zones/Desires/` that **no menu recipe reaches**, so the dish has to be
 invented. **Custom Tools → Cooking Prototype → Build Desire Zones** creates them (existing ones are
-kept, so tune them in the Inspector) and assigns them to the regulars in the open scene. They're
+kept, so tune them in the Inspector) and assigns them to the regulars in the open scene; **Reset
+Desire Zones** puts them back to the values in code. They're
 built around dishes from the design doc that aren't on the menu; one way to hit each:
 
 | Regular | Desire | One dish that hits it |
 |---|---|---|
-| The Woman | Their lost love's soup | Soup Cube, 2× Tofu sliced, Onion peeled+sliced, 2× Sugar, 2× Citric Acid, boiled |
+| The Woman | Their lost love's soup (needs Beef) | Soup Cube, Beef sliced, 2× Sugar, 2× Citric Acid, boiled. With Real Beef it tastes right but isn't it |
 | The Man | An honest broth | Soup Cube, 2× Potato peeled+sliced, Pak Choi sliced, Mushroom sliced, Salt, boiled |
 | The Sleeper | Mother's fire | Seaweed Noodles, Synthetic Chicken sliced, 4× Chilli grated, 2× MSG2 grated, fried |
 
-- **Clues.** From the Warmed up stage, after each dish (unless refused or the dream meal) the
-  regular adds a clue after their reaction: warmer / colder / about the same than their closest
-  dish so far, plus the flavour that's most off ("It should be sweeter", "Hotter. Much hotter",
-  "It needs more depth"). Dejected regulars keep it to themselves. Their dialogue lines drop
-  story hints too.
+- **Clues.** From Familiar, after each dish (until they've had their dream meal) the regular adds a
+  clue after their reaction: warmer / colder / about the same than their closest dish so far, plus
+  the flavour that's most off ("It should be sweeter", "Hotter. Much hotter", "It needs more
+  depth"), or, when the flavour is right but an ingredient it needs is missing, "It tastes right.
+  But something in it isn't what it should be." Strangers keep it to themselves. Their dialogue
+  lines drop story hints too.
 - **Cooking history.** Each visit is recorded from the moment the customer arrives
   (`HistoryEntry`) as a full report on the recipe book's **History** page. On the left you filter
   by regular and pick an order (newest first). In the middle is the report:
-  - **Order:** the dish, their order line, the timer and when it was served (or untimed).
-  - **What was said:** every line with a timestamp, labelled Order, Hurrying, Reaction or Clue.
+  - **Order:** the dish, their order lines, and how long after ordering it was served.
+  - **What was said:** every line with a timestamp, labelled Order, Musing, Hurrying, Reaction or Clue.
   - **What was cooked:** a timestamped log of units put into the wok/pot/plate, stations started
     and taken off (at what %, doneness, wok shakes), anything binned, and prep done during the order.
-  - **Served**, the dish's **flavour profile** per axis next to the order's (orange = more, blue
+  - **Served**, **to make it again** (the dish's name or "Nameless", and its recipe steps), the dish's **flavour profile** per axis next to the order's (orange = more, blue
     = less), the zone it tastes like, and the **result** (verdict, similarity breakdown, pay,
     ingredient cost, profit).
 
   On the right is that dish on the radar against the order's outline, plus what you know about
   that regular's secret desire (their clues so far, or the recipe you found).
-- **Unlocking.** Hitting the desire is their dream meal (eureka story beat and dialogue, they
-  always order it afterwards) and the dish becomes a new recipe: a prompt asks you to **name it**,
-  and it goes into the recipe book's Learned section ("Discovered for …").
+- **Unlocking.** Hitting the desire is their dream meal (the dream order scene, and they become
+  Friendly) and the dish becomes a new recipe: the result screen asks you to **name it** and save
+  it to the menu. Unnamed, it stays "Nameless" in the book's "Not on the menu" section.
+
+### The recipe book's menu
+
+The book lists the menu, then "Not on the menu": dishes regulars order that you never saved or took
+off. Each dish shows whether it's a soup, fried, or neither. **Remove from the menu** soft-deletes a
+dish: it leaves the menu and the bundles, regulars can still order it, and their lines stop
+naming it.
 
 ## Tests
 
@@ -266,5 +291,4 @@ calculator, evaluator, recipe matching, stations, dish judging, the minigame ges
 ## Not here yet
 
 The real stall: art and plating visuals, tool sprites that follow the cursor, oil options for the
-wok, plates piling up, saving new recipes to the menu, cooking history, day cycles and rent, and the
-conversation system hookup.
+wok, plates piling up, saving between sessions, and the Man's and the Sleeper's lines from the board.

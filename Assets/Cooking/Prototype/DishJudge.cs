@@ -14,7 +14,7 @@ namespace Cooking.Prototype
         VeryClose,
         /// <summary>Close enough to pay for, but they're lukewarm about it.</summary>
         CloseEnough,
-        /// <summary>Hits their secret desire. Paid and tipped generously.</summary>
+        /// <summary>Hits their secret desire (with what it needs). Paid and tipped generously, even over a refusal.</summary>
         DreamMeal,
     }
 
@@ -36,13 +36,11 @@ namespace Cooking.Prototype
         public float PayShare;
         public float Payment;
         public float Tip;
-        /// <summary>Served after the order timer ran out: they still pay, but never tip and aren't happy.</summary>
-        public bool Late;
 
         public bool IsPaid => Payment > 0f;
 
-        /// <summary>The top tiers on time: exact, very close, or their dream meal. Counts towards warming up.</summary>
-        public bool IsHappy => IsPaid && !Late && (Verdict == Verdict.Ordered || Verdict == Verdict.VeryClose || Verdict == Verdict.DreamMeal);
+        /// <summary>The top tiers: exact, very close, or their dream meal. Liked meals make them Familiar.</summary>
+        public bool IsLiked => IsPaid && (Verdict == Verdict.Ordered || Verdict == Verdict.VeryClose || Verdict == Verdict.DreamMeal);
     }
 
     /// <summary>
@@ -86,17 +84,7 @@ namespace Cooking.Prototype
             return recipe != null ? recipe.CalculateIngredientCost() * margin : 0f;
         }
 
-        /// <param name="late">Served after the order timer ran out. Payment is unchanged, but there is no tip.</param>
         public static JudgeResult Judge(RecipeDefinition order, IReadOnlyList<IngredientPortion> dish, Customer customer,
-            IReadOnlyList<FlavourZone> zones, FlavourRules rules, Settings settings, bool late = false)
-        {
-            JudgeResult result = JudgeFood(order, dish, customer, zones, rules, settings);
-            result.Late = late;
-            if(late) result.Tip = 0f;
-            return result;
-        }
-
-        private static JudgeResult JudgeFood(RecipeDefinition order, IReadOnlyList<IngredientPortion> dish, Customer customer,
             IReadOnlyList<FlavourZone> zones, FlavourRules rules, Settings settings)
         {
             float falloff = rules != null ? rules.zoneFalloff : FlavourRules.DefaultZoneFalloff;
@@ -121,17 +109,21 @@ namespace Cooking.Prototype
 
             if(!HasFood(dish)) return result;
 
+            // Their dream meal wins over anything they'd otherwise refuse.
+            if(result.DesireScore >= 1f && HasAll(dish, customer.dreamNeeds))
+            {
+                result.Verdict = Verdict.DreamMeal;
+                result.PayShare = 1f;
+                result.Tip = result.Price * settings.DreamTip;
+                result.Payment = result.Price;
+                return result;
+            }
+
             result.RefusedIngredient = FindRefused(dish, customer);
 
             if(result.RefusedIngredient != null)
             {
                 result.Verdict = Verdict.Refused;
-            }
-            else if(result.DesireScore >= 1f)
-            {
-                result.Verdict = Verdict.DreamMeal;
-                result.PayShare = 1f;
-                result.Tip = result.Price * settings.DreamTip;
             }
             else if(result.ExactMatch)
             {
@@ -163,6 +155,26 @@ namespace Cooking.Prototype
             }
 
             return false;
+        }
+
+        private static bool HasAll(IReadOnlyList<IngredientPortion> dish, List<IngredientDefinition> needs)
+        {
+            if(needs == null) return true;
+
+            foreach(IngredientDefinition need in needs)
+            {
+                if(need == null) continue;
+                bool found = false;
+
+                for(int i = 0; i < dish.Count && !found; i++)
+                {
+                    found = dish[i] != null && dish[i].IsValid && dish[i].ingredient == need;
+                }
+
+                if(!found) return false;
+            }
+
+            return true;
         }
 
         private static IngredientDefinition FindRefused(IReadOnlyList<IngredientPortion> dish, Customer customer)

@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Woman - Hurry - Familiar - O3
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: d93b5a67-e261-4153-a0f0-b16d8a6ccec7
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: 674a4df6-7376-4e19-8edd-6940da1af366
+    kind: 0
+    line:
+      text: I don't come here for fun...
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: e6c6e06e-8b91-4220-84b4-8c67ac44fe5c
+    kind: 0
+    line:
+      text: Are we clear on that?
+      delaySeconds: 2
+    editorPosition: {x: 520, y: 0}
+  - guid: 1c0ebbe5-be95-4edf-a92e-3626ae596b9f
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 780, y: 0}
+  edges:
+  - fromNodeGuid: d93b5a67-e261-4153-a0f0-b16d8a6ccec7
+    fromOptionGuid: 
+    toNodeGuid: 674a4df6-7376-4e19-8edd-6940da1af366
+  - fromNodeGuid: 674a4df6-7376-4e19-8edd-6940da1af366
+    fromOptionGuid: 
+    toNodeGuid: e6c6e06e-8b91-4220-84b4-8c67ac44fe5c
+  - fromNodeGuid: e6c6e06e-8b91-4220-84b4-8c67ac44fe5c
+    fromOptionGuid: 
+    toNodeGuid: 1c0ebbe5-be95-4edf-a92e-3626ae596b9f
+  isOneShot: 0
+  payload: 

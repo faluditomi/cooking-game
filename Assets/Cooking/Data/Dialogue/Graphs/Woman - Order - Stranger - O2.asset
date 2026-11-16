@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Woman - Order - Stranger - O2
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: e404feac-8541-425d-ad88-25a9c98996c4
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: 86120909-687f-400a-bd94-3b08bd08364b
+    kind: 0
+    line:
+      text: '[liked meal]. Get on it!'
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: 30186665-f489-41ee-955b-13674c6dbd2a
+    kind: 0
+    line:
+      text: I'm starving.
+      delaySeconds: 1.9
+    editorPosition: {x: 520, y: 0}
+  - guid: 61e3268f-e06c-4227-90f9-33bb6408b6d7
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 780, y: 0}
+  edges:
+  - fromNodeGuid: e404feac-8541-425d-ad88-25a9c98996c4
+    fromOptionGuid: 
+    toNodeGuid: 86120909-687f-400a-bd94-3b08bd08364b
+  - fromNodeGuid: 86120909-687f-400a-bd94-3b08bd08364b
+    fromOptionGuid: 
+    toNodeGuid: 30186665-f489-41ee-955b-13674c6dbd2a
+  - fromNodeGuid: 30186665-f489-41ee-955b-13674c6dbd2a
+    fromOptionGuid: 
+    toNodeGuid: 61e3268f-e06c-4227-90f9-33bb6408b6d7
+  isOneShot: 0
+  payload: '[liked meal]'

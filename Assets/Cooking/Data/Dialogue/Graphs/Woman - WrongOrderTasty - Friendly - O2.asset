@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Woman - WrongOrderTasty - Friendly - O2
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: e1cd9875-edfe-4c01-a6ed-e5777fbe92fc
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: 5151be85-5df6-4277-846b-5577c7ce08da
+    kind: 0
+    line:
+      text: Ohhh... The boss pulls out another one.
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: 15db51df-0b11-4f4a-9017-a41a61bfe34b
+    kind: 0
+    line:
+      text: Be back soon, alright?
+      delaySeconds: 2.4
+    editorPosition: {x: 520, y: 0}
+  - guid: 2db5a861-7996-4b29-9ea5-8a11266a0088
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 780, y: 0}
+  edges:
+  - fromNodeGuid: e1cd9875-edfe-4c01-a6ed-e5777fbe92fc
+    fromOptionGuid: 
+    toNodeGuid: 5151be85-5df6-4277-846b-5577c7ce08da
+  - fromNodeGuid: 5151be85-5df6-4277-846b-5577c7ce08da
+    fromOptionGuid: 
+    toNodeGuid: 15db51df-0b11-4f4a-9017-a41a61bfe34b
+  - fromNodeGuid: 15db51df-0b11-4f4a-9017-a41a61bfe34b
+    fromOptionGuid: 
+    toNodeGuid: 2db5a861-7996-4b29-9ea5-8a11266a0088
+  isOneShot: 0
+  payload: 

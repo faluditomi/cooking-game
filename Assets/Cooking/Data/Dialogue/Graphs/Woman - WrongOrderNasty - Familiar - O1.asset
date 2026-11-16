@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Woman - WrongOrderNasty - Familiar - O1
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: e04c6ffa-672c-4741-ab5d-5b5d2fe94c07
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: 8c6bd007-f02b-4d94-b9f7-74e002e498fb
+    kind: 0
+    line:
+      text: Is that you, Pot Boy? Am I at the wrong stall?
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: f7c66c25-44d0-412c-945b-91f613f014d9
+    kind: 0
+    line:
+      text: Why would you do me like this?
+      delaySeconds: 2.6
+    editorPosition: {x: 520, y: 0}
+  - guid: fb1b1ba5-6a97-450c-8f35-a092625987f3
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 780, y: 0}
+  edges:
+  - fromNodeGuid: e04c6ffa-672c-4741-ab5d-5b5d2fe94c07
+    fromOptionGuid: 
+    toNodeGuid: 8c6bd007-f02b-4d94-b9f7-74e002e498fb
+  - fromNodeGuid: 8c6bd007-f02b-4d94-b9f7-74e002e498fb
+    fromOptionGuid: 
+    toNodeGuid: f7c66c25-44d0-412c-945b-91f613f014d9
+  - fromNodeGuid: f7c66c25-44d0-412c-945b-91f613f014d9
+    fromOptionGuid: 
+    toNodeGuid: fb1b1ba5-6a97-450c-8f35-a092625987f3
+  isOneShot: 0
+  payload: 

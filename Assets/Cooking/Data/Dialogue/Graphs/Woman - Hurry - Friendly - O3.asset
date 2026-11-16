@@ -1,0 +1,69 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Woman - Hurry - Friendly - O3
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: feb5357e-4a4b-44c7-8881-724a88851e5c
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: 54bc1961-9979-4f69-8c68-13830c036339
+    kind: 0
+    line:
+      text: I was already hungry when I got here.
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: 4378a688-a49f-4c5b-bb5c-eb2d3242b563
+    kind: 0
+    line:
+      text: Keeping me in suspense doesn't make me more hungry.
+      delaySeconds: 2.3
+    editorPosition: {x: 520, y: 0}
+  - guid: 6d0e3f49-9e58-4d47-97fc-f0e53af8a596
+    kind: 0
+    line:
+      text: Only more fu--
+      delaySeconds: 2.8
+    editorPosition: {x: 780, y: 0}
+  - guid: 043de5b9-c31a-41ca-9ed5-6885c81fcb69
+    kind: 0
+    line:
+      text: I mean, nothing. This is great.
+      delaySeconds: 1.5
+    editorPosition: {x: 1040, y: 0}
+  - guid: f0a9dacb-6941-477d-bd6c-7848601026ae
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 1300, y: 0}
+  edges:
+  - fromNodeGuid: feb5357e-4a4b-44c7-8881-724a88851e5c
+    fromOptionGuid: 
+    toNodeGuid: 54bc1961-9979-4f69-8c68-13830c036339
+  - fromNodeGuid: 54bc1961-9979-4f69-8c68-13830c036339
+    fromOptionGuid: 
+    toNodeGuid: 4378a688-a49f-4c5b-bb5c-eb2d3242b563
+  - fromNodeGuid: 4378a688-a49f-4c5b-bb5c-eb2d3242b563
+    fromOptionGuid: 
+    toNodeGuid: 6d0e3f49-9e58-4d47-97fc-f0e53af8a596
+  - fromNodeGuid: 6d0e3f49-9e58-4d47-97fc-f0e53af8a596
+    fromOptionGuid: 
+    toNodeGuid: 043de5b9-c31a-41ca-9ed5-6885c81fcb69
+  - fromNodeGuid: 043de5b9-c31a-41ca-9ed5-6885c81fcb69
+    fromOptionGuid: 
+    toNodeGuid: f0a9dacb-6941-477d-bd6c-7848601026ae
+  isOneShot: 0
+  payload: 

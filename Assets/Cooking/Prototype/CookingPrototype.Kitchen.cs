@@ -262,9 +262,9 @@ namespace Cooking.Prototype
 
         private void Serve()
         {
-            if(!orderTaken)
+            if(customer == null || !orderIn)
             {
-                Say("Take the order first.", UIFactory.Bad);
+                Say(customer == null ? "Nobody's at the counter." : "Wait for their order.", UIFactory.Bad);
                 return;
             }
 
@@ -274,7 +274,7 @@ namespace Cooking.Prototype
                 return;
             }
 
-            JudgeResult result = DishJudge.Judge(order, plate, customer, zones, rules, JudgeSettings(), late: timedOrders && orderTimeLeft < 0f);
+            JudgeResult result = DishJudge.Judge(order, plate, customer, zones, rules, JudgeSettings());
             FinishOrder(result);
         }
 
@@ -472,13 +472,13 @@ namespace Cooking.Prototype
                 plateText.text = sb.ToString();
             }
 
-            serveButton.interactable = plate.Count > 0 && orderTaken;
+            serveButton.interactable = plate.Count > 0 && orderIn;
             binPlateButton.interactable = plate.Count > 0;
             UIFactory.SetButtonText(previewButton, livePreview ? "Live flavour: on" : "Live flavour: off");
 
-            plateRadar.SetHighlight(orderTaken ? orderZone : null);
+            plateRadar.SetHighlight(orderIn ? orderZone : null);
             plateRadar.ClearProfiles();
-            if(orderTaken) plateRadar.AddProfile(orderProfile, new Color(0.85f, 0.85f, 0.85f, 0.7f), false);
+            if(orderIn) plateRadar.AddProfile(orderProfile, new Color(0.85f, 0.85f, 0.85f, 0.7f), false);
             if(livePreview && plate.Count > 0) plateRadar.AddProfile(FlavourCalculator.Calculate(plate, rules), UIFactory.Accent, true);
         }
 

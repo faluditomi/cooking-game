@@ -18,6 +18,11 @@ namespace DialogueSystem.EditorTools
                 "Custom Tools > Dialogue Graph Editor.",
                 MessageType.Info);
 
+            serializedObject.Update();
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("isOneShot"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("payload"));
+            serializedObject.ApplyModifiedProperties();
+
             if(GUILayout.Button("Open Graph Editor"))
             {
                 EditorApplication.ExecuteMenuItem("Custom Tools/Dialogue Graph Editor");

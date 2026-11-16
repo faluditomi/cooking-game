@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Woman - WrongOrderTasty - Familiar - O2
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: 410c2903-db06-407e-b0f1-7a0acd76c265
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: bcd579d6-de67-43e6-854b-85496c217764
+    kind: 0
+    line:
+      text: Mmmm, damn!
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: b75889c5-37d0-49a2-9478-2d339d54490b
+    kind: 0
+    line:
+      text: The fuck else are you hiding from me?
+      delaySeconds: 1.4
+    editorPosition: {x: 520, y: 0}
+  - guid: 10e12d28-f420-4dc9-9fd3-2d321f96c772
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 780, y: 0}
+  edges:
+  - fromNodeGuid: 410c2903-db06-407e-b0f1-7a0acd76c265
+    fromOptionGuid: 
+    toNodeGuid: bcd579d6-de67-43e6-854b-85496c217764
+  - fromNodeGuid: bcd579d6-de67-43e6-854b-85496c217764
+    fromOptionGuid: 
+    toNodeGuid: b75889c5-37d0-49a2-9478-2d339d54490b
+  - fromNodeGuid: b75889c5-37d0-49a2-9478-2d339d54490b
+    fromOptionGuid: 
+    toNodeGuid: 10e12d28-f420-4dc9-9fd3-2d321f96c772
+  isOneShot: 0
+  payload: 

@@ -1,0 +1,69 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Woman - Musing - Friendly - O3
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: 364dcff0-5ae5-466d-a772-256bb00de8c2
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: c7a5269c-ef2c-4e9d-9a26-0b37addfccaa
+    kind: 0
+    line:
+      text: Get this, Pot Boy!
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: bd5ce53d-d5e2-4330-8213-bfda898d18bb
+    kind: 0
+    line:
+      text: This blockhead just secured some tix out of here.
+      delaySeconds: 1.6
+    editorPosition: {x: 520, y: 0}
+  - guid: ae4dafde-217a-4a3a-b7b8-392411cb7fd0
+    kind: 0
+    line:
+      text: That's right, few weeks time, imma be clean out. Looking for someone I last seen many many lonely birthdays ago. Tyna cook for them.
+      delaySeconds: 2.8
+    editorPosition: {x: 780, y: 0}
+  - guid: a0a735e3-84a7-4758-90be-b869d234e533
+    kind: 0
+    line:
+      text: Fuckin' terrifying...
+      delaySeconds: 5.7
+    editorPosition: {x: 1040, y: 0}
+  - guid: 7b71f077-d589-4037-83a9-03d31ca06130
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 1300, y: 0}
+  edges:
+  - fromNodeGuid: 364dcff0-5ae5-466d-a772-256bb00de8c2
+    fromOptionGuid: 
+    toNodeGuid: c7a5269c-ef2c-4e9d-9a26-0b37addfccaa
+  - fromNodeGuid: c7a5269c-ef2c-4e9d-9a26-0b37addfccaa
+    fromOptionGuid: 
+    toNodeGuid: bd5ce53d-d5e2-4330-8213-bfda898d18bb
+  - fromNodeGuid: bd5ce53d-d5e2-4330-8213-bfda898d18bb
+    fromOptionGuid: 
+    toNodeGuid: ae4dafde-217a-4a3a-b7b8-392411cb7fd0
+  - fromNodeGuid: ae4dafde-217a-4a3a-b7b8-392411cb7fd0
+    fromOptionGuid: 
+    toNodeGuid: a0a735e3-84a7-4758-90be-b869d234e533
+  - fromNodeGuid: a0a735e3-84a7-4758-90be-b869d234e533
+    fromOptionGuid: 
+    toNodeGuid: 7b71f077-d589-4037-83a9-03d31ca06130
+  isOneShot: 0
+  payload: 

@@ -62,8 +62,9 @@ namespace Cooking.Prototype
             else
             {
                 HistoryEntry entry = selectedEntry;
-                bookTitle.text = "<b>Day " + entry.Day + ", customer " + entry.Visit + ": " + entry.Customer.name + "</b>\n<size=18><color=" + Muted + ">"
-                                 + StageLabel(entry.Stage) + " · ordered " + entry.Ordered + " · " + VerdictLabel(entry.Verdict) + "</color></size>";
+                bookTitle.text = "<b>" + DishName(entry.Dish, "Nothing") + "</b> <size=22>for " + entry.Customer.name + "</size>\n<size=18><color=" + Muted + ">Cycle "
+                                 + entry.Day + ", customer " + entry.Visit + " · " + StageLabel(entry.Stage) + " · ordered " + OrderedName(entry) + " · "
+                                 + VerdictLabel(entry.Verdict) + "</color></size>";
                 bookSteps.text = Report(entry);
             }
 
@@ -94,7 +95,7 @@ namespace Cooking.Prototype
             for(int i = entries.Count - 1; i >= 0; i--)
             {
                 HistoryEntry entry = entries[i];
-                string label = "Day " + entry.Day + " · " + entry.Customer.name
+                string label = DishName(entry.Dish, "Nothing") + "  <size=14><color=" + Muted + ">cycle " + entry.Day + " · " + entry.Customer.name + "</color></size>"
                                + "\n<size=14>" + VerdictLabel(entry.Verdict) + " <color=" + Muted + ">· $" + entry.Paid.ToString("0.00")
                                + (string.IsNullOrEmpty(entry.Clue) ? "" : " · clue") + "</color></size>";
                 AddListButton(label, entry == selectedEntry, () => SelectEntry(entry), 52f);
@@ -112,26 +113,24 @@ namespace Cooking.Prototype
 
         // ------------------------------------------------------------------ Middle: the report
 
+        /// <summary>The order's current name (it may have been named since), or the name it had then.</summary>
+        private static string OrderedName(HistoryEntry entry)
+        {
+            return entry.Order != null ? entry.Order.DisplayName : entry.Ordered ?? "-";
+        }
+
         /// <summary>The full report for one order.</summary>
-        private static string Report(HistoryEntry entry)
+        private string Report(HistoryEntry entry)
         {
             StringBuilder sb = new StringBuilder();
 
             // Order
             sb.Append("<b>ORDER</b>\n");
-            sb.Append("  ").Append(entry.Ordered);
+            sb.Append("  ").Append(OrderedName(entry));
             if(!string.IsNullOrEmpty(entry.OrderLine)) sb.Append("  <i><color=#c8c3ba>\"").Append(entry.OrderLine).Append("\"</color></i>");
             sb.Append('\n');
 
-            if(entry.Timed)
-            {
-                sb.Append("  Timer ").Append(FormatTime(entry.TimeAllowed)).Append(", served after ").Append(FormatTime(entry.TimeTaken))
-                  .Append(entry.Late ? "  <color=#e5594d>late</color>" : "  <color=#73cc73>on time</color>").Append('\n');
-            }
-            else
-            {
-                sb.Append("  <color=").Append(Muted).Append(">Untimed. Served after ").Append(FormatTime(entry.TimeTaken)).Append(".</color>\n");
-            }
+            sb.Append("  <color=").Append(Muted).Append(">Served ").Append(FormatTime(entry.TimeTaken)).Append(" after they ordered.</color>\n");
 
             // What was said
             sb.Append("\n<b>WHAT WAS SAID</b>\n");
@@ -159,6 +158,14 @@ namespace Cooking.Prototype
             // Served
             sb.Append("\n<b>SERVED</b>\n");
             foreach(IngredientPortion portion in entry.Served) sb.Append("  ").Append(Describe(portion, true)).Append('\n');
+
+            // How to make it again
+            if(entry.Dish != null)
+            {
+                sb.Append("\n<b>TO MAKE IT AGAIN</b>  <color=").Append(Muted).Append(">").Append(DishType(entry.Dish))
+                  .Append(IsOnMenu(entry.Dish) ? " · on the menu" : " · not on the menu").Append("</color>\n");
+                sb.Append(RecipeGuide.Steps(entry.Dish, Owned)).Append('\n');
+            }
 
             // Flavour profile, next to the order's
             sb.Append("\n<b>FLAVOUR PROFILE</b>  <color=").Append(Muted).Append(">served (ordered)</color>\n");
@@ -240,7 +247,7 @@ namespace Cooking.Prototype
 
             if(relationship.DreamMeal != null)
             {
-                sb.Append("<color=#f28c33>Found it: ").Append(relationship.DreamMeal.DisplayName).Append("</color>\n");
+                sb.Append("<color=#f28c33>Found it: ").Append(DishName(relationship.DreamMeal)).Append("</color>\n");
                 return;
             }
 
@@ -250,9 +257,9 @@ namespace Cooking.Prototype
                 return;
             }
 
-            if(relationship.Stage == NpcStage.Dejected)
+            if(relationship.Stage == NpcStage.Stranger)
             {
-                sb.Append("<color=").Append(Muted).Append(">They don't open up yet. Warm them up and they'll start dropping hints.</color>\n");
+                sb.Append("<color=").Append(Muted).Append(">They don't open up yet. Once they're familiar they'll start dropping hints.</color>\n");
             }
 
             int clues = 0;
@@ -260,11 +267,11 @@ namespace Cooking.Prototype
             {
                 if(entry.Customer != regular || string.IsNullOrEmpty(entry.Clue)) continue;
                 if(clues == 0) sb.Append("Clues so far:\n");
-                sb.Append("  Day ").Append(entry.Day).Append(": \"").Append(entry.Clue).Append("\"\n");
+                sb.Append("  Cycle ").Append(entry.Day).Append(": \"").Append(entry.Clue).Append("\"\n");
                 clues++;
             }
 
-            if(clues == 0 && relationship.Stage != NpcStage.Dejected) sb.Append("<color=").Append(Muted).Append(">No clues yet.</color>\n");
+            if(clues == 0 && relationship.Stage != NpcStage.Stranger) sb.Append("<color=").Append(Muted).Append(">No clues yet.</color>\n");
         }
 
         private static string VerdictLabel(Verdict verdict)
@@ -272,11 +279,11 @@ namespace Cooking.Prototype
             switch(verdict)
             {
                 case Verdict.DreamMeal: return "<color=#f28c33>Dream meal</color>";
-                case Verdict.Ordered: return "<color=#73cc73>Exact order</color>";
-                case Verdict.VeryClose: return "<color=#73cc73>Very close</color>";
-                case Verdict.CloseEnough: return "<color=#f28c33>Close enough</color>";
-                case Verdict.Refused: return "<color=#e5594d>Refused</color>";
-                default: return "<color=#e5594d>Too different</color>";
+                case Verdict.Ordered: return "<color=#73cc73>Correct order</color>";
+                case Verdict.VeryClose: return "<color=#73cc73>Wrong order, good food (liked)</color>";
+                case Verdict.CloseEnough: return "<color=#f28c33>Wrong order, good food</color>";
+                case Verdict.Refused: return "<color=#e5594d>Wrong order, bad food (refused)</color>";
+                default: return "<color=#e5594d>Wrong order, bad food</color>";
             }
         }
 

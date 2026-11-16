@@ -101,30 +101,35 @@ namespace Cooking.Tests
         }
 
         [Test]
-        public void LateDish_IsStillPaid_ButNotTippedOrHappy()
+        public void DreamMeal_NeedsItsIngredient_AndBeatsARefusal()
         {
             IngredientDefinition sweet = Ingredient("Sweet", new FlavourProfile { sweet = 8f }, price: 2f);
+            IngredientDefinition beef = Ingredient("Beef", FlavourProfile.Zero, price: 1f);
+            FlavourZone zone = ScriptableObject.CreateInstance<FlavourZone>();
+            created.Add(zone);
+            zone.Configure("Sweet", new FlavourProfile { sweet = 3f }, FlavourProfile.Filled(10f));
+            Customer customer = new Customer
+            {
+                secretDesire = zone,
+                dreamNeeds = new List<IngredientDefinition> { beef },
+                refuses = new List<IngredientDefinition> { beef },
+            };
+
             RecipeDefinition order = ScriptableObject.CreateInstance<RecipeDefinition>();
             created.Add(order);
             order.Configure("Sweet thing", "Test", new[] { new IngredientPortion(sweet, 1) });
-            FlavourZone zone = ScriptableObject.CreateInstance<FlavourZone>();
-            created.Add(zone);
-            zone.Configure("Sweet", new FlavourProfile { sweet = 6f }, FlavourProfile.Filled(10f));
-            Customer customer = new Customer { secretDesire = zone };
             DishJudge.Settings settings = DishJudge.Settings.Default;
             settings.Margin = 2f;
 
-            JudgeResult onTime = DishJudge.Judge(order, order.CreatePerfectPortions(), customer, new[] { zone }, null, settings);
-            JudgeResult late = DishJudge.Judge(order, order.CreatePerfectPortions(), customer, new[] { zone }, null, settings, late: true);
+            JudgeResult withoutBeef = DishJudge.Judge(order, new[] { new IngredientPortion(sweet, 1) }, customer, new[] { zone }, null, settings);
+            JudgeResult withBeef = DishJudge.Judge(order, new[] { new IngredientPortion(sweet, 1), new IngredientPortion(beef, 1) }, customer, new[] { zone }, null, settings);
+            JudgeResult beefOnly = DishJudge.Judge(order, new[] { new IngredientPortion(beef, 1) }, customer, new[] { zone }, null, settings);
 
-            Assert.IsTrue(onTime.IsHappy);
-            Assert.Greater(onTime.Tip, 0f);
-
-            Assert.AreEqual(Verdict.DreamMeal, late.Verdict);
-            Assert.AreEqual(4f, late.Payment, 0.0001f);
-            Assert.AreEqual(0f, late.Tip);
-            Assert.IsTrue(late.IsPaid);
-            Assert.IsFalse(late.IsHappy);
+            Assert.AreEqual(Verdict.Ordered, withoutBeef.Verdict, "in the zone but without beef it's just their order");
+            Assert.AreEqual(Verdict.DreamMeal, withBeef.Verdict, "the dream meal wins over refusing beef");
+            Assert.Greater(withBeef.Tip, 0f);
+            Assert.IsTrue(withBeef.IsLiked);
+            Assert.AreEqual(Verdict.Refused, beefOnly.Verdict, "outside the dream they still refuse beef");
         }
     }
 }

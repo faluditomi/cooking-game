@@ -14,22 +14,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: Cooking.Runtime::Cooking.FlavourZone
   displayName: Their lost love's soup
   color: {r: 0.95, g: 0.45, b: 0.7, a: 1}
-  description: Sweet and sour, soft, a soup. What she used to make for the one who left.
+  description: Sweet and sour, a hearty beef soup. What she used to make for the one who left.
   min:
-    savoury: 1.5
+    savoury: 5.5
     salty: 0
-    sweet: 3.2
+    sweet: 4
     bitter: 0
-    sour: 2.3
+    sour: 3.5
     pain: 0
-    nutrition: 2.5
+    nutrition: 3.5
     texture: 0
   max:
-    savoury: 5
-    salty: 3
-    sweet: 6
+    savoury: 8
+    salty: 3.5
+    sweet: 7
     bitter: 1.5
-    sour: 5
+    sour: 6.5
     pain: 1.5
-    nutrition: 6.5
+    nutrition: 7
     texture: 3

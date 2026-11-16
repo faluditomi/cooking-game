@@ -35,7 +35,12 @@ namespace DialogueSystem
         /// Raises a trigger for an NPC with an optional event type and NPC state. Handled on the
         /// director's next Update.
         /// </summary>
-        public static void Trigger(DialogueNpcId npc, DialogueEventType eventType = DialogueEventType.None, DialogueNpcState npcState = DialogueNpcState.None)
+        /// <param name="priority">
+        /// Under <see cref="DialoguePolicyOnNewTrigger.FinishThenQueue"/>, plays right after the
+        /// current dialogue and drops everything else waiting. Other policies ignore it.
+        /// </param>
+        public static void Trigger(DialogueNpcId npc, DialogueEventType eventType = DialogueEventType.None, DialogueNpcState npcState = DialogueNpcState.None,
+            bool priority = false)
         {
             if(activeDirector == null)
             {
@@ -49,7 +54,16 @@ namespace DialogueSystem
                 return;
             }
 
-            activeDirector.EnqueueTrigger(new DialogueEvent(npc, eventType, npcState));
+            activeDirector.EnqueueTrigger(new DialogueEvent(npc, eventType, npcState, priority));
+        }
+
+        /// <summary>
+        /// Stops the playing dialogue (DialogueEnded fires with Completed = false) and drops every
+        /// queued trigger. For when the scene moves on, like a customer leaving.
+        /// </summary>
+        public static void StopAll()
+        {
+            if(activeDirector != null) activeDirector.StopAll();
         }
 
         internal static void Bind(DialogueDirector director)
