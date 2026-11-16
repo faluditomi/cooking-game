@@ -65,11 +65,11 @@ namespace Cooking.Prototype
             if(takeNext && inventory.Count(ingredient, boardSourcePrep) > 0)
             {
                 PlaceOnBoard(new Inventory.Entry { Ingredient = ingredient, Prep = boardSourcePrep, Quantity = 1 });
-                Say(done + " → stock. Next " + ingredient.DisplayName + " on the board.");
+                Say(done + " back in stock. Next " + ingredient.DisplayName + " on the board.");
                 return;
             }
 
-            Say(done + " → stock." + (takeNext ? " No more like it." : ""));
+            Say(done + " back in stock." + (takeNext ? " No more like it." : ""));
             RefreshAll();
         }
 
@@ -203,7 +203,7 @@ namespace Cooking.Prototype
             {
                 string finished = Describe(boardUnit, true);
                 ReturnBoardToStock();
-                Say(finished + " → stock. That was the last one.", UIFactory.Good);
+                Say(finished + " back in stock. That was the last one.", UIFactory.Good);
                 RefreshAll();
                 return;
             }

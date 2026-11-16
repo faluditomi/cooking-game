@@ -580,7 +580,7 @@ namespace Cooking.Prototype
             {
                 string done = Describe(boardUnit, true);
                 ReturnBoardToStock();
-                Say(done + " → stock.");
+                Say(done + " back in stock.");
             }
 
             area = target;
@@ -784,7 +784,7 @@ namespace Cooking.Prototype
                 string readiness = ready >= portion.quantity ? "<color=#73cc73>ready</color>"
                     : total >= portion.quantity ? "<color=#f28c33>needs prep</color>"
                     : "<color=#e5594d>short</color>";
-                sb.Append("• ").Append(Describe(portion, true)).Append("  ").Append(readiness).Append('\n');
+                sb.Append("- ").Append(Describe(portion, true)).Append("  ").Append(readiness).Append('\n');
             }
 
             sb.Append("<color=#a6a199>Steps are in the Recipe book.</color>\n");
@@ -968,7 +968,7 @@ namespace Cooking.Prototype
             dayText = UIFactory.Label(top, "", 22, TextAnchor.MiddleCenter);
             UIFactory.Place(dayText.rectTransform, 0.55f, 0f, 0.68f, 1f);
 
-            phaseButton = UIFactory.Button(top, "Buy ingredients and start the day →", OpenStall, new Color(0.75f, 0.42f, 0.15f, 1f), 18);
+            phaseButton = UIFactory.Button(top, "Buy ingredients and start the day", OpenStall, new Color(0.75f, 0.42f, 0.15f, 1f), 18);
             UIFactory.Place((RectTransform)phaseButton.transform, 0.68f, 0f, 0.88f, 1f, 8f);
 
             moneyText = UIFactory.Label(top, "", 30, TextAnchor.MiddleRight, FontStyle.Bold, UIFactory.Good);

@@ -26,7 +26,7 @@ namespace Cooking.Prototype
 
             foreach(KeyValuePair<IngredientDefinition, int> need in ShoppingCart.Needs(recipe))
             {
-                sb.Append("  • ").Append(need.Value).Append("× ").Append(need.Key.DisplayName);
+                sb.Append("  - ").Append(need.Value).Append("× ").Append(need.Key.DisplayName);
 
                 if(have != null)
                 {
@@ -51,7 +51,7 @@ namespace Cooking.Prototype
                 }
 
                 anyPrep = true;
-                sb.Append("  • ").Append(portion.quantity).Append("× ").Append(portion.ingredient.DisplayName).Append(": ")
+                sb.Append("  - ").Append(portion.quantity).Append("× ").Append(portion.ingredient.DisplayName).Append(": ")
                   .Append(DescribePrep(portion.prep)).Append('\n');
             }
 

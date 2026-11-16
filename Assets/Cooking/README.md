@@ -150,7 +150,7 @@ Everything you buy goes into your stock (`Inventory`), which tracks units per pr
    - **Pot**: take it off on the narrow green line, or it overcooks. Without a stock cube it boils
      one ingredient at a time; with one, it's a soup and takes anything. Everything in it comes
      off with the same doneness.
-   - **Seasoning**: once the dish is on the plate, **→ Plate** adds seasonings to it: salt, pepper,
+   - **Seasoning**: once the dish is on the plate, **To plate** adds seasonings to it: salt, pepper,
      sugar, MSG2, citric acid and chilli (`IngredientDefinition.isSeasoning`). Nothing else goes on
      raw. Chilli and MSG2 give their full taste grated, half unprepped (`fullFlavourPrep`). For a
      recipe, a seasoning counts the same whether it was cooked in or added after.

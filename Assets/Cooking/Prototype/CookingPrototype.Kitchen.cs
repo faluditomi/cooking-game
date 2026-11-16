@@ -198,7 +198,7 @@ namespace Cooking.Prototype
             if(station != null)
             {
                 station.AddAll(batch);
-                Say(units + (units == 1 ? " unit" : " units") + " → " + station.Name + (station.IsSoup ? " (soup)." : ".") + " Press Start when it's all in.");
+                Say(units + (units == 1 ? " unit" : " units") + " into the " + station.Name.ToLowerInvariant() + (station.IsSoup ? " (soup)." : ".") + " Press Start when it's all in.");
                 LogCooking(station.Name, "Put in " + ListPortions(batch) + (station.IsSoup ? " (soup)." : "."));
             }
             else
@@ -246,12 +246,12 @@ namespace Cooking.Prototype
             if(wokSummary != null)
             {
                 LogCooking(station.Name, "Took it off: " + wokSummary + ".");
-                Say(station.Name + " → plate: " + wokSummary + ".", allPerfect ? UIFactory.Good : UIFactory.Bad);
+                Say(station.Name + " onto the plate: " + wokSummary + ".", allPerfect ? UIFactory.Good : UIFactory.Bad);
             }
             else
             {
                 LogCooking(station.Name, "Took it off at " + (progress * 100f).ToString("0") + "%: " + DonenessLabel(doneness) + ".");
-                Say(station.Name + " → plate: " + DonenessLabel(doneness) + ".", allPerfect ? UIFactory.Good : UIFactory.Bad);
+                Say(station.Name + " onto the plate: " + DonenessLabel(doneness) + ".", allPerfect ? UIFactory.Good : UIFactory.Bad);
             }
 
             RefreshAll();
@@ -416,9 +416,9 @@ namespace Cooking.Prototype
             selectionText = UIFactory.Label(stock, "", 17);
             UIFactory.Size(selectionText, 24f, 0f);
             RectTransform sendRow = UIFactory.Row(stock, 44f, 6f);
-            sendButtons[Destination.Wok] = UIFactory.Button(sendRow, "→ Wok", () => SendSelection(Destination.Wok), new Color(0.75f, 0.42f, 0.15f, 1f), 18);
-            sendButtons[Destination.Pot] = UIFactory.Button(sendRow, "→ Pot", () => SendSelection(Destination.Pot), new Color(0.75f, 0.42f, 0.15f, 1f), 18);
-            sendButtons[Destination.Plate] = UIFactory.Button(sendRow, "→ Plate", () => SendSelection(Destination.Plate), null, 18);
+            sendButtons[Destination.Wok] = UIFactory.Button(sendRow, "To wok", () => SendSelection(Destination.Wok), new Color(0.75f, 0.42f, 0.15f, 1f), 18);
+            sendButtons[Destination.Pot] = UIFactory.Button(sendRow, "To pot", () => SendSelection(Destination.Pot), new Color(0.75f, 0.42f, 0.15f, 1f), 18);
+            sendButtons[Destination.Plate] = UIFactory.Button(sendRow, "To plate", () => SendSelection(Destination.Plate), null, 18);
             RectTransform clearRow = UIFactory.Row(stock, 34f, 6f);
             clearSelectionButton = UIFactory.Button(clearRow, "Clear selection", ClearSelection, null, 16);
 
@@ -456,7 +456,7 @@ namespace Cooking.Prototype
 
             RectTransform row = UIFactory.Row(panel, 46f);
             view.StartButton = UIFactory.Button(row, "Start", () => StartStation(view));
-            view.TakeOffButton = UIFactory.Button(row, "Take off → plate", () => TakeOff(view), new Color(0.25f, 0.4f, 0.25f, 1f));
+            view.TakeOffButton = UIFactory.Button(row, "Take off", () => TakeOff(view), new Color(0.25f, 0.4f, 0.25f, 1f));
             view.BinButton = UIFactory.Button(row, "Bin", () => BinStation(view), new Color(0.35f, 0.2f, 0.2f, 1f));
 
             UpdateStationView(view);
@@ -580,7 +580,7 @@ namespace Cooking.Prototype
                 pick.interactable = phase == Phase.Service;
                 UIFactory.Size(pick, 38f, 0f, -1f, 1f);
 
-                Button less = UIFactory.Button(row, "−", () => SelectLess(captured), null, 20);
+                Button less = UIFactory.Button(row, "-", () => SelectLess(captured), null, 20);
                 less.interactable = selected > 0;
                 UIFactory.Size(less, 38f, 0f, 38f, 0f);
             }
