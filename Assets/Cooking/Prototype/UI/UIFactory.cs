@@ -103,6 +103,15 @@ namespace Cooking.Prototype
             return image;
         }
 
+        /// <summary>Shrinks the text (down to 12 px) when it would otherwise spill out of its rect.</summary>
+        public static void FitText(Text text)
+        {
+            text.resizeTextForBestFit = true;
+            text.resizeTextMinSize = 12;
+            text.resizeTextMaxSize = text.fontSize;
+            text.verticalOverflow = VerticalWrapMode.Truncate;
+        }
+
         public static void SetButtonText(Button button, string text)
         {
             Text label = button.GetComponentInChildren<Text>();

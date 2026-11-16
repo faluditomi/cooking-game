@@ -784,7 +784,8 @@ namespace Cooking.Prototype
                 string readiness = ready >= portion.quantity ? "<color=#73cc73>ready</color>"
                     : total >= portion.quantity ? "<color=#f28c33>needs prep</color>"
                     : "<color=#e5594d>short</color>";
-                sb.Append("- ").Append(Describe(portion, true)).Append("  ").Append(readiness).Append('\n');
+                // Prep only: how it's cooked is the dish type above, and repeating it wraps the narrow ticket.
+                sb.Append("- ").Append(Describe(new IngredientPortion(portion.ingredient, portion.quantity, portion.prep))).Append("  ").Append(readiness).Append('\n');
             }
 
             sb.Append("<color=#a6a199>Steps are in the Recipe book.</color>\n");
@@ -1060,6 +1061,7 @@ namespace Cooking.Prototype
                 Text text = button.GetComponentInChildren<Text>();
                 text.alignment = TextAnchor.MiddleLeft;
                 text.rectTransform.offsetMin = new Vector2(12f, 0f);
+                UIFactory.FitText(text);
                 button.interactable = interactable;
                 UIFactory.Size(button, 38f, 0f, -1f, 1f);
             }
