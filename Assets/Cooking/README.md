@@ -92,6 +92,21 @@ A playable loop to try the flavour system with. **Custom Tools → Cooking Proto
 creates `Prototype/CookingPrototype.unity` and the design-doc recipes in `Data/Recipes/`. It keeps
 recipe assets that already exist, so hand tuning survives a rebuild. Then press Play.
 
+The game opens on a **title screen** (`CookingPrototype.Title.cs`): **Start** begins the game,
+**Quit** closes it. A game over goes back to the title screen, and Start there begins a new game.
+
+### Building
+
+The build settings contain only `Prototype/CookingPrototype.unity`. Build from **Custom Tools →
+Cooking Prototype**, into `Builds/` (git-ignored):
+
+- **Build Windows** → `Builds/Windows/EmphisStall.exe`. It always runs full screen (it forces a
+  full-screen window at startup, so a windowed launch isn't remembered). Zip the folder for itch.
+- **Build WebGL** → `Builds/WebGL`. Needs the WebGL Build Support module for this Unity version
+  (Unity Hub → Installs → ⚙ → Add modules). It's gzip-compressed with a decompression fallback, so it
+  runs on itch.io without server setup; zip the folder's contents and upload as an HTML game
+  (1280×720). There's no Quit button in the browser.
+
 ### The cycle
 
 The game runs in cycles (days), and there are three areas you switch between with the tabs at the
@@ -135,7 +150,7 @@ Everything you buy goes into your stock (`Inventory`), which tracks units per pr
    - **Pot**: take it off on the narrow green line, or it overcooks. Without a stock cube it boils
      one ingredient at a time; with one, it's a soup and takes anything. Everything in it comes
      off with the same doneness.
-   - **Seasoning**: once the dish is on the plate, **→ Plate** adds seasonings to it: salt, pepper,
+   - **Seasoning**: once the dish is on the plate, **To plate** adds seasonings to it: salt, pepper,
      sugar, MSG2, citric acid and chilli (`IngredientDefinition.isSeasoning`). Nothing else goes on
      raw. Chilli and MSG2 give their full taste grated, half unprepped (`fullFlavourPrep`). For a
      recipe, a seasoning counts the same whether it was cooked in or added after.
@@ -149,7 +164,7 @@ Everything you buy goes into your stock (`Inventory`), which tracks units per pr
 4. **End of the cycle**, when everyone has been or the timer runs out (whoever is still waiting
    leaves without eating): a summary of each dish and who it was for, income, expenses, the
    **stall rent** (`stallRent`, $10) and the profit. If you can't pay the rent, it's **game over**
-   and you start again from cycle 1. Anything left in the stations or on the board is binned.
+   and you go back to the title screen. Anything left in the stations or on the board is binned.
    **Prepped stock spoils; raw stock carries over.**
 
 ### Minigames (`Prototype/Minigames/`)
@@ -192,7 +207,7 @@ is added to what they like.
 
 Price is the **ordered** dish's ingredient cost × `margin`. Customers come from the design doc's NPC notes:
 
-- **The Woman**: orders MSBeef fried rice (Real Beef™ only) and refuses Beef. Secretly craves *Their lost love's soup*, a sweet and sour beef soup: her dream needs Beef, and wins over the refusal.
+- **The Woman**: starts out liking MSBeef fried rice (Real Beef™ only), Synthetic soup and Calorice, and refuses Beef. Secretly craves *Their lost love's soup*, a sweet and sour beef soup: her dream needs Beef, and wins over the refusal.
 - **The Man**: refuses synthetic chicken. Craves *An honest broth* (filling, a little to chew, a touch sweet).
 - **The Sleeper**: orders boiled synthetic chicken, a recipe only NPCs know (it's not on the menu or in the book). Craves *Mother's fire* (very hot, savoury, not sweet).
 - **A generic Eyesider**: orders anything on the menu, craves nothing.
@@ -252,7 +267,8 @@ the session:
   in `Data/Dialogue/Graphs/` ("Woman - Order - Stranger - O1") and the catalog
   `Data/Dialogue/CookingDialogueCatalog.asset` through the DialogueSystem's editor API, then wires
   the open prototype scene (catalog, each regular's `dialogueId`, a `DialogueDirector`). The Woman's
-  lines are the board's, as written; the Man has the board's MSG line and otherwise placeholders, as
+  lines are the board's, as written (her Stranger "correct order" O1 is "[Nothing]" on the board,
+  so that graph has no lines and she says nothing); the Man has the board's MSG line and otherwise placeholders, as
   do the Sleeper and Eyesiders. Existing graphs are kept, so rewrite the text in
   **Custom Tools → Dialogue Graph Editor**; rerunning only adds what's missing. Build Scene runs it too.
 - The cycle summary lists who became familiar or had their dream meal; the morning ticket shows

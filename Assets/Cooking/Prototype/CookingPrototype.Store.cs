@@ -140,7 +140,7 @@ namespace Cooking.Prototype
                 RectTransform buttons = UIFactory.Rect(panel, "Buttons");
                 UIFactory.Place(buttons, 0f, 0f, 1f, 0.4f, 6f);
                 UIFactory.Horizontal(buttons.gameObject, 6f);
-                card.Less = UIFactory.Button(buttons, "−", () => RemoveFromCart(captured), null, 18);
+                card.Less = UIFactory.Button(buttons, "-", () => RemoveFromCart(captured), null, 18);
                 card.More = UIFactory.Button(buttons, "+1", () => AddToCart(captured, 1), null, 17);
                 card.MoreFive = UIFactory.Button(buttons, "+5", () => AddToCart(captured, 5), null, 17);
 
@@ -251,7 +251,7 @@ namespace Cooking.Prototype
                     17, TextAnchor.MiddleLeft);
                 UIFactory.Size(label, 34f, 0f, -1f, 1f);
 
-                Button less = UIFactory.Button(row, "−", () => RemoveFromCart(ingredient), null, 18);
+                Button less = UIFactory.Button(row, "-", () => RemoveFromCart(ingredient), null, 18);
                 UIFactory.Size(less, 34f, 0f, 36f, 0f);
                 Button more = UIFactory.Button(row, "+", () => AddToCart(ingredient, 1), null, 18);
                 UIFactory.Size(more, 34f, 0f, 36f, 0f);

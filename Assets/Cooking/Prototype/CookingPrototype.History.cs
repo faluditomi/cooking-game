@@ -299,8 +299,8 @@ namespace Cooking.Prototype
         {
             switch(warmth)
             {
-                case Warmth.Warmer: return "<color=#73cc73>▲ warmer</color>";
-                case Warmth.Colder: return "<color=#e5594d>▼ colder</color>";
+                case Warmth.Warmer: return "<color=#73cc73>(warmer)</color>";
+                case Warmth.Colder: return "<color=#e5594d>(colder)</color>";
                 case Warmth.Same: return "<color=#a6a199>= about the same</color>";
                 default: return "";
             }

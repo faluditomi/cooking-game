@@ -176,6 +176,11 @@ namespace Cooking.Prototype
 
         private void Start()
         {
+#if UNITY_STANDALONE && !UNITY_EDITOR
+            // Always full screen. Unity remembers the last window mode per machine, so one windowed
+            // launch (say with -screen-fullscreen 0) would otherwise stick.
+            Screen.SetResolution(Display.main.systemWidth, Display.main.systemHeight, FullScreenMode.FullScreenWindow);
+#endif
             random = randomSeed != 0 ? new System.Random(randomSeed) : new System.Random();
             money = startingMoney;
             startingMenu = new List<RecipeDefinition>(menu);
@@ -189,6 +194,7 @@ namespace Cooking.Prototype
             BuildUI();
             InitNpcs();
             StartDay();
+            ShowTitle();
         }
 
         private void Update()
@@ -456,7 +462,7 @@ namespace Cooking.Prototype
                 sb.Append("\n\n<color=#e5594d><b>You can't pay the rent.</b> You have $").Append(money.ToString("0.00"))
                   .Append(" and the rent is $").Append(stallRent.ToString("0.00")).Append(". The stall is gone.</color>");
                 summaryTitle.text = "Game over";
-                UIFactory.SetButtonText(summaryButton, "Start again");
+                UIFactory.SetButtonText(summaryButton, "Back to the main menu");
             }
             else
             {
@@ -474,9 +480,11 @@ namespace Cooking.Prototype
 
         private void NextDay()
         {
+            // Game over goes back to the main menu; Start there begins a new game.
             if(gameOver)
             {
-                RestartGame();
+                summaryOverlay.SetActive(false);
+                ShowTitle();
                 return;
             }
 
@@ -572,7 +580,7 @@ namespace Cooking.Prototype
             {
                 string done = Describe(boardUnit, true);
                 ReturnBoardToStock();
-                Say(done + " → stock.");
+                Say(done + " back in stock.");
             }
 
             area = target;
@@ -776,7 +784,7 @@ namespace Cooking.Prototype
                 string readiness = ready >= portion.quantity ? "<color=#73cc73>ready</color>"
                     : total >= portion.quantity ? "<color=#f28c33>needs prep</color>"
                     : "<color=#e5594d>short</color>";
-                sb.Append("• ").Append(Describe(portion, true)).Append("  ").Append(readiness).Append('\n');
+                sb.Append("- ").Append(Describe(portion, true)).Append("  ").Append(readiness).Append('\n');
             }
 
             sb.Append("<color=#a6a199>Steps are in the Recipe book.</color>\n");
@@ -925,6 +933,7 @@ namespace Cooking.Prototype
             BuildRecipeBook(root);
             BuildResultOverlay(root);
             BuildSummaryOverlay(root);
+            BuildTitle(root);
         }
 
         private static RectTransform AreaRoot(RectTransform parent, string name)
@@ -959,7 +968,7 @@ namespace Cooking.Prototype
             dayText = UIFactory.Label(top, "", 22, TextAnchor.MiddleCenter);
             UIFactory.Place(dayText.rectTransform, 0.55f, 0f, 0.68f, 1f);
 
-            phaseButton = UIFactory.Button(top, "Buy ingredients and start the day →", OpenStall, new Color(0.75f, 0.42f, 0.15f, 1f), 18);
+            phaseButton = UIFactory.Button(top, "Buy ingredients and start the day", OpenStall, new Color(0.75f, 0.42f, 0.15f, 1f), 18);
             UIFactory.Place((RectTransform)phaseButton.transform, 0.68f, 0f, 0.88f, 1f, 8f);
 
             moneyText = UIFactory.Label(top, "", 30, TextAnchor.MiddleRight, FontStyle.Bold, UIFactory.Good);
