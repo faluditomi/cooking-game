@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Synthetic Chicken
   m_EditorClassIdentifier: Cooking.Runtime::Cooking.IngredientDefinition
   displayName: Synthetic Chicken
-  icon: {fileID: 0}
+  icon: {fileID: 6396273110550457780, guid: 50e8960cc0c06314fb2453eead7405c9, type: 3}
   price: 4
   bulk: 1
   flavour:
@@ -34,4 +34,7 @@ MonoBehaviour:
     pain: 0
     nutrition: -3
     texture: -2
+  isStock: 0
+  isSeasoning: 0
+  fullFlavourPrep: 0
   notes: Placeholder values. Tune in the Flavour Lab.

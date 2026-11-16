@@ -47,6 +47,7 @@ namespace Cooking.Prototype
         private StationView potView;
         private GesturePadGraphic wokPad;
         private Text plateText;
+        private RectTransform plateIcons;
         private Button serveButton;
         private Button binPlateButton;
         private Button previewButton;
@@ -468,8 +469,12 @@ namespace Cooking.Prototype
             VerticalLayoutGroup layout = UIFactory.Vertical(column.gameObject, 10f, 16);
             layout.childForceExpandHeight = false;
             Header(column, "PLATE");
+            plateIcons = UIFactory.Row(column, 52f, 6f);
+            HorizontalLayoutGroup iconLayout = plateIcons.GetComponent<HorizontalLayoutGroup>();
+            iconLayout.childForceExpandWidth = false;
+            iconLayout.childAlignment = TextAnchor.MiddleLeft;
             plateText = UIFactory.Label(column, "", 19);
-            UIFactory.Size(plateText, 170f, 0f);
+            UIFactory.Size(plateText, 120f, 0f);
 
             RectTransform row = UIFactory.Row(column, 52f);
             serveButton = UIFactory.Button(row, "Serve", Serve, new Color(0.75f, 0.42f, 0.15f, 1f), 24);
@@ -514,6 +519,7 @@ namespace Cooking.Prototype
             if(plate.Count == 0)
             {
                 plateText.text = "<color=#a6a199>Empty.</color>";
+                UIFactory.ClearChildren(plateIcons);
             }
             else
             {
@@ -521,6 +527,10 @@ namespace Cooking.Prototype
                 foreach(IngredientPortion portion in plate) sb.Append(Describe(portion, true)).Append('\n');
                 sb.Append("<color=#a6a199>Ingredients used: $").Append(dishCost.ToString("0.00")).Append("</color>");
                 plateText.text = sb.ToString();
+
+                // One picture per ingredient on the plate.
+                UIFactory.ClearChildren(plateIcons);
+                foreach(IngredientPortion portion in plate) UIFactory.Icon(plateIcons, portion.ingredient.Icon, 48f);
             }
 
             serveButton.interactable = plate.Count > 0 && orderIn;
@@ -568,6 +578,7 @@ namespace Cooking.Prototype
                 RectTransform row = UIFactory.Row(kitchenStockContent, 38f, 4f);
                 HorizontalLayoutGroup rowLayout = row.GetComponent<HorizontalLayoutGroup>();
                 rowLayout.childForceExpandWidth = false;
+                UIFactory.Icon(row, entry.Ingredient.Icon, 38f);
 
                 string label = Describe(new IngredientPortion(entry.Ingredient, entry.Quantity, entry.Prep), true);
                 if(selected > 0) label = "<b>" + selected + "/</b>" + label;

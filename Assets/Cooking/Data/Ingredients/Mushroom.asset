@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Mushroom
   m_EditorClassIdentifier: Cooking.Runtime::Cooking.IngredientDefinition
   displayName: Mushroom
-  icon: {fileID: 0}
+  icon: {fileID: -4902608913318666287, guid: b12f911fce944f047aede9f7db6eac9f, type: 3}
   price: 3
   bulk: 1
   flavour:
@@ -34,4 +34,7 @@ MonoBehaviour:
     pain: 0
     nutrition: 0
     texture: 0
+  isStock: 0
+  isSeasoning: 0
+  fullFlavourPrep: 0
   notes: Placeholder values. Tune in the Flavour Lab.

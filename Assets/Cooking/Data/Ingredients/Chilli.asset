@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Chilli
   m_EditorClassIdentifier: Cooking.Runtime::Cooking.IngredientDefinition
   displayName: Chilli
-  icon: {fileID: 0}
+  icon: {fileID: 24424499547967296, guid: 81080ec5e704223419d2802bd951f158, type: 3}
   price: 1
   bulk: 0.2
   flavour:

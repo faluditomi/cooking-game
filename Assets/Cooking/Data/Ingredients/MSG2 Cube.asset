@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: MSG2 Cube
   m_EditorClassIdentifier: Cooking.Runtime::Cooking.IngredientDefinition
   displayName: MSG2 Cube
-  icon: {fileID: 0}
+  icon: {fileID: -7850160556239178753, guid: da511b1805aba3d4990155e748db1c3e, type: 3}
   price: 1
   bulk: 0.15
   flavour:

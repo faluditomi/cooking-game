@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Onion
   m_EditorClassIdentifier: Cooking.Runtime::Cooking.IngredientDefinition
   displayName: Onion
-  icon: {fileID: 0}
+  icon: {fileID: -2254506527001743228, guid: f9e95e5bf0f2b6546a4ba65ad2bae97b, type: 3}
   price: 1
   bulk: 0.6
   flavour:
@@ -34,4 +34,7 @@ MonoBehaviour:
     pain: 0
     nutrition: 0
     texture: 0
+  isStock: 0
+  isSeasoning: 0
+  fullFlavourPrep: 0
   notes: Placeholder values. Tune in the Flavour Lab.

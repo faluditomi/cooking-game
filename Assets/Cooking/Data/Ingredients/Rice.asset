@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Rice
   m_EditorClassIdentifier: Cooking.Runtime::Cooking.IngredientDefinition
   displayName: Rice
-  icon: {fileID: 0}
+  icon: {fileID: 487814399709125807, guid: 1288f9977ea016f4099120a6fe1244a2, type: 3}
   price: 1
   bulk: 1
   flavour:
@@ -34,4 +34,7 @@ MonoBehaviour:
     pain: 0
     nutrition: -5
     texture: 5
+  isStock: 0
+  isSeasoning: 0
+  fullFlavourPrep: 0
   notes: Placeholder values. Tune in the Flavour Lab.

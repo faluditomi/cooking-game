@@ -1051,13 +1051,17 @@ namespace Cooking.Prototype
             {
                 Inventory.Entry captured = entry;
                 string label = Describe(new IngredientPortion(entry.Ingredient, entry.Quantity, entry.Prep), true);
+                RectTransform row = UIFactory.Row(content, 38f, 4f);
+                row.GetComponent<HorizontalLayoutGroup>().childForceExpandWidth = false;
+                UIFactory.Icon(row, entry.Ingredient.Icon, 38f);
+
                 // Prepped and raw stock look the same: colour would suggest only prepped stock goes in a dish.
-                Button button = UIFactory.Button(content, label, () => onClick(captured), UIFactory.ButtonColor, 17);
+                Button button = UIFactory.Button(row, label, () => onClick(captured), UIFactory.ButtonColor, 17);
                 Text text = button.GetComponentInChildren<Text>();
                 text.alignment = TextAnchor.MiddleLeft;
                 text.rectTransform.offsetMin = new Vector2(12f, 0f);
                 button.interactable = interactable;
-                UIFactory.Size(button, 38f, 0f);
+                UIFactory.Size(button, 38f, 0f, -1f, 1f);
             }
         }
 

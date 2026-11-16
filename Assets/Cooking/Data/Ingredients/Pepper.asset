@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Pepper
   m_EditorClassIdentifier: Cooking.Runtime::Cooking.IngredientDefinition
   displayName: Pepper
-  icon: {fileID: 0}
+  icon: {fileID: -7829927106330958214, guid: 014daec0ca9c76146b57af604b8521b5, type: 3}
   price: 0.5
   bulk: 0.05
   flavour:

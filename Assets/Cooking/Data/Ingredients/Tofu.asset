@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Tofu
   m_EditorClassIdentifier: Cooking.Runtime::Cooking.IngredientDefinition
   displayName: Tofu
-  icon: {fileID: 0}
+  icon: {fileID: -5350936062833865590, guid: e88672c8b54788940b77271a1d84bf57, type: 3}
   price: 3
   bulk: 1
   flavour:
@@ -34,4 +34,7 @@ MonoBehaviour:
     pain: 0
     nutrition: -5
     texture: -1
+  isStock: 0
+  isSeasoning: 0
+  fullFlavourPrep: 0
   notes: Placeholder values. Tune in the Flavour Lab.

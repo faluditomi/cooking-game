@@ -92,6 +92,17 @@ namespace Cooking.Prototype
             return button;
         }
 
+        /// <summary>A square, aspect-preserving image for an ingredient or dish sprite. Clear when there's no sprite.</summary>
+        public static Image Icon(Transform parent, Sprite sprite, float size)
+        {
+            Image image = Panel(parent, "Icon", sprite != null ? Color.white : Color.clear);
+            image.sprite = sprite;
+            image.preserveAspect = true;
+            image.raycastTarget = false;
+            Size(image, size, 0f, size, 0f);
+            return image;
+        }
+
         public static void SetButtonText(Button button, string text)
         {
             Text label = button.GetComponentInChildren<Text>();
