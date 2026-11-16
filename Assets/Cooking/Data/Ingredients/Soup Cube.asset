@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Soup Cube
   m_EditorClassIdentifier: Cooking.Runtime::Cooking.IngredientDefinition
   displayName: Soup Cube
-  icon: {fileID: 0}
+  icon: {fileID: 1254976186270791833, guid: 691d7150841849140a133927518168fa, type: 3}
   price: 2
   bulk: 0.5
   flavour:
@@ -35,4 +35,6 @@ MonoBehaviour:
     nutrition: 0
     texture: 0
   isStock: 1
+  isSeasoning: 0
+  fullFlavourPrep: 0
   notes: Placeholder values. Tune in the Flavour Lab.

@@ -21,6 +21,8 @@ namespace Cooking.Prototype
         private Text boardText;
         private readonly Dictionary<PrepSteps, Button> toolButtons = new Dictionary<PrepSteps, Button>();
         private GesturePadGraphic prepPad;
+        /// <summary>The board unit's picture, in the middle of the pad.</summary>
+        private Image prepItem;
         private Text prepHint;
         private RectTransform prepProgressFill;
         private Button putBackButton;
@@ -251,6 +253,9 @@ namespace Cooking.Prototype
             toolButtons[PrepSteps.Grated] = UIFactory.Button(toolRow, "Grater (grate)", () => PickUpTool(PrepSteps.Grated), null, 20);
 
             prepPad = BuildPad(board, "Prep Pad", 300f, 1f, OnPrepPressed, OnPrepMoved, OnPrepReleased);
+            prepItem = UIFactory.Icon(prepPad.transform, null, 0f);
+            prepItem.rectTransform.anchorMin = prepItem.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+            prepItem.rectTransform.sizeDelta = new Vector2(180f, 180f);
 
             Image progressBack = UIFactory.Panel(board, "Prep Progress", new Color(0.08f, 0.08f, 0.09f, 1f));
             UIFactory.Size(progressBack, 12f, 0f);
@@ -287,7 +292,11 @@ namespace Cooking.Prototype
             putBackButton.interactable = boardUnit != null;
             putBackNextButton.interactable = boardUnit != null;
 
-            prepPad.SetDisc(boardUnit != null, boardUnit != null ? IngredientColor(boardUnit.ingredient) : Color.clear);
+            // The ingredient's picture on the board; a coloured disc only for one without a sprite.
+            Sprite onBoard = boardUnit != null ? boardUnit.ingredient.Icon : null;
+            prepItem.sprite = onBoard;
+            prepItem.color = onBoard != null ? Color.white : Color.clear;
+            prepPad.SetDisc(boardUnit != null && onBoard == null, boardUnit != null ? IngredientColor(boardUnit.ingredient) : Color.clear);
             prepPad.SetGuide(ToolGuide(activeTool), new Color(1f, 0.85f, 0.6f, 0.6f));
 
             if(boardUnit == null) prepHint.text = "<color=#a6a199>Put something on the board, then pick up a tool.</color>";

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Pak Choi
   m_EditorClassIdentifier: Cooking.Runtime::Cooking.IngredientDefinition
   displayName: Pak Choi
-  icon: {fileID: 0}
+  icon: {fileID: -6056840511363455050, guid: 5c4a667ae95d9f74eb08e8e5f95eecb6, type: 3}
   price: 5
   bulk: 0.8
   flavour:
@@ -34,4 +34,7 @@ MonoBehaviour:
     pain: 0
     nutrition: 0
     texture: 0
+  isStock: 0
+  isSeasoning: 0
+  fullFlavourPrep: 0
   notes: Placeholder values. Tune in the Flavour Lab.

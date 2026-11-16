@@ -784,7 +784,8 @@ namespace Cooking.Prototype
                 string readiness = ready >= portion.quantity ? "<color=#73cc73>ready</color>"
                     : total >= portion.quantity ? "<color=#f28c33>needs prep</color>"
                     : "<color=#e5594d>short</color>";
-                sb.Append("- ").Append(Describe(portion, true)).Append("  ").Append(readiness).Append('\n');
+                // Prep only: how it's cooked is the dish type above, and repeating it wraps the narrow ticket.
+                sb.Append("- ").Append(Describe(new IngredientPortion(portion.ingredient, portion.quantity, portion.prep))).Append("  ").Append(readiness).Append('\n');
             }
 
             sb.Append("<color=#a6a199>Steps are in the Recipe book.</color>\n");
@@ -1051,13 +1052,18 @@ namespace Cooking.Prototype
             {
                 Inventory.Entry captured = entry;
                 string label = Describe(new IngredientPortion(entry.Ingredient, entry.Quantity, entry.Prep), true);
+                RectTransform row = UIFactory.Row(content, 38f, 4f);
+                row.GetComponent<HorizontalLayoutGroup>().childForceExpandWidth = false;
+                UIFactory.Icon(row, entry.Ingredient.Icon, 38f);
+
                 // Prepped and raw stock look the same: colour would suggest only prepped stock goes in a dish.
-                Button button = UIFactory.Button(content, label, () => onClick(captured), UIFactory.ButtonColor, 17);
+                Button button = UIFactory.Button(row, label, () => onClick(captured), UIFactory.ButtonColor, 17);
                 Text text = button.GetComponentInChildren<Text>();
                 text.alignment = TextAnchor.MiddleLeft;
                 text.rectTransform.offsetMin = new Vector2(12f, 0f);
+                UIFactory.FitText(text);
                 button.interactable = interactable;
-                UIFactory.Size(button, 38f, 0f);
+                UIFactory.Size(button, 38f, 0f, -1f, 1f);
             }
         }
 

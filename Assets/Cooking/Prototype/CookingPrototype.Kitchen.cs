@@ -47,6 +47,7 @@ namespace Cooking.Prototype
         private StationView potView;
         private GesturePadGraphic wokPad;
         private Text plateText;
+        private RectTransform plateIcons;
         private Button serveButton;
         private Button binPlateButton;
         private Button previewButton;
@@ -407,28 +408,29 @@ namespace Cooking.Prototype
         {
             BuildTicket(Column(root, "Ticket", 0f, 0.2f));
 
-            RectTransform stock = Column(root, "Stock", 0.2f, 0.37f);
+            // Wide enough for "1× Synthetic Chicken sliced" on one line next to its icon.
+            RectTransform stock = Column(root, "Stock", 0.2f, 0.42f);
             VerticalLayoutGroup stockLayout = UIFactory.Vertical(stock.gameObject, 8f, 14);
             stockLayout.childForceExpandHeight = false;
-            Header(stock, "STOCK  <color=#77736d>click once per unit to select</color>");
+            Header(stock, "STOCK");
             kitchenStockContent = UIFactory.ScrollList(stock);
 
             selectionText = UIFactory.Label(stock, "", 17);
             UIFactory.Size(selectionText, 24f, 0f);
             RectTransform sendRow = UIFactory.Row(stock, 44f, 6f);
-            sendButtons[Destination.Wok] = UIFactory.Button(sendRow, "To wok", () => SendSelection(Destination.Wok), new Color(0.75f, 0.42f, 0.15f, 1f), 18);
-            sendButtons[Destination.Pot] = UIFactory.Button(sendRow, "To pot", () => SendSelection(Destination.Pot), new Color(0.75f, 0.42f, 0.15f, 1f), 18);
-            sendButtons[Destination.Plate] = UIFactory.Button(sendRow, "To plate", () => SendSelection(Destination.Plate), null, 18);
+            sendButtons[Destination.Wok] = UIFactory.Button(sendRow, "Wok", () => SendSelection(Destination.Wok), new Color(0.75f, 0.42f, 0.15f, 1f), 18);
+            sendButtons[Destination.Pot] = UIFactory.Button(sendRow, "Pot", () => SendSelection(Destination.Pot), new Color(0.75f, 0.42f, 0.15f, 1f), 18);
+            sendButtons[Destination.Plate] = UIFactory.Button(sendRow, "Plate", () => SendSelection(Destination.Plate), null, 18);
             RectTransform clearRow = UIFactory.Row(stock, 34f, 6f);
             clearSelectionButton = UIFactory.Button(clearRow, "Clear selection", ClearSelection, null, 16);
 
-            RectTransform stations = Column(root, "Stations", 0.37f, 0.65f, false);
+            RectTransform stations = Column(root, "Stations", 0.42f, 0.67f, false);
             VerticalLayoutGroup layout = UIFactory.Vertical(stations.gameObject, 10f, 0);
             layout.childForceExpandHeight = false;
             wokView = BuildStation(stations, wok, "WOK  <color=#77736d>shake in the green, once per unit</color>");
             potView = BuildStation(stations, pot, "POT  <color=#77736d>take it off on the green line</color>");
 
-            BuildPlateColumn(Column(root, "Plate", 0.65f, 1f));
+            BuildPlateColumn(Column(root, "Plate", 0.67f, 1f));
             return root.gameObject;
         }
 
@@ -468,8 +470,12 @@ namespace Cooking.Prototype
             VerticalLayoutGroup layout = UIFactory.Vertical(column.gameObject, 10f, 16);
             layout.childForceExpandHeight = false;
             Header(column, "PLATE");
+            plateIcons = UIFactory.Row(column, 52f, 6f);
+            HorizontalLayoutGroup iconLayout = plateIcons.GetComponent<HorizontalLayoutGroup>();
+            iconLayout.childForceExpandWidth = false;
+            iconLayout.childAlignment = TextAnchor.MiddleLeft;
             plateText = UIFactory.Label(column, "", 19);
-            UIFactory.Size(plateText, 170f, 0f);
+            UIFactory.Size(plateText, 120f, 0f);
 
             RectTransform row = UIFactory.Row(column, 52f);
             serveButton = UIFactory.Button(row, "Serve", Serve, new Color(0.75f, 0.42f, 0.15f, 1f), 24);
@@ -499,8 +505,8 @@ namespace Cooking.Prototype
 
             int selected = SelectedTotal;
             selectionText.text = selected == 0
-                ? "<color=#a6a199>Nothing selected.</color>"
-                : "<b>" + selected + (selected == 1 ? " unit" : " units") + "</b> selected. Send them to:";
+                ? "<color=#a6a199>Click a row once per unit to select it.</color>"
+                : "<b>" + selected + (selected == 1 ? " unit" : " units") + "</b> selected. Send to:";
             foreach(Button button in sendButtons.Values) button.interactable = selected > 0 && phase == Phase.Service;
             sendButtons[Destination.Wok].interactable &= !wok.IsCooking;
             sendButtons[Destination.Pot].interactable &= !pot.IsCooking;
@@ -514,6 +520,7 @@ namespace Cooking.Prototype
             if(plate.Count == 0)
             {
                 plateText.text = "<color=#a6a199>Empty.</color>";
+                UIFactory.ClearChildren(plateIcons);
             }
             else
             {
@@ -521,6 +528,10 @@ namespace Cooking.Prototype
                 foreach(IngredientPortion portion in plate) sb.Append(Describe(portion, true)).Append('\n');
                 sb.Append("<color=#a6a199>Ingredients used: $").Append(dishCost.ToString("0.00")).Append("</color>");
                 plateText.text = sb.ToString();
+
+                // One picture per ingredient on the plate.
+                UIFactory.ClearChildren(plateIcons);
+                foreach(IngredientPortion portion in plate) UIFactory.Icon(plateIcons, portion.ingredient.Icon, 48f);
             }
 
             serveButton.interactable = plate.Count > 0 && orderIn;
@@ -568,15 +579,17 @@ namespace Cooking.Prototype
                 RectTransform row = UIFactory.Row(kitchenStockContent, 38f, 4f);
                 HorizontalLayoutGroup rowLayout = row.GetComponent<HorizontalLayoutGroup>();
                 rowLayout.childForceExpandWidth = false;
+                UIFactory.Icon(row, entry.Ingredient.Icon, 38f);
 
-                string label = Describe(new IngredientPortion(entry.Ingredient, entry.Quantity, entry.Prep), true);
+                string label = Describe(new IngredientPortion(entry.Ingredient, entry.Quantity, entry.Prep));
                 if(selected > 0) label = "<b>" + selected + "/</b>" + label;
                 Color color = selected > 0 ? selectedColor : UIFactory.ButtonColor;
 
-                Button pick = UIFactory.Button(row, label, () => SelectMore(captured), color, 17);
+                Button pick = UIFactory.Button(row, label, () => SelectMore(captured), color, 16);
                 Text text = pick.GetComponentInChildren<Text>();
                 text.alignment = TextAnchor.MiddleLeft;
                 text.rectTransform.offsetMin = new Vector2(12f, 0f);
+                UIFactory.FitText(text);
                 pick.interactable = phase == Phase.Service;
                 UIFactory.Size(pick, 38f, 0f, -1f, 1f);
 

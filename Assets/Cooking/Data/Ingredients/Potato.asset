@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Potato
   m_EditorClassIdentifier: Cooking.Runtime::Cooking.IngredientDefinition
   displayName: Potato
-  icon: {fileID: 0}
+  icon: {fileID: 8432917187497723501, guid: 212a17b55aef1fe439e4d7193db6abcf, type: 3}
   price: 2
   bulk: 1
   flavour:
@@ -34,4 +34,7 @@ MonoBehaviour:
     pain: 0
     nutrition: -3
     texture: 3
+  isStock: 0
+  isSeasoning: 0
+  fullFlavourPrep: 0
   notes: Placeholder values. Tune in the Flavour Lab.

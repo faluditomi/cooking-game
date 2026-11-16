@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Beef
   m_EditorClassIdentifier: Cooking.Runtime::Cooking.IngredientDefinition
   displayName: Beef
-  icon: {fileID: 0}
+  icon: {fileID: -6382982338849176468, guid: 85e12e9202a19a94a94fbf3125a1d75b, type: 3}
   price: 15
   bulk: 1
   flavour:
@@ -34,4 +34,7 @@ MonoBehaviour:
     pain: 0
     nutrition: -2
     texture: 0
+  isStock: 0
+  isSeasoning: 0
+  fullFlavourPrep: 0
   notes: Placeholder values. Tune in the Flavour Lab.

@@ -92,6 +92,26 @@ namespace Cooking.Prototype
             return button;
         }
 
+        /// <summary>A square, aspect-preserving image for an ingredient or dish sprite. Clear when there's no sprite.</summary>
+        public static Image Icon(Transform parent, Sprite sprite, float size)
+        {
+            Image image = Panel(parent, "Icon", sprite != null ? Color.white : Color.clear);
+            image.sprite = sprite;
+            image.preserveAspect = true;
+            image.raycastTarget = false;
+            Size(image, size, 0f, size, 0f);
+            return image;
+        }
+
+        /// <summary>Shrinks the text (down to 12 px) when it would otherwise spill out of its rect.</summary>
+        public static void FitText(Text text)
+        {
+            text.resizeTextForBestFit = true;
+            text.resizeTextMinSize = 12;
+            text.resizeTextMaxSize = text.fontSize;
+            text.verticalOverflow = VerticalWrapMode.Truncate;
+        }
+
         public static void SetButtonText(Button button, string text)
         {
             Text label = button.GetComponentInChildren<Text>();

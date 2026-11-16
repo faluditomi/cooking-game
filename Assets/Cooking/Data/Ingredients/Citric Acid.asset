@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Citric Acid
   m_EditorClassIdentifier: Cooking.Runtime::Cooking.IngredientDefinition
   displayName: Citric Acid
-  icon: {fileID: 0}
+  icon: {fileID: -1702074011950629263, guid: 64ebb829b82ba9e478c465b3a3f95fdf, type: 3}
   price: 0.5
   bulk: 0.1
   flavour:

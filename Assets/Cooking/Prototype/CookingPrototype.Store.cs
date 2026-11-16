@@ -129,13 +129,18 @@ namespace Cooking.Prototype
                 ShelfCard card = new ShelfCard { Ingredient = ingredient };
                 RectTransform panel = UIFactory.Panel(grid, ingredient.DisplayName, UIFactory.PanelDark).rectTransform;
 
-                Text name = UIFactory.Label(panel, ingredient.DisplayName + "  <size=15><color=#a6a199>$" + ingredient.Price.ToString("0.00") + "</color></size>",
-                    19, TextAnchor.UpperLeft, FontStyle.Bold);
-                UIFactory.Place(name.rectTransform, 0f, 0.55f, 1f, 1f).offsetMin = new Vector2(10f, 0f);
+                // The ingredient's picture on the left, name and stock beside it.
+                Image icon = UIFactory.Icon(panel, ingredient.Icon, 0f);
+                UIFactory.Place(icon.rectTransform, 0f, 0.4f, 0f, 1f, 4f).sizeDelta = new Vector2(52f, -8f);
+                icon.rectTransform.anchoredPosition = new Vector2(30f, 0f);
+
+                // The price sits on the line below (with stock), so long names don't wrap into it.
+                Text name = UIFactory.Label(panel, ingredient.DisplayName, 19, TextAnchor.UpperLeft, FontStyle.Bold);
+                UIFactory.Place(name.rectTransform, 0f, 0.55f, 1f, 1f).offsetMin = new Vector2(62f, 0f);
                 name.rectTransform.offsetMax = new Vector2(-6f, -6f);
 
                 card.Info = UIFactory.Label(panel, "", 14, TextAnchor.MiddleLeft, FontStyle.Normal, UIFactory.MutedText);
-                UIFactory.Place(card.Info.rectTransform, 0f, 0.38f, 1f, 0.62f).offsetMin = new Vector2(10f, 0f);
+                UIFactory.Place(card.Info.rectTransform, 0f, 0.38f, 1f, 0.62f).offsetMin = new Vector2(62f, 0f);
 
                 RectTransform buttons = UIFactory.Rect(panel, "Buttons");
                 UIFactory.Place(buttons, 0f, 0f, 1f, 0.4f, 6f);
@@ -208,7 +213,7 @@ namespace Cooking.Prototype
             {
                 int stock = inventory.Total(card.Ingredient);
                 int inCart = cart.Count(card.Ingredient);
-                card.Info.text = "Stock " + stock + (inCart > 0 ? "   <color=#f28c33>In cart " + inCart + "</color>" : "");
+                card.Info.text = "$" + card.Ingredient.Price.ToString("0.00") + "   Stock " + stock + (inCart > 0 ? "   <color=#f28c33>In cart " + inCart + "</color>" : "");
                 card.Less.interactable = open && inCart > 0;
                 card.More.interactable = open;
                 card.MoreFive.interactable = open;
@@ -246,6 +251,7 @@ namespace Cooking.Prototype
                 IngredientDefinition ingredient = line.Ingredient;
                 RectTransform row = UIFactory.Row(cartContent, 34f, 4f);
                 row.GetComponent<HorizontalLayoutGroup>().childForceExpandWidth = false;
+                UIFactory.Icon(row, ingredient.Icon, 32f);
 
                 Text label = UIFactory.Label(row, line.Quantity + "× " + ingredient.DisplayName + "  <color=#a6a199>$" + line.Cost.ToString("0.00") + "</color>",
                     17, TextAnchor.MiddleLeft);
