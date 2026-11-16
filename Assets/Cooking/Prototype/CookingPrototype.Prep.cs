@@ -155,7 +155,11 @@ namespace Cooking.Prototype
         {
             int index = BoardAt(screen);
 
-            // Onto another board (or off one): a fresh go.
+            // Once the tool has started on a board it stays locked to it until the prep is done or
+            // the tool is put down, so wandering off the board mid-stroke doesn't lose progress.
+            if(prepGesture != null && gestureBoard >= 0) index = gestureBoard;
+
+            // Onto another board (or off one, before starting): a fresh go.
             if(index != gestureBoard)
             {
                 prepGesture?.End();

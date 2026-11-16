@@ -162,6 +162,8 @@ units per prep state ("3× Onion raw", "2× Onion peeled, sliced").
    didn't save, it says to look in the cooking history.
    - **Prep**: put units on a cutting board. A board takes several units of **one kind**. Hold a
      tool on the roof to pick it up and do its gesture over the board: that preps everything on it.
+     Once it has started on a board, the tool stays locked to that board until the prep is done
+     or you let go, so moving off the board mid-stroke doesn't reset it.
      Letting go hangs the tool back up. **Peeling comes first**: something sliced or grated can't
      be peeled. Prepped units stay on the board; hold the board to take all of them.
    - **A dish is one batch**: everything for it goes into the pot or the pan before you light it.
