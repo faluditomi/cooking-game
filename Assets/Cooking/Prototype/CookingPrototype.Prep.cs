@@ -5,77 +5,86 @@ using UnityEngine.UI;
 namespace Cooking.Prototype
 {
     /// <summary>
-    /// The Prep area: one unit at a time on the board (as in the design doc). Pick up a tool and do
-    /// its gesture; finished units go back into stock prepped. Peeling comes first. Open once the day
-    /// starts, while the regulars arrive.
+    /// Prepping, as on the Miro mock-up. Two cutting boards sit side by side on the workbench; each
+    /// takes several units of one kind. The knife, peeler and grater hang from the stall roof: hold one
+    /// to pick it up, and do its gesture over a board to prep everything on it. Letting go hangs it back
+    /// up. Peeling comes first. Prepped units stay on the board until you drag them somewhere.
     /// </summary>
     public partial class CookingPrototype
     {
-        private IngredientPortion boardUnit;
-        /// <summary>The stock entry the board unit came from, for "put back and take the next one".</summary>
-        private PrepSteps boardSourcePrep;
-        private PrepSteps activeTool;
+        private class CuttingBoard
+        {
+            public IngredientPortion Units;
+            public RectTransform Rect;
+            public GesturePadGraphic Pad;
+            public RectTransform Pieces;
+            public Text Label;
+            public RectTransform ProgressFill;
+        }
+
+        private readonly List<CuttingBoard> boards = new List<CuttingBoard>();
+        private readonly Dictionary<PrepSteps, CanvasGroup> toolHooks = new Dictionary<PrepSteps, CanvasGroup>();
+        private PrepSteps heldTool;
         private Gesture prepGesture;
+        /// <summary>The board the held tool is over, or -1.</summary>
+        private int gestureBoard = -1;
 
-        private RectTransform prepStockContent;
-        private Text boardText;
-        private readonly Dictionary<PrepSteps, Button> toolButtons = new Dictionary<PrepSteps, Button>();
-        private GesturePadGraphic prepPad;
-        /// <summary>The board unit's picture, in the middle of the pad.</summary>
-        private Image prepItem;
-        private Text prepHint;
-        private RectTransform prepProgressFill;
-        private Button putBackButton;
-        private Button putBackNextButton;
+        // ------------------------------------------------------------------ Boards
 
-        // ------------------------------------------------------------------ Board
-
-        private void PlaceOnBoard(Inventory.Entry entry)
+        private bool PutOnBoard(int index, IngredientPortion portion)
         {
-            if(phase == Phase.DayOver) return;
+            CuttingBoard board = boards[index];
 
-            // Whatever is on the board goes back to stock first.
-            if(boardUnit != null) ReturnBoardToStock();
-
-            if(!inventory.Take(entry.Ingredient, entry.Prep)) return;
-
-            boardUnit = new IngredientPortion(entry.Ingredient, 1, entry.Prep);
-            boardSourcePrep = entry.Prep;
-            PutDownTool();
-            Say(entry.Ingredient.DisplayName + " on the board. Pick up a tool.");
-            RefreshAll();
-        }
-
-        /// <summary>Puts the board unit back into stock with whatever prep it has now.</summary>
-        private void ReturnBoardToStock()
-        {
-            if(boardUnit == null) return;
-
-            inventory.Add(boardUnit.ingredient, boardUnit.prep);
-            boardUnit = null;
-            PutDownTool();
-        }
-
-        private void PutBack(bool takeNext)
-        {
-            if(boardUnit == null) return;
-
-            IngredientDefinition ingredient = boardUnit.ingredient;
-            string done = Describe(boardUnit, true);
-            ReturnBoardToStock();
-
-            if(takeNext && inventory.Count(ingredient, boardSourcePrep) > 0)
+            if(!portion.IsRaw)
             {
-                PlaceOnBoard(new Inventory.Entry { Ingredient = ingredient, Prep = boardSourcePrep, Quantity = 1 });
-                Say(done + " back in stock. Next " + ingredient.DisplayName + " on the board.");
-                return;
+                Say("Cooked food doesn't go back on a board.", UIFactory.Bad);
+                return false;
             }
 
-            Say(done + " back in stock." + (takeNext ? " No more like it." : ""));
-            RefreshAll();
+            if(board.Units == null)
+            {
+                board.Units = new IngredientPortion(portion.ingredient, portion.quantity, portion.prep);
+                Say(Describe(board.Units, true) + " on the board. Grab a tool from the stall roof and work over the board.");
+                return true;
+            }
+
+            if(board.Units.ingredient == portion.ingredient && board.Units.prep == portion.prep)
+            {
+                board.Units.quantity += portion.quantity;
+                Say(Describe(board.Units, true) + " on the board.");
+                return true;
+            }
+
+            Say("One kind at a time on a board. Use the other board, or move this lot off first.", UIFactory.Bad);
+            return false;
         }
 
-        // ------------------------------------------------------------------ Tools and gestures
+        private void GrabFromBoard(int index, Vector2 screen)
+        {
+            if(!CanPickUp) return;
+
+            CuttingBoard board = boards[index];
+            if(board.Units == null) return;
+
+            // The whole board-full at once, into a pot or onto the desk.
+            IngredientPortion units = board.Units;
+            board.Units = null;
+            HoldPortion(units, Origin.Board, index, screen);
+        }
+
+        private int BoardAt(Vector2 screen)
+        {
+            for(int i = 0; i < boards.Count; i++) if(Over(boards[i].Rect, screen)) return i;
+            return -1;
+        }
+
+        private static Vector2 BoardPoint(CuttingBoard board, Vector2 screen)
+        {
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(board.Rect, screen, null, out Vector2 local);
+            return local - board.Rect.rect.center;
+        }
+
+        // ------------------------------------------------------------------ Tools
 
         private static string ToolName(PrepSteps step)
         {
@@ -92,9 +101,9 @@ namespace Cooking.Prototype
         {
             switch(step)
             {
-                case PrepSteps.Sliced: return "Hold and drag up and down to slice.";
-                case PrepSteps.Peeled: return "Hold and drag a half circle from the top down to peel. Bottom to top doesn't count.";
-                case PrepSteps.Grated: return "Hold and drag left to right to grate. Going back doesn't count.";
+                case PrepSteps.Sliced: return "Move it up and down over the board to slice.";
+                case PrepSteps.Peeled: return "Draw half circles from the top down over the board to peel.";
+                case PrepSteps.Grated: return "Move it left to right over the board to grate. Going back doesn't count.";
                 default: return "";
             }
         }
@@ -115,44 +124,6 @@ namespace Cooking.Prototype
             return step == PrepSteps.Sliced ? sliceStrokes : step == PrepSteps.Peeled ? peelStrokes : grateStrokes;
         }
 
-        private void PickUpTool(PrepSteps step)
-        {
-            if(boardUnit == null) return;
-
-            if((boardUnit.prep & step) != 0)
-            {
-                Say(boardUnit.ingredient.DisplayName + " is already " + step.ToString().ToLowerInvariant() + ".");
-                return;
-            }
-
-            if(!CanPrep(boardUnit, step))
-            {
-                Say("Peel it first: you can't peel something that's already sliced or grated.", UIFactory.Bad);
-                return;
-            }
-
-            if(activeTool == step)
-            {
-                PutDownTool();
-                Say("Put the " + ToolName(step) + " down.");
-                RefreshAll();
-                return;
-            }
-
-            activeTool = step;
-            int strokes = RequiredStrokes(step);
-
-            switch(step)
-            {
-                case PrepSteps.Sliced: prepGesture = new BackAndForthGesture(true, strokes); break;
-                case PrepSteps.Peeled: prepGesture = new HalfCircleDownGesture(strokes); break;
-                default: prepGesture = new SwipeRightGesture(strokes); break;
-            }
-
-            Say("Picked up the " + ToolName(step) + ". " + ToolInstruction(step));
-            RefreshAll();
-        }
-
         /// <summary>Peeling has to come first: once sliced or grated, it can't be peeled.</summary>
         private static bool CanPrep(IngredientPortion unit, PrepSteps step)
         {
@@ -160,158 +131,205 @@ namespace Cooking.Prototype
             return step != PrepSteps.Peeled || (unit.prep & (PrepSteps.Sliced | PrepSteps.Grated)) == 0;
         }
 
-        private void PutDownTool()
+        private void GrabTool(PrepSteps step, Vector2 screen)
         {
-            activeTool = PrepSteps.None;
+            if(!CanPickUp) return;
+
+            held = Held.Tool;
+            heldFrom = Origin.Hook;
+            heldTool = step;
+            gestureBoard = -1;
             prepGesture = null;
+
+            CreateGhost(screen, 120f, 44f);
+            ghost.GetComponent<Image>().color = new Color(0.62f, 0.64f, 0.7f, 0.95f);
+            Text label = UIFactory.Label(ghost, ToolName(step).ToUpperInvariant(), 18, TextAnchor.MiddleCenter, FontStyle.Bold, new Color(0.1f, 0.1f, 0.12f, 1f));
+            UIFactory.Stretch(label.rectTransform);
+
+            toolHooks[step].alpha = 0.25f;
+            foreach(CuttingBoard board in boards) board.Pad.SetGuide(ToolGuide(step), new Color(1f, 0.85f, 0.6f, 0.6f));
+            Say("Picked up the " + ToolName(step) + ". " + ToolInstruction(step));
         }
 
-        private void OnPrepPressed(Vector2 position)
+        private void MoveTool(Vector2 screen)
         {
-            prepPad.AddTrailPoint(position, newStroke: true);
+            int index = BoardAt(screen);
 
-            if(boardUnit == null)
+            // Once the tool has started on a board it stays locked to it until the prep is done or
+            // the tool is put down, so wandering off the board mid-stroke doesn't lose progress.
+            if(prepGesture != null && gestureBoard >= 0) index = gestureBoard;
+
+            // Onto another board (or off one, before starting): a fresh go.
+            if(index != gestureBoard)
             {
-                Say("Nothing on the board. Pick something from your stock.");
+                prepGesture?.End();
+                prepGesture = null;
+                gestureBoard = index;
+                if(index >= 0) StartToolGesture(index, screen);
+                RefreshBoards();
                 return;
             }
 
-            if(prepGesture == null)
-            {
-                Say("Pick up a tool first: knife, peeler or grater.");
-                return;
-            }
+            if(index < 0) return;
 
-            prepGesture.Begin(position);
-        }
+            CuttingBoard board = boards[index];
+            Vector2 local = BoardPoint(board, screen);
+            board.Pad.AddTrailPoint(local);
+            if(prepGesture == null || !prepGesture.Move(local)) return;
 
-        private void OnPrepMoved(Vector2 position)
-        {
-            prepPad.AddTrailPoint(position);
-            if(prepGesture == null || !prepGesture.Move(position)) return;
-
-            UpdatePrepProgress();
+            UpdateBoardProgress();
             if(!prepGesture.IsComplete) return;
 
-            PrepSteps done = activeTool;
-            boardUnit.prep |= done;
-            PutDownTool();
-            LogCooking("Prep", done + " 1× " + boardUnit.ingredient.DisplayName + " during the order.");
+            PrepSteps done = heldTool;
+            board.Units.prep |= done;
+            prepGesture = null;
+            LogCooking("Prep", done + " " + board.Units.quantity + "× " + board.Units.ingredient.DisplayName + " during the order.");
+            Say(Describe(board.Units, true) + ". Another tool, or drag it into the pot or pan.", UIFactory.Good);
+            RefreshBoards();
+        }
 
-            // The last one of its kind goes back by itself once it's sliced or grated (nothing comes
-            // after those; after a peel it stays, in case you slice it next).
-            bool last = inventory.Count(boardUnit.ingredient, boardSourcePrep) == 0;
-            if(last && done != PrepSteps.Peeled)
+        private void StartToolGesture(int index, Vector2 screen)
+        {
+            CuttingBoard board = boards[index];
+
+            if(board.Units == null) return;
+
+            if((board.Units.prep & heldTool) != 0)
             {
-                string finished = Describe(boardUnit, true);
-                ReturnBoardToStock();
-                Say(finished + " back in stock. That was the last one.", UIFactory.Good);
-                RefreshAll();
+                Say(board.Units.ingredient.DisplayName + " is already " + heldTool.ToString().ToLowerInvariant() + ".");
                 return;
             }
 
-            Say(done + " " + boardUnit.ingredient.DisplayName + ". Another step, or put it back in stock.", UIFactory.Good);
-            RefreshAll();
+            if(!CanPrep(board.Units, heldTool))
+            {
+                Say("Peel it first: you can't peel something that's already sliced or grated.", UIFactory.Bad);
+                return;
+            }
+
+            int strokes = RequiredStrokes(heldTool);
+
+            switch(heldTool)
+            {
+                case PrepSteps.Sliced: prepGesture = new BackAndForthGesture(true, strokes); break;
+                case PrepSteps.Peeled: prepGesture = new HalfCircleDownGesture(strokes); break;
+                default: prepGesture = new SwipeRightGesture(strokes); break;
+            }
+
+            Vector2 local = BoardPoint(board, screen);
+            prepGesture.Begin(local);
+            board.Pad.AddTrailPoint(local, newStroke: true);
         }
 
-        private void OnPrepReleased()
+        private void DropTool()
         {
             prepGesture?.End();
+            prepGesture = null;
+            gestureBoard = -1;
+            if(toolHooks.TryGetValue(heldTool, out CanvasGroup hook)) hook.alpha = 1f;
+            heldTool = PrepSteps.None;
+            foreach(CuttingBoard board in boards) board.Pad.SetGuide(GestureGuide.None, Color.clear);
         }
 
-        private void UpdatePrepProgress()
+        private void UpdateBoardProgress()
         {
-            float progress = prepGesture != null ? prepGesture.Progress : 0f;
-            prepProgressFill.anchorMax = new Vector2(progress, 1f);
-
-            if(prepGesture != null)
+            for(int i = 0; i < boards.Count; i++)
             {
-                prepHint.text = ToolInstruction(activeTool) + "  <color=#a6a199>(" + prepGesture.Strokes + "/" + prepGesture.RequiredStrokes + ")</color>";
+                float progress = i == gestureBoard && prepGesture != null ? prepGesture.Progress : 0f;
+                boards[i].ProgressFill.anchorMax = new Vector2(progress, 1f);
             }
         }
 
         // ------------------------------------------------------------------ UI
 
-        private GameObject BuildPrepArea(RectTransform root)
+        /// <summary>The prep section: two cutting boards side by side.</summary>
+        private void BuildBoards(RectTransform desk)
         {
-            RectTransform stock = Column(root, "Stock", 0f, 0.25f);
-            VerticalLayoutGroup stockLayout = UIFactory.Vertical(stock.gameObject, 8f, 14);
-            stockLayout.childForceExpandHeight = false;
-            Header(stock, "STOCK  <color=#77736d>click to put one on the board</color>");
-            prepStockContent = UIFactory.ScrollList(stock);
+            RectTransform section = UIFactory.Rect(desk, "Prep Section");
+            UIFactory.Place(section, 0.415f, 0.04f, 0.79f, 0.34f);
 
-            RectTransform board = Column(root, "Prep Board", 0.25f, 0.72f);
-            VerticalLayoutGroup layout = UIFactory.Vertical(board.gameObject, 8f, 14);
-            layout.childForceExpandHeight = false;
-            Header(board, "PREP BOARD  <color=#77736d>one at a time. Pick up a tool, then hold and drag on the pad</color>");
-            boardText = UIFactory.Label(board, "", 24);
-            UIFactory.Size(boardText, 32f, 0f);
+            for(int i = 0; i < 2; i++)
+            {
+                int index = i;
+                CuttingBoard board = new CuttingBoard();
+                Image wood = UIFactory.Panel(section, "Cutting Board", new Color(0.56f, 0.41f, 0.27f, 1f));
+                UIFactory.Place(wood.rectTransform, i * 0.5f, 0f, (i + 1) * 0.5f, 1f, 5f);
+                board.Rect = wood.rectTransform;
 
-            RectTransform toolRow = UIFactory.Row(board, 48f);
-            toolButtons[PrepSteps.Sliced] = UIFactory.Button(toolRow, "Knife (slice)", () => PickUpTool(PrepSteps.Sliced), null, 20);
-            toolButtons[PrepSteps.Peeled] = UIFactory.Button(toolRow, "Peeler (peel)", () => PickUpTool(PrepSteps.Peeled), null, 20);
-            toolButtons[PrepSteps.Grated] = UIFactory.Button(toolRow, "Grater (grate)", () => PickUpTool(PrepSteps.Grated), null, 20);
+                RectTransform padRect = UIFactory.Rect(board.Rect, "Pad");
+                UIFactory.Stretch(padRect);
+                board.Pad = padRect.gameObject.AddComponent<GesturePadGraphic>();
+                board.Pad.raycastTarget = true;
+                board.Pad.SetTrailColor(new Color(1f, 0.95f, 0.8f, 1f));
+                padRect.gameObject.AddComponent<DragHandle>().Began = screen => GrabFromBoard(index, screen);
 
-            prepPad = BuildPad(board, "Prep Pad", 300f, 1f, OnPrepPressed, OnPrepMoved, OnPrepReleased);
-            prepItem = UIFactory.Icon(prepPad.transform, null, 0f);
-            prepItem.rectTransform.anchorMin = prepItem.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
-            prepItem.rectTransform.sizeDelta = new Vector2(180f, 180f);
+                board.Pieces = UIFactory.Rect(padRect, "Pieces");
+                UIFactory.Place(board.Pieces, 0f, 0.25f, 1f, 0.9f);
 
-            Image progressBack = UIFactory.Panel(board, "Prep Progress", new Color(0.08f, 0.08f, 0.09f, 1f));
-            UIFactory.Size(progressBack, 12f, 0f);
-            prepProgressFill = UIFactory.Panel(progressBack.transform, "Fill", UIFactory.Good).rectTransform;
-            UIFactory.Place(prepProgressFill, 0f, 0f, 0f, 1f);
+                board.Label = UIFactory.Label(padRect, "", 14, TextAnchor.LowerCenter, FontStyle.Bold, new Color(0.15f, 0.1f, 0.06f, 1f));
+                UIFactory.Place(board.Label.rectTransform, 0f, 0.02f, 1f, 0.3f, 4f);
+                UIFactory.FitText(board.Label);
 
-            prepHint = UIFactory.Label(board, "", 17);
-            UIFactory.Size(prepHint, 26f, 0f);
+                Image progressBack = UIFactory.Panel(padRect, "Progress", new Color(0f, 0f, 0f, 0.35f));
+                progressBack.raycastTarget = false;
+                UIFactory.Place(progressBack.rectTransform, 0.05f, 0.9f, 0.95f, 0.95f);
+                Image fill = UIFactory.Panel(progressBack.transform, "Fill", UIFactory.Good);
+                fill.raycastTarget = false;
+                board.ProgressFill = fill.rectTransform;
+                UIFactory.Place(board.ProgressFill, 0f, 0f, 0f, 1f);
 
-            RectTransform putRow = UIFactory.Row(board, 48f);
-            putBackButton = UIFactory.Button(putRow, "Put back in stock", () => PutBack(false), null, 19);
-            putBackNextButton = UIFactory.Button(putRow, "Put back + next one", () => PutBack(true), new Color(0.25f, 0.4f, 0.25f, 1f), 19);
-
-            BuildTicket(Column(root, "Ticket", 0.72f, 1f));
-            return root.gameObject;
+                boards.Add(board);
+            }
         }
 
-        private void RefreshPrep()
+        /// <summary>The knife, peeler and grater hanging from the stall roof.</summary>
+        private void BuildToolRail(RectTransform market)
         {
-            if(prepStockContent == null) return;
+            RectTransform rail = UIFactory.Rect(market, "Prep Tools");
+            UIFactory.Place(rail, 0.46f, 0.66f, 0.89f, 1f);
 
-            if(area == Area.Prep) RebuildStockList(prepStockContent, PlaceOnBoard, phase != Phase.DayOver);
+            Image bar = UIFactory.Panel(rail, "Rail", new Color(0.32f, 0.3f, 0.34f, 1f));
+            bar.raycastTarget = false;
+            UIFactory.Place(bar.rectTransform, 0f, 0.9f, 1f, 0.96f);
 
-            boardText.text = boardUnit == null
-                ? "<color=#a6a199>Empty. Click something in your stock.</color>"
-                : Describe(boardUnit, true);
+            AddTool(rail, PrepSteps.Sliced, "KNIFE", "slice", 0.06f, 0.3f);
+            AddTool(rail, PrepSteps.Peeled, "PEELER", "peel", 0.38f, 0.62f);
+            AddTool(rail, PrepSteps.Grated, "GRATER", "grate", 0.7f, 0.94f);
+        }
 
-            foreach(KeyValuePair<PrepSteps, Button> pair in toolButtons)
+        private void AddTool(RectTransform rail, PrepSteps step, string name, string verb, float xMin, float xMax)
+        {
+            Image hook = UIFactory.Panel(rail, "Hook", new Color(0.5f, 0.5f, 0.55f, 1f));
+            hook.raycastTarget = false;
+            float centre = (xMin + xMax) * 0.5f;
+            UIFactory.Place(hook.rectTransform, centre - 0.004f, 0.62f, centre + 0.004f, 0.92f);
+
+            Image tag = UIFactory.Panel(rail, name, new Color(0.62f, 0.64f, 0.7f, 1f));
+            UIFactory.Place(tag.rectTransform, xMin, 0.08f, xMax, 0.64f);
+            tag.gameObject.AddComponent<DragHandle>().Began = screen => GrabTool(step, screen);
+            toolHooks[step] = tag.gameObject.AddComponent<CanvasGroup>();
+
+            Text label = UIFactory.Label(tag.transform, name + "\n<size=13>hold to " + verb + "</size>", 18, TextAnchor.MiddleCenter, FontStyle.Bold,
+                new Color(0.1f, 0.1f, 0.12f, 1f));
+            UIFactory.Stretch(label.rectTransform, 2f);
+        }
+
+        private void RefreshBoards()
+        {
+            foreach(CuttingBoard board in boards)
             {
-                pair.Value.interactable = CanPrep(boardUnit, pair.Key);
-                pair.Value.GetComponent<Image>().color = activeTool == pair.Key ? new Color(0.75f, 0.42f, 0.15f, 1f) : UIFactory.ButtonColor;
+                UIFactory.ClearChildren(board.Pieces);
+
+                if(board.Units == null)
+                {
+                    board.Label.text = "Cutting board";
+                    continue;
+                }
+
+                AddPile(board.Pieces, board.Units.ingredient.Icon, Mathf.Min(board.Units.quantity, 4), 70f, new Vector2(0.5f, 0.5f));
+                board.Label.text = Describe(board.Units, true);
             }
 
-            putBackButton.interactable = boardUnit != null;
-            putBackNextButton.interactable = boardUnit != null;
-
-            // The ingredient's picture on the board; a coloured disc only for one without a sprite.
-            Sprite onBoard = boardUnit != null ? boardUnit.ingredient.Icon : null;
-            prepItem.sprite = onBoard;
-            prepItem.color = onBoard != null ? Color.white : Color.clear;
-            prepPad.SetDisc(boardUnit != null && onBoard == null, boardUnit != null ? IngredientColor(boardUnit.ingredient) : Color.clear);
-            prepPad.SetGuide(ToolGuide(activeTool), new Color(1f, 0.85f, 0.6f, 0.6f));
-
-            if(boardUnit == null) prepHint.text = "<color=#a6a199>Put something on the board, then pick up a tool.</color>";
-            else if(prepGesture == null) prepHint.text = "<color=#a6a199>Pick up a tool, or put it back in stock.</color>";
-
-            UpdatePrepProgress();
-        }
-
-        private static Color IngredientColor(IngredientDefinition ingredient)
-        {
-            // Stable, readable colour per ingredient until there are sprites.
-            float hue = (ingredient.DisplayName.GetHashCode() & 0xFFFF) / 65535f;
-            Color color = Color.HSVToRGB(hue, 0.45f, 0.75f);
-            color.a = 0.9f;
-            return color;
+            UpdateBoardProgress();
         }
     }
 }

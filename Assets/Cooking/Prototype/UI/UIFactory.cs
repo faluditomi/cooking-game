@@ -28,6 +28,58 @@ namespace Cooking.Prototype
             }
         }
 
+        private static Sprite circle;
+
+        /// <summary>A soft-edged white disc, made at runtime (for heads, plates and other round shapes).</summary>
+        public static Sprite Circle
+        {
+            get
+            {
+                if(circle != null) return circle;
+
+                const int size = 128;
+                Texture2D texture = new Texture2D(size, size, TextureFormat.RGBA32, false);
+                texture.wrapMode = TextureWrapMode.Clamp;
+                Color32[] pixels = new Color32[size * size];
+                float radius = size / 2f;
+
+                for(int y = 0; y < size; y++)
+                {
+                    for(int x = 0; x < size; x++)
+                    {
+                        float distance = Vector2.Distance(new Vector2(x + 0.5f, y + 0.5f), new Vector2(radius, radius));
+                        byte alpha = (byte)(Mathf.Clamp01(radius - distance) * 255f);
+                        pixels[y * size + x] = new Color32(255, 255, 255, alpha);
+                    }
+                }
+
+                texture.SetPixels32(pixels);
+                texture.Apply();
+                circle = Sprite.Create(texture, new Rect(0f, 0f, size, size), new Vector2(0.5f, 0.5f), 100f);
+                return circle;
+            }
+        }
+
+        /// <summary>A thin rectangular outline (four bars) inside <paramref name="rt"/>. Returns the bars to recolour.</summary>
+        public static Image[] Outline(RectTransform rt, Color color, float thickness)
+        {
+            Image[] bars = new Image[4];
+            for(int i = 0; i < 4; i++)
+            {
+                bars[i] = Panel(rt, "Outline", color);
+                bars[i].raycastTarget = false;
+                RectTransform bar = bars[i].rectTransform;
+                bool horizontal = i < 2;
+                bar.anchorMin = horizontal ? new Vector2(0f, i == 0 ? 0f : 1f) : new Vector2(i == 2 ? 0f : 1f, 0f);
+                bar.anchorMax = horizontal ? new Vector2(1f, i == 0 ? 0f : 1f) : new Vector2(i == 2 ? 0f : 1f, 1f);
+                bar.pivot = horizontal ? new Vector2(0.5f, i == 0 ? 0f : 1f) : new Vector2(i == 2 ? 0f : 1f, 0.5f);
+                bar.sizeDelta = horizontal ? new Vector2(0f, thickness) : new Vector2(thickness, 0f);
+                bar.anchoredPosition = Vector2.zero;
+            }
+
+            return bars;
+        }
+
         public static RectTransform Rect(Transform parent, string name)
         {
             GameObject go = new GameObject(name, typeof(RectTransform));

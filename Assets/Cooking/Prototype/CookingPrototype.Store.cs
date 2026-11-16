@@ -6,7 +6,7 @@ using UnityEngine.UI;
 namespace Cooking.Prototype
 {
     /// <summary>
-    /// The Store area (mornings only). Pick ingredients into a cart, one by one from the shelf or by
+    /// The Shop tab on the tablet (mornings only). Pick ingredients into a cart, one by one from the shelf or by
     /// dish from the recipe book, then pay for the whole cart at checkout. Nothing is bought until then.
     /// </summary>
     public partial class CookingPrototype
@@ -111,11 +111,11 @@ namespace Cooking.Prototype
         {
             VerticalLayoutGroup layout = UIFactory.Vertical(shelf.gameObject, 12f, 16);
             layout.childForceExpandHeight = false;
-            Header(shelf, "SHELF  <color=#77736d>pick ingredients into the cart, or shop by dish from the Recipe book</color>");
+            Header(shelf, "SHELF  <color=#77736d>pick ingredients into the cart, or shop by dish on the Recipes tab</color>");
 
             RectTransform grid = UIFactory.Rect(shelf, "Grid");
             GridLayoutGroup gridLayout = grid.gameObject.AddComponent<GridLayoutGroup>();
-            gridLayout.cellSize = new Vector2(236f, 92f);
+            gridLayout.cellSize = new Vector2(196f, 92f);
             gridLayout.spacing = new Vector2(8f, 8f);
             gridLayout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
             gridLayout.constraintCount = 4;
@@ -135,7 +135,8 @@ namespace Cooking.Prototype
                 icon.rectTransform.anchoredPosition = new Vector2(30f, 0f);
 
                 // The price sits on the line below (with stock), so long names don't wrap into it.
-                Text name = UIFactory.Label(panel, ingredient.DisplayName, 19, TextAnchor.UpperLeft, FontStyle.Bold);
+                Text name = UIFactory.Label(panel, ingredient.DisplayName, 18, TextAnchor.UpperLeft, FontStyle.Bold);
+                UIFactory.FitText(name);
                 UIFactory.Place(name.rectTransform, 0f, 0.55f, 1f, 1f).offsetMin = new Vector2(62f, 0f);
                 name.rectTransform.offsetMax = new Vector2(-6f, -6f);
 
@@ -156,7 +157,7 @@ namespace Cooking.Prototype
             Header(shelf, "BUNDLES  <color=#77736d>all the ingredients for one serving</color>");
             bundleGrid = UIFactory.Rect(shelf, "Bundles");
             GridLayoutGroup bundleLayout = bundleGrid.gameObject.AddComponent<GridLayoutGroup>();
-            bundleLayout.cellSize = new Vector2(236f, 64f);
+            bundleLayout.cellSize = new Vector2(196f, 64f);
             bundleLayout.spacing = new Vector2(8f, 8f);
             bundleLayout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
             bundleLayout.constraintCount = 4;
@@ -193,9 +194,13 @@ namespace Cooking.Prototype
             UIFactory.Size(cartTotalText, 54f, 0f);
 
             RectTransform buyRow = UIFactory.Row(column, 54f);
-            checkoutButton = UIFactory.Button(buyRow, "Buy everything", Checkout, new Color(0.75f, 0.42f, 0.15f, 1f), 22);
+            checkoutButton = UIFactory.Button(buyRow, "Buy everything", Checkout, null, 20);
             RectTransform clearRow = UIFactory.Row(column, 36f);
             clearCartButton = UIFactory.Button(clearRow, "Clear cart", ClearCart, new Color(0.35f, 0.2f, 0.2f, 1f), 17);
+
+            // Pays for the cart (if anything's in it) and opens the stall.
+            RectTransform startRow = UIFactory.Row(column, 58f);
+            phaseButton = UIFactory.Button(startRow, "Buy and start the day", OpenStall, new Color(0.75f, 0.42f, 0.15f, 1f), 22);
 
             // For planning the day: the timer setting and who's coming.
             RectTransform timerRow = UIFactory.Row(column, 36f);
@@ -219,7 +224,7 @@ namespace Cooking.Prototype
                 card.MoreFive.interactable = open;
             }
 
-            if(area == Area.Store)
+            if(shopPage != null && shopPage.activeSelf)
             {
                 RebuildCartList();
                 RebuildBundles();

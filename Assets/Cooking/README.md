@@ -107,85 +107,119 @@ Cooking Prototype**, into `Builds/` (git-ignored):
   runs on itch.io without server setup; zip the folder's contents and upload as an HTML game
   (1280×720). There's no Quit button in the browser.
 
+### The screen
+
+The layout follows the "Screen layout mock-up" on the Miro board:
+
+- **Conversation** (left, full height): the stall, the cycle and time left, your money, who's at
+  the counter, and what they say, typed out with the newest line at the bottom. Under it, the latest
+  hint. It clears when the customer leaves.
+- **Market** (top right): the night market with billboard ads (CraftPix pack, new ads each cycle),
+  the customer as a placeholder figure at the bottom left, and the **prep tools** (knife, peeler,
+  grater) hanging from the stall roof.
+- **Workbench** (bottom right), all press-and-hold drags:
+  - **Pantry** (right): your stock (`Inventory`), grouped into **raw**, **prepped** and
+    **seasoning**, each pile showing its pieces. Holding a pile takes **one** unit. Drop it on a
+    cutting board, the pot, the pan, a plate (seasonings only, on a cooked dish) or free desk
+    space. Dropped anywhere else, it goes back on its pile.
+  - **Desk space** (top left, six spots): plates and loose ingredients. Hold a loose pile to take
+    all of it.
+  - **Clean plates**: an endless stack. A plate dropped on the desk goes to the nearest free spot.
+    An empty plate can go back on the stack; a plate with anything on it stays on the desk.
+  - **Food delivery**: drop a plate here to serve it.
+  - **Cooking station (pot)** and **frying station (pan)**: drop ingredients in, then click the
+    station to light it.
+  - **Prep section**: two cutting boards.
+  - **Tablet**, built into the table (bottom left). Small, it shows the **Order** page. **Recipes**,
+    **History** and, in the morning, **Shop** open it big over the right side, as do the Dish
+    Served and End of Cycle pages. **Shrink** puts it back.
+
+The UI is built in code at startup (`CookingPrototype.Layout.cs`), with uGUI and the built-in font,
+and needs the Input System UI module (the setup adds one). A held item follows the pointer from
+`UpdateHeld` (Input System `Pointer`), so a drag survives the UI under it being rebuilt.
+**Custom Tools → Cooking Prototype → Assign Market Art** puts the billboard sprites on the scene's
+prototype and sets them to point filtering.
+
 ### The cycle
 
-The game runs in cycles (days), and there are three areas you switch between with the tabs at the
-top: **Store**, **Prep** and **Kitchen**. What customers say types out in the sidebar on the right.
-Everything you buy goes into your stock (`Inventory`), which tracks units per prep state
-("3× Onion raw", "1× Onion peeled, sliced").
+The game runs in cycles (days). Everything you buy goes into your stock (`Inventory`), which tracks
+units per prep state ("3× Onion raw", "2× Onion peeled, sliced").
 
-1. **Morning** (untimed). The **Store** is open. Fill a cart (`ShoppingCart`): ingredients one at a
-   time from the shelf (−, +1, +5), a whole dish from the **Bundles** tiles under the shelf (one
-   serving of a menu dish), or from the **Recipe book** (**+ One serving**, **+ What's missing**).
-   Nothing is bought until you pay. The cart column also has the day-timer switch and who's coming
-   today. Prep and Kitchen are locked: prepping is part of the timed day (meeting decision, so the
-   day doesn't get boring once everything is prepped in the morning).
-2. **Buy ingredients and start the day** (top bar) pays for the cart, starts the timer and opens
-   the stall. The Store closes until the next morning.
+1. **Morning** (untimed). The tablet opens big on the **Shop**. Fill a cart (`ShoppingCart`):
+   ingredients one at a time from the shelf (−, +1, +5), a whole dish from the **Bundles** tiles
+   (one serving of a menu dish), or from the **Recipes** tab (**+ One serving**, **+ What's
+   missing**). Nothing is bought until you pay. The cart column also has the day-timer switch and
+   who's coming today. The workbench is locked: prepping is part of the timed day (meeting
+   decision).
+2. **Buy and start the day** (Shop tab) pays for the cart, starts the timer and opens the stall.
+   The tablet goes back into the table, on the Order page. The Shop closes until the next morning.
 3. **Service.** The day timer runs (`daySeconds`, 6 minutes). Every regular comes **once**, in a
    shuffled order, 1–6 s (`arrivalDelay`) after the last one leaves. They order as they arrive:
-   their order dialogue names the dish, and the ticket fills in.
-   On the **Prep** board, prep stock one unit at a time (as in the design doc): put a unit on the
-   board, pick up a tool, do its gesture, then put it back. It goes back into stock prepped
-   (switching to another area puts it back too).
-   **Peeling comes first**: something sliced or grated can't be peeled. When the unit on the board
-   is the last of its kind, it goes back to the pile by itself after slicing or grating (after a
-   peel it stays, in case you slice it next).
-   The ticket (on the Prep and Kitchen areas) shows the recipe with each ingredient marked ready /
-   needs prep / short. If they order something that isn't in your recipe book (like the Sleeper's
-   boiled synthetic chicken), it only shows the name: working out what goes in it is up to you.
-   For a dish you made them before but didn't save, it says to look in the cooking history.
-   In the **Kitchen**, stock is grouped into **raw**, **prepped** and **seasoning**; select some
-   (each click on a row adds one unit, − takes one back). **A dish
-   is one batch**: send everything for it to the wok or the pot at once (a station takes one batch
-   until it's emptied), cook it, and take it off onto the plate. You can't add more cooked food to
-   a plate that has a dish on it. A batch for the pot can include the soup cube; it goes in first,
-   so the rest joins the soup. The wok and pot keep cooking while you're prepping.
-   - **Wok**: every unit needs one stir, a shake on the shake pad (3× tofu + 1× rice: 4 stirs).
-     The bar has four zones. **Grey**: a shake is too early and sends the bar back to the start.
-     **Green**: stirs one unit perfectly. **Red**: stirs one unit, a bit burned (overcooked:
-     bitter). Each counted shake sends the bar back to the middle of the grey. Reaching the
-     **black** burns one unit, and leaving it at the end burns another every 2 s. Take it off
-     yourself; units never stirred come off undercooked, which costs flavour.
-   - **Pot**: take it off on the narrow green line, or it overcooks. Without a stock cube it boils
+   their order dialogue names the dish, and the Order page fills in. It shows the recipe with each
+   ingredient marked ready / needs prep / short (counting stock, the boards and the desk). If they
+   order something that isn't on your menu (like the Sleeper's boiled synthetic chicken), it only
+   shows the name: working out what goes in it is up to you. For a dish you made them before but
+   didn't save, it says to look in the cooking history.
+   - **Prep**: put units on a cutting board. A board takes several units of **one kind**. Hold a
+     tool on the roof to pick it up and do its gesture over the board: that preps everything on it.
+     Once it has started on a board, the tool stays locked to that board until the prep is done
+     or you let go, so moving off the board mid-stroke doesn't reset it.
+     Letting go hangs the tool back up. **Peeling comes first**: something sliced or grated can't
+     be peeled. Prepped units stay on the board; hold the board to take all of them.
+   - **A dish is one batch**: everything for it goes into the pot or the pan before you light it.
+     Holding a lit station **takes it off the heat**: its cycle pauses and its bar goes with it.
+     Drop it on a plate to dish up; anywhere else puts it back and the cycle carries on. A plate
+     with a dish on it takes no more cooked food. **Take it all out** returns an unlit station's
+     contents to the pantry.
+   - **Pan**: every unit needs one stir (3× tofu + 1× rice: 4 stirs). Lift the pan and shake it
+     side to side. The bar has four zones. **Grey**: a shake is too early and sends the bar back to
+     the start. **Green**: stirs one unit perfectly. **Red**: stirs one unit, a bit burned
+     (overcooked: bitter). A counted shake sends the bar back to the middle of the grey, so it's
+     one stir per lift: put it back to heat up again. Reaching the **black** burns one unit, and
+     leaving it at the end burns another every 2 s. Units never stirred come off undercooked.
+   - **Pot**: dish it up on the narrow green line, or it overcooks. Without a stock cube it boils
      one ingredient at a time; with one, it's a soup and takes anything. Everything in it comes
      off with the same doneness.
-   - **Seasoning**: once the dish is on the plate, **Plate** adds seasonings to it: salt, pepper,
-     sugar, MSG2, citric acid and chilli (`IngredientDefinition.isSeasoning`). Nothing else goes on
-     raw. Chilli and MSG2 give their full taste grated, half unprepped (`fullFlavourPrep`). For a
+   - **Seasoning**: drop salt, pepper, sugar, MSG2, citric acid or chilli
+     (`IngredientDefinition.isSeasoning`) on a plate with a cooked dish. Nothing else goes on raw.
+     Chilli and MSG2 give their full taste grated, half unprepped (`fullFlavourPrep`). For a
      recipe, a seasoning counts the same whether it was cooked in or added after.
-   - **Serve**: the dish is judged (`DishJudge`). The result screen plays their reaction and shows
-     the dish's flavour profile, with the order's outline when it's a recipe you know. If the dish isn't on the menu, it offers a name
-     field (20 letters): **Save dish** adds it to the menu (origin Emphis); **Continue** leaves it
+   - **Serve**: drop the plate on the food delivery spot. The dish is judged (`DishJudge`). The
+     Dish Served page plays their reaction and shows the dish's flavour profile, with the order's
+     outline when it's a recipe you know. If the dish isn't on the menu, it offers a name field
+     (20 letters): **Save dish** adds it to the menu (origin Emphis); **Continue** leaves it
      "Nameless". Continue sends the customer off (anything they were still saying stops).
    - **Day timer off**: to compare the "time trial gauntlet" and "zen social kitchen" vibes
-     (design doc TODO), switch it off in the Store in the morning, or untick `dayTimer` on the
+     (design doc TODO), switch it off in the Shop in the morning, or untick `dayTimer` on the
      `Cooking Prototype` object. The day then ends when everyone has been.
 4. **End of the cycle**, when everyone has been or the timer runs out (whoever is still waiting
-   leaves without eating): a summary of each dish and who it was for, income, expenses, the
-   **stall rent** (`stallRent`, $10) and the profit. If you can't pay the rent, it's **game over**
-   and you go back to the title screen. Anything left in the stations or on the board is binned.
-   **Prepped stock spoils; raw stock carries over.**
+   leaves without eating): the End of Cycle page lists each dish and who it was for, income,
+   expenses, the **stall rent** (`stallRent`, $10) and the profit. If you can't pay the rent, it's
+   **game over** and you go back to the title screen. Units on the boards and the desk go back into
+   stock; plates and whatever is in the stations are binned. **Prepped stock spoils; raw stock
+   carries over.**
 
 ### Minigames (`Prototype/Minigames/`)
 
-From the design doc's cooking section. All of them are a held mouse drag on a pad (`GesturePad`)
-that feeds a `Gesture`. The pad draws a guide for the current tool and a fading trail of the pointer.
+From the design doc's cooking section. Each is a held drag that feeds a `Gesture`: a prep tool
+moved over a cutting board, or the lifted pan. While a tool is held, the boards draw its guide and
+a fading trail of the pointer (`GesturePadGraphic`).
 
-| Tool | Gesture | Counts as a stroke | Strokes (1 unit) |
+| Tool | Gesture | Counts as a stroke | Strokes (one board) |
 |---|---|---|---|
 | Knife → sliced | `BackAndForthGesture` (vertical) | each change of direction after 70 px | 6 |
 | Peeler → peeled | `HalfCircleDownGesture` | a half circle from the top down to the bottom, either side. Bottom to top, straight lines and reversals don't count | 3 |
 | Grater → grated | `SwipeRightGesture` | 110 px to the right. Going back left earns nothing | 5 |
-| Wok shake | `BackAndForthGesture` (horizontal) | each change of direction after 45 px. One shake = one stir (see the wok above) | one per unit |
+| Pan shake | `BackAndForthGesture` (horizontal) | each change of direction after 45 px. One shake = one stir (see the pan above) | one per unit |
 
 Stroke counts, station speeds, the day timer and the rent are on the
 `Cooking Prototype` object. Stock is a flag on the ingredient (`IngredientDefinition.IsStock`, set
 on Soup Cube).
 
-The code is split by area: `CookingPrototype.cs` (cycle loop, top bar, ticket, overlays) and
-`CookingPrototype.Store.cs`, `.Prep.cs`, `.Kitchen.cs`, `.RecipeBook.cs`, `.History.cs`, `.Npcs.cs`
-(customers, dialogue, sidebar) and `.Discovery.cs` (naming dishes).
+The code is split by part: `CookingPrototype.cs` (cycle loop, ticket, result and summary pages),
+`.Layout.cs` (the screen, market and tablet), `.Kitchen.cs` (workbench, plates, stations, drags),
+`.Prep.cs` (cutting boards and tools), `.Store.cs` (Shop tab), `.RecipeBook.cs`, `.History.cs`,
+`.Npcs.cs` (customers and dialogue) and `.Discovery.cs` (naming dishes).
 
 | Verdict | When | Pay | Liked? | Their reaction |
 |---|---|---|---|---|
@@ -216,12 +250,11 @@ Customer lines and other settings (margin, station speed, live preview) are on t
 `Cooking Prototype` object in the scene. The live flavour preview is a tuning aid. The design
 reveals the flavour only after serving.
 
-The UI is built in code at startup (`CookingPrototype.BuildUI`), uses uGUI with the built-in font,
-and needs the Input System UI module (the setup adds one). `FlavourRadarGraphic` is the runtime radar chart.
+`FlavourRadarGraphic` is the runtime radar chart.
 
 ### Recipe book (`CookingPrototype.RecipeBook.cs`, `RecipeGuide.cs`)
 
-The **Recipe book** button in the top bar opens it from any area, any time. It lists the menu only;
+The tablet's **Recipes** tab opens it any time. It lists the menu only;
 dishes you didn't save (or took off) are in the cooking history. For the selected dish it shows:
 
 - **Steps** (`RecipeGuide`): what to buy (with how many you have), what to prep with which tool
@@ -232,8 +265,8 @@ dishes you didn't save (or took off) are in the cooking history. For the selecte
 - **Shopping**: have/need per ingredient (stock + cart), with **+ One serving** and **+ What's
   missing** to fill the store cart. These only work in the morning.
 
-While there's an order, opening it shows that dish. The kitchen keeps running while it's open, so
-looking something up costs time. Switching tabs closes it.
+While there's an order, opening it shows that dish. The kitchen keeps running while it's open (the
+big tablet covers the workbench), so looking something up costs time.
 
 ### Regulars and dialogue (`Prototype/Npc/`, `CookingPrototype.Npcs.cs`)
 

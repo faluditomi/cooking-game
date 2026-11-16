@@ -28,8 +28,7 @@ namespace Cooking.Prototype
 
         private void ShowBookPage(BookPage page)
         {
-            bookPage = page;
-            RefreshAll();
+            ShowTabletPage(page == BookPage.History ? TabletPage.History : TabletPage.Recipes);
         }
 
         private void FilterHistory(Customer regular)

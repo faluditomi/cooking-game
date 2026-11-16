@@ -286,22 +286,6 @@ namespace Cooking.Prototype
             }
         }
 
-        private void BuildSpeechSidebar(Transform root)
-        {
-            RectTransform panel = UIFactory.Panel(root, "Speech Sidebar", UIFactory.PanelDark).rectTransform;
-            panel.anchorMin = new Vector2(1f - SidebarWidth, 0f);
-            panel.anchorMax = Vector2.one;
-            panel.offsetMin = new Vector2(0f, 44f);
-            panel.offsetMax = new Vector2(0f, -60f);
-            VerticalLayoutGroup layout = UIFactory.Vertical(panel.gameObject, 10f, 18);
-            layout.childForceExpandHeight = false;
-
-            Header(panel, "AT THE COUNTER");
-            sidebarCustomer = UIFactory.Label(panel, "", 26, TextAnchor.UpperLeft, FontStyle.Bold, UIFactory.Accent);
-            sidebarSpeech = UIFactory.Label(panel, "", 19, TextAnchor.UpperLeft, FontStyle.Italic);
-            UIFactory.Size(sidebarSpeech, -1f, 1f);
-        }
-
         // ------------------------------------------------------------------ Visits
 
         /// <summary>A customer arrives: start a fresh visit record and have them order.</summary>

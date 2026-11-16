@@ -78,9 +78,6 @@ namespace Cooking.Prototype
         [Tooltip("0 picks a random seed.")]
         [SerializeField] private int randomSeed;
 
-        /// <summary>Share of the screen width the speech sidebar takes on the right.</summary>
-        private const float SidebarWidth = 0.2f;
-
         private enum Phase
         {
             Morning,
@@ -88,14 +85,7 @@ namespace Cooking.Prototype
             DayOver,
         }
 
-        private enum Area
-        {
-            Store,
-            Prep,
-            Kitchen,
-        }
-
-        /// <summary>The order ticket, shown on both the Prep and Kitchen areas.</summary>
+        /// <summary>The order ticket, on the tablet's Order page.</summary>
         private class TicketView
         {
             public Text Customer;
@@ -112,7 +102,6 @@ namespace Cooking.Prototype
         private float money;
         private int day = 1;
         private Phase phase;
-        private Area area;
         private readonly Inventory inventory = new Inventory();
         private bool overlayOpen;
         private bool gameOver;
@@ -147,8 +136,6 @@ namespace Cooking.Prototype
         private Text moneyText;
         private Text messageText;
         private Button phaseButton;
-        private readonly Dictionary<Area, Button> tabs = new Dictionary<Area, Button>();
-        private readonly Dictionary<Area, GameObject> areaRoots = new Dictionary<Area, GameObject>();
         private readonly List<TicketView> tickets = new List<TicketView>();
         private GameObject resultOverlay;
         private Text resultTitle;
@@ -201,6 +188,8 @@ namespace Cooking.Prototype
         {
             // Lines keep typing out on the result screen too.
             TickSpeech(Time.deltaTime);
+            // Whatever is held follows the pointer, and drops when the button comes up.
+            UpdateHeld();
 
             if(overlayOpen || phase != Phase.Service) return;
 
@@ -253,7 +242,8 @@ namespace Cooking.Prototype
                 (arrivals[i], arrivals[j]) = (arrivals[j], arrivals[i]);
             }
 
-            ShowArea(Area.Store);
+            ShuffleBillboards();
+            ShowTabletPage(TabletPage.Shop);
             Say("Cycle " + day + ". Fill the cart for " + customers.Count + " regulars, then buy and start the day. Prepping starts with the day.");
         }
 
@@ -270,7 +260,7 @@ namespace Cooking.Prototype
                 if(!cart.Checkout(inventory, ref money))
                 {
                     Say("You can't afford the cart: $" + total.ToString("0.00") + ", and you have $" + money.ToString("0.00") + ". Take something out first.", UIFactory.Bad);
-                    ShowArea(Area.Store);
+                    ShowTabletPage(TabletPage.Shop);
                     return;
                 }
 
@@ -278,16 +268,17 @@ namespace Cooking.Prototype
                 Say("Bought " + units + " units for $" + total.ToString("0.00") + ".", UIFactory.Good);
             }
 
-            if(inventory.IsEmpty && boardUnit == null)
+            if(inventory.IsEmpty && !DeskHasIngredients())
             {
                 Say("You have nothing to cook with. Put something in the cart first.", UIFactory.Bad);
-                ShowArea(Area.Store);
+                ShowTabletPage(TabletPage.Shop);
                 return;
             }
 
             phase = Phase.Service;
-            if(recipeBookOverlay != null) recipeBookOverlay.SetActive(false);
-            ShowArea(Area.Kitchen);
+            // The tablet goes back into the workbench, showing the order.
+            tabletPage = TabletPage.Order;
+            tabletBig = false;
             ScheduleArrival();
         }
 
@@ -390,7 +381,8 @@ namespace Cooking.Prototype
 
             phase = Phase.DayOver;
             resultOverlay.SetActive(false);
-            if(recipeBookOverlay != null) recipeBookOverlay.SetActive(false);
+            tabletPage = TabletPage.Order;
+            tabletBig = false;
 
             // Whoever is still here or still coming leaves unserved.
             List<Customer> missed = new List<Customer>();
@@ -405,7 +397,7 @@ namespace Cooking.Prototype
             ClearSpeech();
             Say("Cycle " + day + " is over.");
 
-            ReturnBoardToStock();
+            ReturnDeskToStock();
             ClearKitchen();
             List<Inventory.Entry> spoiled = inventory.SpoilPrepped();
 
@@ -502,7 +494,7 @@ namespace Cooking.Prototype
             deletedDishes.Clear();
             inventory.Clear();
             cart.Clear();
-            ReturnBoardToStock();
+            ReturnDeskToStock();
             inventory.Clear();
             ClearKitchen();
             history.Clear();
@@ -552,43 +544,6 @@ namespace Cooking.Prototype
             return boiled && fried ? "Soup, with fried bits" : boiled ? "Soup" : fried ? "Fried" : "Neither (raw)";
         }
 
-        // ------------------------------------------------------------------ Areas
-
-        private bool IsAreaOpen(Area target)
-        {
-            switch(target)
-            {
-                case Area.Store: return phase == Phase.Morning;
-                // Prepping is part of the timed day, while the regulars arrive.
-                case Area.Prep: return phase == Phase.Service;
-                case Area.Kitchen: return phase == Phase.Service;
-                default: return false;
-            }
-        }
-
-        private void ShowArea(Area target)
-        {
-            if(!IsAreaOpen(target))
-            {
-                Say(target == Area.Store ? "The store is closed until tomorrow morning."
-                    : target == Area.Prep ? "Prepping starts when the day starts." : "The kitchen opens when the day starts.", UIFactory.Bad);
-                return;
-            }
-
-            // Leaving the prep board puts what's on it back in stock, prepped as far as it got.
-            if(area == Area.Prep && target != Area.Prep && boardUnit != null)
-            {
-                string done = Describe(boardUnit, true);
-                ReturnBoardToStock();
-                Say(done + " back in stock.");
-            }
-
-            area = target;
-            if(recipeBookOverlay != null) recipeBookOverlay.SetActive(false);
-            foreach(KeyValuePair<Area, GameObject> pair in areaRoots) pair.Value.SetActive(pair.Key == target);
-            RefreshAll();
-        }
-
         private void RefreshAll()
         {
             moneyText.text = "$" + money.ToString("0.00");
@@ -598,23 +553,14 @@ namespace Cooking.Prototype
                 : "Closed";
             dayText.text = "Cycle " + day + "  ·  " + phaseLabel;
 
-            phaseButton.gameObject.SetActive(phase == Phase.Morning);
+            phaseButton.interactable = phase == Phase.Morning;
 
-            foreach(KeyValuePair<Area, Button> pair in tabs)
-            {
-                bool open = IsAreaOpen(pair.Key);
-                pair.Value.interactable = open;
-                pair.Value.GetComponent<Image>().color = pair.Key == area ? new Color(0.75f, 0.42f, 0.15f, 1f) : UIFactory.ButtonColor;
-                string label = pair.Key.ToString();
-                if(!open) label += pair.Key == Area.Store ? " (closed)" : " (locked)";
-                UIFactory.SetButtonText(pair.Value, label);
-            }
-
+            RefreshTablet();
             RefreshStore();
-            RefreshPrep();
             RefreshKitchen();
             RefreshTickets();
             RefreshSidebar();
+            RefreshMarket();
             RefreshRecipeBook();
         }
 
@@ -631,7 +577,7 @@ namespace Cooking.Prototype
                 if(phase == Phase.Morning)
                 {
                     ticket.Customer.text = "No customers yet";
-                    ticket.Line.text = "<color=#a6a199>Fill the cart in the Store and prep what you can. Prepped stock spoils overnight; raw keeps. "
+                    ticket.Line.text = "<color=#a6a199>Fill the cart in the Shop. Prepped stock spoils overnight; raw keeps. "
                                        + "Each regular comes once today. Rent at the end of the cycle: $" + stallRent.ToString("0.00") + ".</color>";
                     ticket.Order.text = DescribeRegulars();
                 }
@@ -641,7 +587,8 @@ namespace Cooking.Prototype
 
                     if(orderIn)
                     {
-                        ticket.Line.text = string.IsNullOrEmpty(orderLine) ? "" : "\"" + orderLine + "\"";
+                        // What they said is in the conversation.
+                        ticket.Line.text = "";
                         ticket.Order.text = DescribeRecipe(order);
                     }
                     else
@@ -778,9 +725,8 @@ namespace Cooking.Prototype
                 if(portion == null || !portion.IsValid) continue;
 
                 // Whether stock (plus whatever is on the prep board) is ready exactly as the recipe wants it prepped.
-                bool onBoard = boardUnit != null && boardUnit.ingredient == portion.ingredient;
-                int ready = inventory.Count(portion.ingredient, portion.prep) + (onBoard && boardUnit.prep == portion.prep ? 1 : 0);
-                int total = inventory.Total(portion.ingredient) + (onBoard ? 1 : 0);
+                int ready = inventory.Count(portion.ingredient, portion.prep) + OnDesk(portion.ingredient, portion.prep);
+                int total = inventory.Total(portion.ingredient) + OnDesk(portion.ingredient);
                 string readiness = ready >= portion.quantity ? "<color=#73cc73>ready</color>"
                     : total >= portion.quantity ? "<color=#f28c33>needs prep</color>"
                     : "<color=#e5594d>short</color>";
@@ -788,7 +734,7 @@ namespace Cooking.Prototype
                 sb.Append("- ").Append(Describe(new IngredientPortion(portion.ingredient, portion.quantity, portion.prep))).Append("  ").Append(readiness).Append('\n');
             }
 
-            sb.Append("<color=#a6a199>Steps are in the Recipe book.</color>\n");
+            sb.Append("<color=#a6a199>Steps: Recipes tab.</color>\n");
             sb.Append("\nMenu price <b>$").Append(DishJudge.MenuPrice(recipe, margin).ToString("0.00")).Append("</b>");
 
             return sb.ToString();
@@ -825,7 +771,8 @@ namespace Cooking.Prototype
         private void ShowResult(JudgeResult result, RelationshipChange change)
         {
             overlayOpen = true;
-            if(recipeBookOverlay != null) recipeBookOverlay.SetActive(false);
+            tabletPage = TabletPage.Order;
+            tabletBig = false;
             resultOverlay.SetActive(true);
             resultScroll.anchoredPosition = Vector2.zero;
 
@@ -894,88 +841,6 @@ namespace Cooking.Prototype
             go.AddComponent<InputSystemUIInputModule>().AssignDefaultActions();
         }
 
-        private void BuildUI()
-        {
-            GameObject canvasObject = new GameObject("Prototype UI", typeof(RectTransform));
-            canvasObject.transform.SetParent(transform, false);
-            Canvas canvas = canvasObject.AddComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            CanvasScaler scaler = canvasObject.AddComponent<CanvasScaler>();
-            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution = new Vector2(1920f, 1080f);
-            scaler.matchWidthOrHeight = 0.5f;
-            canvasObject.AddComponent<GraphicRaycaster>();
-            Transform root = canvasObject.transform;
-
-            UIFactory.Stretch(UIFactory.Panel(root, "Background", UIFactory.Background).rectTransform);
-            BuildTopBar(root);
-
-            RectTransform bottom = UIFactory.Panel(root, "Message Bar", UIFactory.PanelDark).rectTransform;
-            bottom.anchorMin = Vector2.zero;
-            bottom.anchorMax = new Vector2(1f, 0f);
-            bottom.offsetMin = Vector2.zero;
-            bottom.offsetMax = new Vector2(0f, 44f);
-            messageText = UIFactory.Label(bottom, "", 20, TextAnchor.MiddleLeft);
-            UIFactory.Stretch(messageText.rectTransform).offsetMin = new Vector2(20f, 0f);
-
-            // The areas take the left of the screen; what customers say runs down the right.
-            RectTransform content = UIFactory.Rect(root, "Content");
-            content.anchorMin = Vector2.zero;
-            content.anchorMax = new Vector2(1f - SidebarWidth, 1f);
-            content.offsetMin = new Vector2(0f, 44f);
-            content.offsetMax = new Vector2(0f, -60f);
-
-            areaRoots[Area.Store] = BuildStoreArea(AreaRoot(content, "Store Area"));
-            areaRoots[Area.Prep] = BuildPrepArea(AreaRoot(content, "Prep Area"));
-            areaRoots[Area.Kitchen] = BuildKitchenArea(AreaRoot(content, "Kitchen Area"));
-
-            // The book sits over the areas (not the sidebar); result and summary screens go on top.
-            BuildSpeechSidebar(root);
-            BuildRecipeBook(root);
-            BuildResultOverlay(root);
-            BuildSummaryOverlay(root);
-            BuildTitle(root);
-        }
-
-        private static RectTransform AreaRoot(RectTransform parent, string name)
-        {
-            RectTransform areaRoot = UIFactory.Rect(parent, name);
-            UIFactory.Stretch(areaRoot);
-            return areaRoot;
-        }
-
-        private void BuildTopBar(Transform root)
-        {
-            RectTransform top = UIFactory.Panel(root, "Top Bar", UIFactory.PanelDark).rectTransform;
-            top.anchorMin = new Vector2(0f, 1f);
-            top.anchorMax = Vector2.one;
-            top.offsetMin = new Vector2(0f, -60f);
-            top.offsetMax = Vector2.zero;
-
-            Text title = UIFactory.Label(top, "Emphis's Stall", 28, TextAnchor.MiddleLeft, FontStyle.Bold, UIFactory.Accent);
-            UIFactory.Place(title.rectTransform, 0f, 0f, 0.15f, 1f).offsetMin = new Vector2(20f, 0f);
-
-            RectTransform tabRow = UIFactory.Rect(top, "Tabs");
-            UIFactory.Place(tabRow, 0.15f, 0f, 0.43f, 1f, 8f);
-            UIFactory.Horizontal(tabRow.gameObject, 8f);
-            tabs[Area.Store] = UIFactory.Button(tabRow, "Store", () => ShowArea(Area.Store), null, 20);
-            tabs[Area.Prep] = UIFactory.Button(tabRow, "Prep", () => ShowArea(Area.Prep), null, 20);
-            tabs[Area.Kitchen] = UIFactory.Button(tabRow, "Kitchen", () => ShowArea(Area.Kitchen), null, 20);
-
-            // Always available, whichever area you're in.
-            recipeBookButton = UIFactory.Button(top, "Recipe book", ToggleRecipeBook, new Color(0.3f, 0.36f, 0.5f, 1f), 20);
-            UIFactory.Place((RectTransform)recipeBookButton.transform, 0.43f, 0f, 0.55f, 1f, 8f);
-
-            dayText = UIFactory.Label(top, "", 22, TextAnchor.MiddleCenter);
-            UIFactory.Place(dayText.rectTransform, 0.55f, 0f, 0.68f, 1f);
-
-            phaseButton = UIFactory.Button(top, "Buy ingredients and start the day", OpenStall, new Color(0.75f, 0.42f, 0.15f, 1f), 18);
-            UIFactory.Place((RectTransform)phaseButton.transform, 0.68f, 0f, 0.88f, 1f, 8f);
-
-            moneyText = UIFactory.Label(top, "", 30, TextAnchor.MiddleRight, FontStyle.Bold, UIFactory.Good);
-            UIFactory.Place(moneyText.rectTransform, 0.88f, 0f, 1f, 1f).offsetMax = new Vector2(-20f, 0f);
-        }
-
         private static RectTransform Column(RectTransform parent, string name, float xMin, float xMax, bool panel = true)
         {
             RectTransform column = panel
@@ -992,90 +857,13 @@ namespace Cooking.Prototype
             return header;
         }
 
-        /// <summary>The customer / order ticket with the day timer, filling <paramref name="column"/>.</summary>
-        private void BuildTicket(RectTransform column)
+        /// <summary>The Dish Served page, on the big tablet.</summary>
+        private void BuildResultOverlay(Transform pages)
         {
-            VerticalLayoutGroup layout = UIFactory.Vertical(column.gameObject, 10f, 16);
-            layout.childForceExpandHeight = false;
-
-            TicketView ticket = new TicketView();
-            Header(column, "CUSTOMER");
-            ticket.Customer = UIFactory.Label(column, "", 28, TextAnchor.UpperLeft, FontStyle.Bold, UIFactory.Accent);
-            ticket.Line = UIFactory.Label(column, "", 18, TextAnchor.UpperLeft, FontStyle.Italic);
-
-            Image timerBack = UIFactory.Panel(column, "Timer", new Color(0.08f, 0.08f, 0.09f, 1f));
-            UIFactory.Size(timerBack, 16f, 0f);
-            ticket.TimerBar = timerBack.gameObject;
-            ticket.TimerFillImage = UIFactory.Panel(timerBack.transform, "Fill", UIFactory.Good);
-            ticket.TimerFill = ticket.TimerFillImage.rectTransform;
-            UIFactory.Place(ticket.TimerFill, 0f, 0f, 1f, 1f);
-            ticket.Timer = UIFactory.Label(column, "", 20, TextAnchor.MiddleLeft, FontStyle.Bold);
-            UIFactory.Size(ticket.Timer, 28f, 0f);
-
-            ticket.Order = UIFactory.Label(column, "", 17);
-            tickets.Add(ticket);
-        }
-
-        /// <summary>A dark pad that feeds pointer gestures to the given callbacks and draws guides and a trail.</summary>
-        private static GesturePadGraphic BuildPad(Transform parent, string name, float minHeight, float flexibleHeight,
-            System.Action<Vector2> pressed, System.Action<Vector2> moved, System.Action released)
-        {
-            Image background = UIFactory.Panel(parent, name, new Color(0.09f, 0.085f, 0.1f, 1f));
-            UIFactory.Size(background, minHeight, flexibleHeight);
-            background.raycastTarget = false;
-
-            RectTransform padRect = UIFactory.Rect(background.transform, "Pad");
-            UIFactory.Stretch(padRect);
-            GesturePadGraphic graphic = padRect.gameObject.AddComponent<GesturePadGraphic>();
-            graphic.raycastTarget = true;
-            GesturePad pad = padRect.gameObject.AddComponent<GesturePad>();
-            pad.Pressed += pressed;
-            pad.Moved += moved;
-            pad.Released += released;
-            return graphic;
-        }
-
-        /// <summary>Rebuilds a stock list: one button per inventory entry.</summary>
-        private void RebuildStockList(Transform content, System.Action<Inventory.Entry> onClick, bool interactable)
-        {
-            UIFactory.ClearChildren(content);
-            List<Inventory.Entry> entries = inventory.Entries();
-
-            if(entries.Count == 0)
-            {
-                Text empty = UIFactory.Label(content, "<color=#a6a199>No stock. Everything comes from the store in the morning.</color>", 17);
-                UIFactory.Size(empty, 50f, 0f);
-                return;
-            }
-
-            foreach(Inventory.Entry entry in entries)
-            {
-                Inventory.Entry captured = entry;
-                string label = Describe(new IngredientPortion(entry.Ingredient, entry.Quantity, entry.Prep), true);
-                RectTransform row = UIFactory.Row(content, 38f, 4f);
-                row.GetComponent<HorizontalLayoutGroup>().childForceExpandWidth = false;
-                UIFactory.Icon(row, entry.Ingredient.Icon, 38f);
-
-                // Prepped and raw stock look the same: colour would suggest only prepped stock goes in a dish.
-                Button button = UIFactory.Button(row, label, () => onClick(captured), UIFactory.ButtonColor, 17);
-                Text text = button.GetComponentInChildren<Text>();
-                text.alignment = TextAnchor.MiddleLeft;
-                text.rectTransform.offsetMin = new Vector2(12f, 0f);
-                UIFactory.FitText(text);
-                button.interactable = interactable;
-                UIFactory.Size(button, 38f, 0f, -1f, 1f);
-            }
-        }
-
-        private void BuildResultOverlay(Transform root)
-        {
-            Image overlay = UIFactory.Panel(root, "Result Overlay", new Color(0f, 0f, 0f, 0.78f));
+            Image overlay = UIFactory.Panel(pages, "Dish Served", UIFactory.PanelColor);
             UIFactory.Stretch(overlay.rectTransform);
             resultOverlay = overlay.gameObject;
-
-            RectTransform panel = UIFactory.Panel(overlay.transform, "Result", UIFactory.PanelColor).rectTransform;
-            panel.anchorMin = panel.anchorMax = new Vector2(0.5f, 0.5f);
-            panel.sizeDelta = new Vector2(1500f, 920f);
+            RectTransform panel = overlay.rectTransform;
 
             RectTransform radarArea = UIFactory.Rect(panel, "Radar");
             UIFactory.Place(radarArea, 0f, 0f, 0.45f, 1f, 30f);
@@ -1103,15 +891,17 @@ namespace Cooking.Prototype
             resultOverlay.SetActive(false);
         }
 
-        private void BuildSummaryOverlay(Transform root)
+        /// <summary>The End of Cycle page, on the big tablet.</summary>
+        private void BuildSummaryOverlay(Transform pages)
         {
-            Image overlay = UIFactory.Panel(root, "Summary Overlay", new Color(0f, 0f, 0f, 0.82f));
+            Image overlay = UIFactory.Panel(pages, "End of Cycle", UIFactory.Background);
             UIFactory.Stretch(overlay.rectTransform);
             summaryOverlay = overlay.gameObject;
 
             RectTransform panel = UIFactory.Panel(overlay.transform, "Summary", UIFactory.PanelColor).rectTransform;
-            panel.anchorMin = panel.anchorMax = new Vector2(0.5f, 0.5f);
-            panel.sizeDelta = new Vector2(820f, 940f);
+            panel.anchorMin = new Vector2(0.5f, 0f);
+            panel.anchorMax = new Vector2(0.5f, 1f);
+            panel.sizeDelta = new Vector2(900f, -24f);
             VerticalLayoutGroup layout = UIFactory.Vertical(panel.gameObject, 14f, 32);
             layout.childForceExpandHeight = false;
 
