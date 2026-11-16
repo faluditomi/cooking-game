@@ -217,13 +217,11 @@ namespace Cooking.Prototype
         private void RefreshHistorySide()
         {
             bookRadar.ClearProfiles();
-            bookRadar.SetHighlight(null);
             StringBuilder sb = new StringBuilder();
 
             if(selectedEntry != null)
             {
                 bookRadarHeader.text = "FLAVOUR OF THIS DISH";
-                bookRadar.SetHighlight(zones.Find(z => z != null && z.DisplayName == selectedEntry.BestZone));
                 bookRadar.AddProfile(selectedEntry.OrderedFlavour, new Color(0.6f, 0.6f, 0.6f, 0.8f), false);
                 bookRadar.AddProfile(selectedEntry.Flavour, new Color(0.95f, 0.93f, 0.86f, 1f), true);
                 sb.Append("<color=#ebe6db>Light</color>: what you served.  <color=#999999>Grey outline</color>: what they ordered.\n");

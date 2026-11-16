@@ -67,14 +67,6 @@ namespace Cooking.Prototype
             RefreshAll();
         }
 
-        /// <summary>Opens the book on <paramref name="recipe"/> (an order coming in).</summary>
-        private void OpenRecipeBookOn(RecipeDefinition recipe)
-        {
-            bookPage = BookPage.Recipes;
-            if(recipe != null) bookRecipe = recipe;
-            recipeBookOverlay.SetActive(true);
-            RefreshAll();
-        }
 
         /// <summary>Takes the selected dish off the menu. It stays known (regulars can still order it), just unnamed in their lines.</summary>
         private void DeleteFromMenu()
@@ -150,10 +142,9 @@ namespace Cooking.Prototype
 
             bookSteps.text = RecipeGuide.Steps(recipe, Owned);
 
-            bookRadar.SetHighlight(zone);
+            // Only the selected dish: no zone bands, so its shape reads at a glance.
             bookRadar.ClearProfiles();
-            // Light rather than orange, so the dish stands out from zones like Greasy Comfort.
-            bookRadar.AddProfile(profile, new Color(0.95f, 0.93f, 0.86f, 1f), true);
+            bookRadar.AddProfile(profile, new Color(0.95f, 0.55f, 0.2f, 1f), true);
 
             // Shopping: have/need per ingredient, counting stock, cart and the prep board.
             StringBuilder needs = new StringBuilder();
@@ -256,7 +247,7 @@ namespace Cooking.Prototype
             UIFactory.Size(radarArea, 260f, 1f);
             bookRadar = radarArea.gameObject.AddComponent<FlavourRadarGraphic>();
             bookRadar.raycastTarget = false;
-            bookRadar.SetZones(zones);
+            // No zones: the book's radar shows just the dish (the title says which zone it tastes like).
             bookRadar.CreateLabels(UIFactory.Font, 15, UIFactory.MutedText);
 
             // Recipes page: shopping for the selected dish.

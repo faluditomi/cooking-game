@@ -109,7 +109,7 @@ Everything you buy goes into your stock (`Inventory`), which tracks units per pr
    closes until the next morning.
 3. **Service.** The day timer runs (`daySeconds`, 6 minutes). Every regular comes **once**, in a
    shuffled order, 1–6 s (`arrivalDelay`) after the last one leaves. They order as they arrive:
-   their order dialogue names the dish, the ticket fills in, and the recipe book opens on it.
+   their order dialogue names the dish, and the ticket fills in.
    The ticket (on the Prep and Kitchen areas) shows the recipe with each ingredient marked ready /
    needs prep / short. In the **Kitchen**, select stock (each click on a row adds one unit, − takes
    one back), then send the whole selection at once with → Wok, → Pot or → Plate. Cook and serve.
@@ -197,7 +197,7 @@ dishes learned from customers (their specials and dream meals). For the selected
 - **Shopping**: have/need per ingredient (stock + cart), with **+ One serving** and **+ What's
   missing** to fill the store cart. These only work in the morning.
 
-When an order comes in it opens on that dish. The kitchen keeps running while it's open, so
+While there's an order, opening it shows that dish. The kitchen keeps running while it's open, so
 looking something up costs time. Switching tabs closes it.
 
 ### Regulars and dialogue (`Prototype/Npc/`, `CookingPrototype.Npcs.cs`)

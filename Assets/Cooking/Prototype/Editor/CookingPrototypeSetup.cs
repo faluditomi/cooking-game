@@ -81,7 +81,10 @@ namespace Cooking.Prototype.EditorTools
 
             foreach(string guid in AssetDatabase.FindAssets("t:FlavourZone", new[] { DataRoot + "/Zones" }))
             {
-                zones.Add(AssetDatabase.LoadAssetAtPath<FlavourZone>(AssetDatabase.GUIDToAssetPath(guid)));
+                // Secret desire zones belong to the regulars, not the zones the game shows.
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                if(path.Contains("/Desires/")) continue;
+                zones.Add(AssetDatabase.LoadAssetAtPath<FlavourZone>(path));
             }
 
             return zones;

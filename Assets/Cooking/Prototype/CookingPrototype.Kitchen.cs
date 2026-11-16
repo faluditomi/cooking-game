@@ -416,27 +416,15 @@ namespace Cooking.Prototype
             UIFactory.Size(radarArea, 300f, 1f);
             plateRadar = radarArea.gameObject.AddComponent<FlavourRadarGraphic>();
             plateRadar.raycastTarget = false;
-            plateRadar.SetZones(zones);
+            // No zones: just your dish and, when you know it, the order.
             plateRadar.CreateLabels(UIFactory.Font, 16, UIFactory.MutedText);
 
-            Text legend = UIFactory.Label(column, LegendText(), 16, TextAnchor.UpperLeft, FontStyle.Normal, UIFactory.MutedText);
-            UIFactory.Size(legend, 44f, 0f);
+            Text legend = UIFactory.Label(column, "<color=#d9d9d9>Grey outline</color>: the order.  <color=#f28c33>Orange</color>: your dish so far.",
+                16, TextAnchor.UpperLeft, FontStyle.Normal, UIFactory.MutedText);
+            UIFactory.Size(legend, 24f, 0f);
 
             RectTransform previewRow = UIFactory.Row(column, 36f);
             previewButton = UIFactory.Button(previewRow, "", TogglePreview, null, 16);
-        }
-
-        private string LegendText()
-        {
-            StringBuilder sb = new StringBuilder("<color=#d9d9d9>Grey outline</color>: what they ordered.  <color=#f28c33>Orange</color>: your plate.\n");
-
-            foreach(FlavourZone zone in zones)
-            {
-                if(zone == null) continue;
-                sb.Append("<color=#").Append(ColorUtility.ToHtmlStringRGB(zone.Color)).Append(">■ ").Append(zone.DisplayName).Append("</color>   ");
-            }
-
-            return sb.ToString();
         }
 
         private void RefreshKitchen()
@@ -476,9 +464,9 @@ namespace Cooking.Prototype
             binPlateButton.interactable = plate.Count > 0;
             UIFactory.SetButtonText(previewButton, livePreview ? "Live flavour: on" : "Live flavour: off");
 
-            plateRadar.SetHighlight(orderIn ? orderZone : null);
             plateRadar.ClearProfiles();
-            if(orderIn) plateRadar.AddProfile(orderProfile, new Color(0.85f, 0.85f, 0.85f, 0.7f), false);
+            // The order only when it's a recipe you know (in the recipe book).
+            if(orderIn && order != null && KnownRecipes().Contains(order)) plateRadar.AddProfile(orderProfile, new Color(0.85f, 0.85f, 0.85f, 0.7f), false);
             if(livePreview && plate.Count > 0) plateRadar.AddProfile(FlavourCalculator.Calculate(plate, rules), UIFactory.Accent, true);
         }
 

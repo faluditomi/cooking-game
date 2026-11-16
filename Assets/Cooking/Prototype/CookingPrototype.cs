@@ -14,7 +14,7 @@ namespace Cooking.Prototype
     /// Nothing is timed. "Buy ingredients and start the day" pays for the cart and opens the stall.</item>
     /// <item><b>Service</b>: the store closes and the day timer runs. Every regular comes once, in a
     /// shuffled order, a few seconds apart. They order as they arrive (their order dialogue names the
-    /// dish), and the recipe book opens on it. Cook in the <b>Kitchen</b>; you can still prep.</item>
+    /// dish) and the ticket fills in. Cook in the <b>Kitchen</b>; you can still prep.</item>
     /// <item><b>After each order</b>: their reaction, the dish's flavour profile, and, for a dish
     /// that isn't on the menu, a chance to name it and save it to the menu.</item>
     /// <item><b>End of the cycle</b>: when everyone has been or the timer runs out. A summary of
@@ -178,6 +178,9 @@ namespace Cooking.Prototype
             startingMenu = new List<RecipeDefinition>(menu);
             if(customers.Count == 0) customers.Add(new Customer());
 
+            // Secret desires are undiscovered recipes: never drawn, listed or named as a zone.
+            zones.RemoveAll(zone => zone == null || customers.Exists(c => c != null && c.secretDesire == zone));
+
             CreateKitchenState();
             EnsureEventSystem();
             BuildUI();
@@ -319,7 +322,7 @@ namespace Cooking.Prototype
             RefreshAll();
         }
 
-        /// <summary>The customer has said what they want: the ticket fills in and the recipe book opens on it.</summary>
+        /// <summary>The customer has said what they want: the ticket fills in. The recipe book opens on it when you open it.</summary>
         private void SetOrder(RecipeDefinition recipe)
         {
             if(customer == null) return;
@@ -331,7 +334,7 @@ namespace Cooking.Prototype
             OnOrderIn();
 
             Say(customer.name + " wants " + DishName(order) + ".", UIFactory.Accent);
-            OpenRecipeBookOn(order);
+            RefreshAll();
         }
 
         /// <summary>Switches the day timer. Mornings only, so a cycle is all one or the other.</summary>
