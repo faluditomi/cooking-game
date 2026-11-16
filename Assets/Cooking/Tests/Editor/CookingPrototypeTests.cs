@@ -95,14 +95,14 @@ namespace Cooking.Tests
         // ------------------------------------------------------------------ Stations
 
         [Test]
-        public void Wok_DonenessFollowsTheBar_AndBurnsAtTheEnd()
+        public void Wok_ZonesAreGreyGreenRedBlack()
         {
             CookingStation wok = CookingStation.CreateWok(10f);
 
             Assert.AreEqual(Doneness.Undercooked, wok.Evaluate(0.3f));
             Assert.AreEqual(Doneness.Perfect, wok.Evaluate(0.6f));
-            Assert.AreEqual(Doneness.Perfect, wok.Evaluate(0.95f));
-            Assert.AreEqual(Doneness.Burnt, wok.Evaluate(1f));
+            Assert.AreEqual(Doneness.Overcooked, wok.Evaluate(0.8f));
+            Assert.AreEqual(Doneness.Burnt, wok.Evaluate(0.95f));
         }
 
         [Test]
@@ -117,45 +117,82 @@ namespace Cooking.Tests
         }
 
         [Test]
-        public void Station_StacksPortions_CooksThemAndEmpties()
+        public void Station_TakesOneBatch_CooksItAndEmpties()
         {
             IngredientDefinition rice = Ingredient("Rice", FlavourProfile.Zero);
-            CookingStation wok = CookingStation.CreateWok(10f);
+            CookingStation pot = CookingStation.CreatePot(10f);
 
-            Assert.IsTrue(wok.Add(new IngredientPortion(rice, 1)));
-            Assert.IsTrue(wok.Add(new IngredientPortion(rice, 1)));
-            Assert.AreEqual(1, wok.Contents.Count);
-            Assert.AreEqual(2, wok.Contents[0].quantity);
+            Assert.IsTrue(pot.AddAll(new[] { new IngredientPortion(rice, 2) }));
+            Assert.IsFalse(pot.CanAddAll(new[] { new IngredientPortion(rice, 1) }, out _), "a dish goes in all at once");
 
-            Assert.IsTrue(wok.StartCooking());
-            Assert.IsFalse(wok.Add(new IngredientPortion(rice, 1)), "cannot add while cooking");
-            wok.Tick(6f);
+            Assert.IsTrue(pot.StartCooking());
+            Assert.IsFalse(pot.Add(new IngredientPortion(rice, 1)), "cannot add while cooking");
+            pot.Tick(5f);
 
-            List<IngredientPortion> cooked = wok.TakeOff();
+            List<IngredientPortion> cooked = pot.TakeOff();
 
             Assert.AreEqual(1, cooked.Count);
-            Assert.AreEqual(CookMethods.Fried, cooked[0].cooking);
+            Assert.AreEqual(2, cooked[0].quantity);
+            Assert.AreEqual(CookMethods.Boiled, cooked[0].cooking);
             Assert.AreEqual(Doneness.Perfect, cooked[0].doneness);
-            Assert.IsTrue(wok.IsEmpty);
-            Assert.IsFalse(wok.IsCooking);
+            Assert.IsTrue(pot.IsEmpty);
+            Assert.IsFalse(pot.IsCooking);
+            Assert.IsTrue(pot.CanAddAll(new[] { new IngredientPortion(rice, 1) }, out _), "empty again");
         }
 
         [Test]
-        public void Shake_OnlyWorksInTheDangerArea()
+        public void Wok_NeedsAStirPerUnit_InTheGreen()
         {
             IngredientDefinition rice = Ingredient("Rice", FlavourProfile.Zero);
-            CookingStation wok = CookingStation.CreateWok(10f);
-            wok.Add(new IngredientPortion(rice, 1));
+            CookingStation wok = CookingStation.CreateWok(10f, seed: 1);
+            wok.AddAll(new[] { new IngredientPortion(rice, 3) });
             wok.StartCooking();
 
-            wok.Tick(5f);
-            Assert.IsFalse(wok.Shake(), "not in danger yet");
+            wok.Tick(3f); // 30%: grey
+            Assert.AreEqual(ShakeResult.TooEarly, wok.Shake());
+            Assert.AreEqual(0f, wok.Progress, "too early sends the bar back to the start");
 
-            wok.Tick(4f);
-            float before = wok.Progress;
-            Assert.IsTrue(wok.Shake());
-            Assert.Less(wok.Progress, before);
-            Assert.AreEqual(Doneness.Perfect, wok.CurrentDoneness);
+            wok.Tick(6f); // 60%: green
+            Assert.AreEqual(ShakeResult.Stirred, wok.Shake());
+            Assert.AreEqual(wok.PerfectStart * 0.5f, wok.Progress, 0.0001f, "back to the middle of the grey");
+
+            wok.Tick(3.5f); // 62.5%: green
+            Assert.AreEqual(ShakeResult.Stirred, wok.Shake());
+
+            List<IngredientPortion> cooked = wok.TakeOff();
+            Assert.AreEqual(2, Count(cooked, Doneness.Perfect));
+            Assert.AreEqual(1, Count(cooked, Doneness.Undercooked), "the unit never stirred is undercooked");
+        }
+
+        [Test]
+        public void Wok_RedStirOvercooks_BlackBurns_AndTheEndKeepsBurning()
+        {
+            IngredientDefinition rice = Ingredient("Rice", FlavourProfile.Zero);
+            CookingStation wok = CookingStation.CreateWok(10f, seed: 2);
+            wok.AddAll(new[] { new IngredientPortion(rice, 4) });
+            wok.StartCooking();
+
+            wok.Tick(8f); // 80%: red
+            Assert.AreEqual(ShakeResult.StirredOverdone, wok.Shake());
+            Assert.AreEqual(1, wok.OverdoneCount);
+
+            wok.Tick(6.5f); // from 27.5% to 92.5%: black burns one
+            Assert.AreEqual(1, wok.BurntCount);
+
+            wok.Tick(1f); // at the end
+            wok.Tick(2f); // two seconds at the end: another
+            Assert.AreEqual(2, wok.BurntCount);
+
+            List<IngredientPortion> cooked = wok.TakeOff();
+            Assert.AreEqual(4, Count(cooked, Doneness.Overcooked) + Count(cooked, Doneness.Burnt) + Count(cooked, Doneness.Undercooked));
+            Assert.AreEqual(2, Count(cooked, Doneness.Burnt));
+        }
+
+        private static int Count(List<IngredientPortion> portions, Doneness doneness)
+        {
+            int count = 0;
+            foreach(IngredientPortion portion in portions) if(portion.doneness == doneness) count += portion.quantity;
+            return count;
         }
 
         [Test]
@@ -167,7 +204,39 @@ namespace Cooking.Tests
             pot.StartCooking();
             pot.Tick(9f);
 
-            Assert.IsFalse(pot.Shake());
+            Assert.AreEqual(ShakeResult.None, pot.Shake());
+        }
+
+        [Test]
+        public void Seasoning_CountsForTheRecipe_CookedInOrAddedAfter()
+        {
+            IngredientDefinition rice = Ingredient("Rice", FlavourProfile.Zero);
+            IngredientDefinition salt = ScriptableObject.CreateInstance<IngredientDefinition>();
+            created.Add(salt);
+            salt.Configure("Salt", new FlavourProfile { salty = 9f }, 0.1f, newIsSeasoning: true);
+
+            RecipeDefinition recipe = ScriptableObject.CreateInstance<RecipeDefinition>();
+            created.Add(recipe);
+            recipe.Configure("Salty rice", "Test", new[] { new IngredientPortion(rice, 1, cooking: CookMethods.Fried), new IngredientPortion(salt, 1, cooking: CookMethods.Fried) });
+
+            IngredientPortion friedRice = new IngredientPortion(rice, 1, PrepSteps.None, CookMethods.Fried, Doneness.Perfect);
+            Assert.IsTrue(recipe.Matches(new[] { friedRice, new IngredientPortion(salt, 1, PrepSteps.None, CookMethods.Fried, Doneness.Perfect) }));
+            Assert.IsTrue(recipe.Matches(new[] { friedRice, new IngredientPortion(salt, 1) }), "salt sprinkled on after counts too");
+            Assert.IsFalse(recipe.Matches(new[] { new IngredientPortion(rice, 1), new IngredientPortion(salt, 1) }), "the rice still has to be fried");
+        }
+
+        [Test]
+        public void Seasoning_GivesHalfItsTaste_WithoutThePrepItNeeds()
+        {
+            IngredientDefinition chilli = ScriptableObject.CreateInstance<IngredientDefinition>();
+            IngredientDefinition rice = Ingredient("Rice", FlavourProfile.Zero);
+            created.Add(chilli);
+            chilli.Configure("Chilli", new FlavourProfile { pain = 8f }, 0.2f, newIsSeasoning: true, newFullFlavourPrep: PrepSteps.Grated);
+
+            float grated = FlavourCalculator.Calculate(new[] { new IngredientPortion(rice, 1), new IngredientPortion(chilli, 1, PrepSteps.Grated) }, null).pain;
+            float whole = FlavourCalculator.Calculate(new[] { new IngredientPortion(rice, 1), new IngredientPortion(chilli, 1) }, null).pain;
+
+            Assert.AreEqual(grated * 0.5f, whole, 0.0001f);
         }
 
         // ------------------------------------------------------------------ Judging

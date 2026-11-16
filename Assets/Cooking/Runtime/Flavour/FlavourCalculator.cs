@@ -45,6 +45,17 @@ namespace Cooking
 
             if(portion.IsRaw) unit += ingredient.RawDelta;
 
+            // Without the prep it needs (chilli not grated), it gives less taste.
+            float strength = ingredient.TasteStrength(portion.prep);
+
+            if(strength < 1f)
+            {
+                foreach(FlavourAxis axis in FlavourAxes.All)
+                {
+                    if(!FlavourAxes.IsAveraged(axis)) unit[axis] *= strength;
+                }
+            }
+
             // Only the floor is clamped: seasonings may legitimately exceed the scale per unit,
             // because their intensity is spread across the dish's bulk.
             return unit.Clamped(0f, float.MaxValue);

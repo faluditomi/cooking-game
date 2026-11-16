@@ -31,6 +31,12 @@ namespace Cooking
         [Tooltip("Stock (the soup cube): in the pot it turns everything into one soup, so several ingredients can boil together.")]
         [SerializeField] private bool isStock;
 
+        [Header("Seasoning")]
+        [Tooltip("Mostly taste rather than bulk (salt, pepper, sugar, MSG2, citric acid, chilli). Can be added to a cooked dish afterwards, and counts the same for a recipe whether it was cooked in or added after.")]
+        [SerializeField] private bool isSeasoning;
+        [Tooltip("The prep it needs for its full flavour (chilli, MSG2: grated). Without it, it gives half its taste. None: always full.")]
+        [SerializeField] private PrepSteps fullFlavourPrep;
+
         [TextArea] [SerializeField] private string notes;
 
         public string DisplayName => string.IsNullOrEmpty(displayName) ? name : displayName;
@@ -40,14 +46,34 @@ namespace Cooking
         public FlavourProfile Flavour => flavour;
         public FlavourProfile RawDelta => rawDelta;
         public bool IsStock => isStock;
+        public bool IsSeasoning => isSeasoning;
+        public PrepSteps FullFlavourPrep => fullFlavourPrep;
+
+        /// <summary>Taste multiplier for this prep: 1, or <see cref="UnpreppedStrength"/> without its full-flavour prep.</summary>
+        public float TasteStrength(PrepSteps prep)
+        {
+            return (prep & fullFlavourPrep) == fullFlavourPrep ? 1f : UnpreppedStrength;
+        }
+
+        /// <summary>Share of its taste an ingredient gives without the prep it needs.</summary>
+        public const float UnpreppedStrength = 0.5f;
+
+        /// <summary>The cooking that counts for recipes: none for a seasoning, which counts wherever it was added.</summary>
+        public CookMethods RecipeCooking(CookMethods cooking)
+        {
+            return isSeasoning ? CookMethods.None : cooking;
+        }
         public string Notes => notes;
 
         /// <summary>Sets the data in code. Intended for tests and editor tooling.</summary>
         public void Configure(string newDisplayName, FlavourProfile newFlavour, float newBulk = 1f,
-            FlavourProfile newRawDelta = default, float newPrice = 1f, bool newIsStock = false)
+            FlavourProfile newRawDelta = default, float newPrice = 1f, bool newIsStock = false,
+            bool newIsSeasoning = false, PrepSteps newFullFlavourPrep = PrepSteps.None)
         {
             displayName = newDisplayName;
             isStock = newIsStock;
+            isSeasoning = newIsSeasoning;
+            fullFlavourPrep = newFullFlavourPrep;
             flavour = newFlavour;
             bulk = Mathf.Max(0.01f, newBulk);
             rawDelta = newRawDelta;

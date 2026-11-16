@@ -69,6 +69,7 @@ namespace Cooking.Prototype
             }
 
             RefreshHistorySide();
+            RefreshHistorySave(selectedEntry);
         }
 
         // ------------------------------------------------------------------ Left: filters and orders
@@ -167,8 +168,8 @@ namespace Cooking.Prototype
                 sb.Append(RecipeGuide.Steps(entry.Dish, Owned)).Append('\n');
             }
 
-            // Flavour profile, next to the order's
-            sb.Append("\n<b>FLAVOUR PROFILE</b>  <color=").Append(Muted).Append(">served (ordered)</color>\n");
+            // Flavour profile, next to the order's when you knew the order
+            sb.Append("\n<b>FLAVOUR PROFILE</b>  <color=").Append(Muted).Append(">").Append(entry.OrderKnown ? "served (ordered)" : "served").Append("</color>\n");
             for(int i = 0; i < FlavourAxes.Count; i += 2)
             {
                 sb.Append("  ").Append(AxisCell(entry, FlavourAxes.All[i]));
@@ -176,7 +177,6 @@ namespace Cooking.Prototype
                 sb.Append('\n');
             }
 
-            sb.Append("  Tastes like: ").Append(string.IsNullOrEmpty(entry.BestZone) ? "<color=" + Muted + ">no desirable zone</color>" : entry.BestZone).Append('\n');
 
             // Result
             sb.Append("\n<b>RESULT</b>\n  ").Append(VerdictLabel(entry.Verdict));
@@ -201,6 +201,8 @@ namespace Cooking.Prototype
         private static string AxisCell(HistoryEntry entry, FlavourAxis axis)
         {
             float served = entry.Flavour[axis];
+            if(!entry.OrderKnown) return (FlavourAxes.Label(axis) + " ").PadRight(11) + "<b>" + served.ToString("0.0") + "</b>";
+
             float ordered = entry.OrderedFlavour[axis];
             float diff = served - ordered;
             string color = Mathf.Abs(diff) < 0.75f ? "#ebe6db" : diff > 0f ? "#f28c33" : "#7fb2e5";
@@ -222,10 +224,18 @@ namespace Cooking.Prototype
             if(selectedEntry != null)
             {
                 bookRadarHeader.text = "FLAVOUR OF THIS DISH";
-                bookRadar.AddProfile(selectedEntry.OrderedFlavour, new Color(0.6f, 0.6f, 0.6f, 0.8f), false);
-                bookRadar.AddProfile(selectedEntry.Flavour, new Color(0.95f, 0.93f, 0.86f, 1f), true);
-                sb.Append("<color=#ebe6db>Light</color>: what you served.  <color=#999999>Grey outline</color>: what they ordered.\n");
-                sb.Append("<color=").Append(Muted).Append(">In the profile, orange is more than the order, blue is less.</color>\n\n");
+                if(selectedEntry.OrderKnown) bookRadar.AddProfile(selectedEntry.OrderedFlavour, new Color(0.6f, 0.6f, 0.6f, 0.8f), false);
+                bookRadar.AddProfile(selectedEntry.Flavour, new Color(0.95f, 0.55f, 0.2f, 1f), true);
+
+                if(selectedEntry.OrderKnown)
+                {
+                    sb.Append("<color=#f28c33>Orange</color>: what you served.  <color=#999999>Grey outline</color>: what they ordered.\n");
+                    sb.Append("<color=").Append(Muted).Append(">In the profile, orange is more than the order, blue is less.</color>\n\n");
+                }
+                else
+                {
+                    sb.Append("<color=#f28c33>Orange</color>: what you served. They ordered something that isn't in your book.\n\n");
+                }
             }
             else
             {

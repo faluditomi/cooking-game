@@ -65,16 +65,16 @@ namespace Cooking.Prototype
 
             foreach(IngredientPortion portion in Valid(ordered))
             {
-                Add(wanted, (portion.ingredient, portion.prep, portion.cooking), portion.quantity);
+                Add(wanted, (portion.ingredient, portion.prep, portion.ingredient.RecipeCooking(portion.cooking)), portion.quantity);
                 orderedUnits += portion.quantity;
             }
 
             foreach(IngredientPortion portion in Valid(served))
             {
                 servedUnits += portion.quantity;
-                bool cookedWell = portion.IsRaw || portion.doneness == Doneness.Perfect;
+                bool cookedWell = portion.IsRaw || portion.doneness == Doneness.Perfect || portion.ingredient.IsSeasoning;
 
-                if(cookedWell) Add(exact, (portion.ingredient, portion.prep, portion.cooking), portion.quantity);
+                if(cookedWell) Add(exact, (portion.ingredient, portion.prep, portion.ingredient.RecipeCooking(portion.cooking)), portion.quantity);
                 else Add(servedLeft, portion.ingredient, portion.quantity);
             }
 

@@ -33,8 +33,9 @@ namespace Cooking.Prototype
         private bool RecipeBookOpen => recipeBookOverlay != null && recipeBookOverlay.activeSelf;
 
         /// <summary>
-        /// The menu, then dishes regulars order that aren't on it: their favourites and dream meals
-        /// you haven't named, or took off the menu.
+        /// The menu, then your own dishes that aren't on it: regulars' favourites and dream meals you
+        /// haven't named, or took off the menu. Recipes only NPCs know (like the Sleeper's boiled
+        /// synthetic chicken) are never in the book.
         /// </summary>
         private List<RecipeDefinition> KnownRecipes()
         {
@@ -42,11 +43,23 @@ namespace Cooking.Prototype
 
             foreach(CustomerRelationship relationship in relationships.Values)
             {
-                foreach(RecipeDefinition recipe in relationship.LikedMeals) if(recipe != null && !known.Contains(recipe)) known.Add(recipe);
-                if(relationship.DreamMeal != null && !known.Contains(relationship.DreamMeal)) known.Add(relationship.DreamMeal);
+                foreach(RecipeDefinition recipe in relationship.LikedMeals) if(IsPlayerDish(recipe) && !known.Contains(recipe)) known.Add(recipe);
+                if(IsPlayerDish(relationship.DreamMeal) && !known.Contains(relationship.DreamMeal)) known.Add(relationship.DreamMeal);
             }
 
             return known;
+        }
+
+        /// <summary>A dish you made in this session (as opposed to a recipe asset).</summary>
+        private static bool IsPlayerDish(RecipeDefinition recipe)
+        {
+            return recipe != null && (recipe.hideFlags & HideFlags.DontSave) != 0;
+        }
+
+        /// <summary>Only your own saved dishes can come off the menu; the default recipes stay.</summary>
+        private bool CanDelete(RecipeDefinition recipe)
+        {
+            return IsOnMenu(recipe) && IsPlayerDish(recipe);
         }
 
         private void ToggleRecipeBook()
@@ -71,7 +84,7 @@ namespace Cooking.Prototype
         /// <summary>Takes the selected dish off the menu. It stays known (regulars can still order it), just unnamed in their lines.</summary>
         private void DeleteFromMenu()
         {
-            if(bookRecipe == null || !IsOnMenu(bookRecipe)) return;
+            if(bookRecipe == null || !CanDelete(bookRecipe)) return;
 
             deletedDishes.Add(bookRecipe);
             Say("\"" + bookRecipe.DisplayName + "\" is off the menu.");
@@ -103,6 +116,7 @@ namespace Cooking.Prototype
             bookShopGroup.SetActive(bookPage == BookPage.Recipes);
             bookHistoryInfo.gameObject.SetActive(bookPage == BookPage.History);
             bookDeleteButton.transform.parent.gameObject.SetActive(false);
+            if(bookPage != BookPage.History) historySaveRow.SetActive(false);
 
             if(bookPage == BookPage.History)
             {
@@ -126,7 +140,6 @@ namespace Cooking.Prototype
 
             RecipeDefinition recipe = bookRecipe;
             FlavourProfile profile = recipe.CalculateProfile(rules);
-            FlavourZone zone = FlavourEvaluator.FindBestZone(profile, zones, Falloff).Zone;
 
             StringBuilder title = new StringBuilder();
             title.Append("<b>").Append(recipe.DisplayName).Append("</b>\n<size=18><color=#a6a199>");
@@ -135,8 +148,6 @@ namespace Cooking.Prototype
             if(!string.IsNullOrEmpty(recipe.Origin)) title.Append("Origin: ").Append(recipe.Origin).Append("   ");
             title.Append("Menu price $").Append(DishJudge.MenuPrice(recipe, margin).ToString("0.00"));
             title.Append("   Ingredients $").Append(recipe.CalculateIngredientCost().ToString("0.00")).Append("</color>");
-            if(zone != null) title.Append("\nTastes like <color=#").Append(ColorUtility.ToHtmlStringRGB(zone.Color)).Append(">").Append(zone.DisplayName).Append("</color>");
-            else title.Append("\n<color=#a6a199>Not in any desirable zone.</color>");
             title.Append("</size>");
             bookTitle.text = title.ToString();
 
@@ -161,7 +172,7 @@ namespace Cooking.Prototype
 
             bookNeeds.text = (covered ? "<color=#73cc73>You have enough for one.</color>\n" : "") + needs;
 
-            bookDeleteButton.transform.parent.gameObject.SetActive(IsOnMenu(recipe));
+            bookDeleteButton.transform.parent.gameObject.SetActive(CanDelete(recipe));
 
             bool shopOpen = phase == Phase.Morning;
             bookServingButton.interactable = shopOpen;
@@ -267,6 +278,7 @@ namespace Cooking.Prototype
             // History page: what you know about the selected regular.
             bookHistoryInfo = UIFactory.Label(right, "", 17);
             bookHistoryInfo.gameObject.SetActive(false);
+            BuildHistorySaveRow(right);
 
             RectTransform deleteRow = UIFactory.Row(right, 38f);
             bookDeleteButton = UIFactory.Button(deleteRow, "Remove from the menu", DeleteFromMenu, new Color(0.35f, 0.2f, 0.2f, 1f), 16);

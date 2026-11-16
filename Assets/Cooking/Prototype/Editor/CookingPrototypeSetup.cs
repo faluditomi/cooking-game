@@ -25,6 +25,9 @@ namespace Cooking.Prototype.EditorTools
             "Sugar", "Pepper", "MSG2 Cube", "Rice", "Seaweed Noodles", "Citric Acid", "Pak Choi", "Beef",
         };
 
+        /// <summary>Recipes regulars can order that the player doesn't get in the book (meeting decision).</summary>
+        private static readonly string[] OffMenu = { "Boiled synthetic chicken" };
+
         [MenuItem("Custom Tools/Cooking Prototype/Build Scene")]
         public static void BuildScene()
         {
@@ -46,7 +49,10 @@ namespace Cooking.Prototype.EditorTools
 
             GameObject root = new GameObject("Cooking Prototype");
             CookingPrototype prototype = root.AddComponent<CookingPrototype>();
-            prototype.Setup(LoadRules(), LoadZones(), LoadPantry(), recipes.Values, CreateCustomers(recipes));
+            // Some recipes only NPCs know: they can order them, but they're not on the menu or in the book.
+            List<RecipeDefinition> menu = new List<RecipeDefinition>(recipes.Values);
+            menu.RemoveAll(recipe => System.Array.IndexOf(OffMenu, recipe.DisplayName) >= 0);
+            prototype.Setup(LoadRules(), LoadZones(), LoadPantry(), menu, CreateCustomers(recipes));
             EditorUtility.SetDirty(prototype);
 
             EditorSceneManager.SaveScene(scene, ScenePath);

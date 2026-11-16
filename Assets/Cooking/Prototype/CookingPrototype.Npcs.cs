@@ -400,6 +400,7 @@ namespace Cooking.Prototype
             currentEntry.Ordered = DishName(order);
             currentEntry.Dish = dish;
             currentEntry.OrderedFlavour = result.Ordered;
+            currentEntry.OrderKnown = orderKnown;
             currentEntry.Flavour = result.Dish;
             currentEntry.BestZone = result.BestZone.IsMatch ? result.BestZone.Zone.DisplayName : null;
             currentEntry.Verdict = result.Verdict;
