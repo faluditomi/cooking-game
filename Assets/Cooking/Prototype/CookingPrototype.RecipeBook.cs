@@ -21,7 +21,6 @@ namespace Cooking.Prototype
         private Button bookServingButton;
         private Button bookMissingButton;
         private Text bookShopHint;
-        private Button recipeBookButton;
         private RecipeDefinition bookRecipe;
         private Text bookRadarHeader;
         private GameObject bookShopGroup;
@@ -29,8 +28,6 @@ namespace Cooking.Prototype
         private Button recipesPageButton;
         private Button historyPageButton;
         private Button bookDeleteButton;
-
-        private bool RecipeBookOpen => recipeBookOverlay != null && recipeBookOverlay.activeSelf;
 
         /// <summary>
         /// The menu, then your own dishes that aren't on it: regulars' favourites and dream meals you
@@ -62,25 +59,6 @@ namespace Cooking.Prototype
             return IsOnMenu(recipe) && IsPlayerDish(recipe);
         }
 
-        private void ToggleRecipeBook()
-        {
-            if(RecipeBookOpen)
-            {
-                recipeBookOverlay.SetActive(false);
-                RefreshAll();
-                return;
-            }
-
-            // Open on the dish being cooked, if there is one.
-            List<RecipeDefinition> known = VisibleMenu();
-            if(orderIn && order != null && known.Contains(order)) bookRecipe = order;
-            else if(bookRecipe == null || !known.Contains(bookRecipe)) bookRecipe = known.Count > 0 ? known[0] : null;
-
-            recipeBookOverlay.SetActive(true);
-            RefreshAll();
-        }
-
-
         /// <summary>Takes the selected dish off the menu. It stays known (regulars can still order it), just unnamed in their lines.</summary>
         private void DeleteFromMenu()
         {
@@ -101,13 +79,11 @@ namespace Cooking.Prototype
 
         private int Owned(IngredientDefinition ingredient)
         {
-            return inventory.Total(ingredient) + cart.Count(ingredient) + (boardUnit != null && boardUnit.ingredient == ingredient ? 1 : 0);
+            return inventory.Total(ingredient) + cart.Count(ingredient) + OnDesk(ingredient);
         }
 
         private void RefreshRecipeBook()
         {
-            if(recipeBookButton == null) return;
-            UIFactory.SetButtonText(recipeBookButton, RecipeBookOpen ? "Close recipe book" : "Recipe book");
             if(!RecipeBookOpen) return;
 
             Color active = new Color(0.75f, 0.42f, 0.15f, 1f);
@@ -178,7 +154,7 @@ namespace Cooking.Prototype
             bookServingButton.interactable = shopOpen;
             bookMissingButton.interactable = shopOpen;
             bookShopHint.text = shopOpen
-                ? "<color=#a6a199>Adds to the store cart. Pay at checkout in the Store.</color>"
+                ? "<color=#a6a199>Adds to the cart on the Shop tab.</color>"
                 : "<color=#a6a199>The store opens in the morning.</color>";
         }
 
@@ -205,29 +181,26 @@ namespace Cooking.Prototype
             }
         }
 
-        private void BuildRecipeBook(Transform root)
+        /// <summary>The Recipes and History pages of the tablet.</summary>
+        private void BuildRecipeBook(Transform pages)
         {
-            Image overlay = UIFactory.Panel(root, "Recipe Book", new Color(0f, 0f, 0f, 0.7f));
-            UIFactory.Stretch(overlay.rectTransform);
-            overlay.rectTransform.anchorMax = new Vector2(1f - SidebarWidth, 1f);
-            // Leave the top bar clickable (the same button closes the book) and the message bar visible.
-            overlay.rectTransform.offsetMax = new Vector2(0f, -60f);
-            overlay.rectTransform.offsetMin = new Vector2(0f, 44f);
-            recipeBookOverlay = overlay.gameObject;
+            RectTransform page = UIFactory.Rect(pages, "Recipe Book");
+            UIFactory.Stretch(page);
+            recipeBookOverlay = page.gameObject;
 
-            RectTransform panel = UIFactory.Panel(overlay.transform, "Book", UIFactory.PanelColor).rectTransform;
-            UIFactory.Stretch(panel, 24f);
+            RectTransform panel = UIFactory.Panel(page, "Book", UIFactory.PanelColor).rectTransform;
+            UIFactory.Stretch(panel, 8f);
 
             // Left: recipes you know.
             RectTransform left = UIFactory.Panel(panel, "Recipes", UIFactory.PanelDark).rectTransform;
             UIFactory.Place(left, 0f, 0f, 0.24f, 1f, 12f);
             VerticalLayoutGroup leftLayout = UIFactory.Vertical(left.gameObject, 8f, 14);
             leftLayout.childForceExpandHeight = false;
-            Text bookHeader = UIFactory.Label(left, "RECIPE BOOK", 22, TextAnchor.MiddleLeft, FontStyle.Bold, UIFactory.Accent);
-            UIFactory.Size(bookHeader, 32f, 0f);
-            RectTransform pages = UIFactory.Row(left, 40f, 6f);
-            recipesPageButton = UIFactory.Button(pages, "Recipes", () => ShowBookPage(BookPage.Recipes), null, 18);
-            historyPageButton = UIFactory.Button(pages, "History", () => ShowBookPage(BookPage.History), null, 18);
+            // The tablet's tabs switch pages; these stay for the page colours but are hidden.
+            RectTransform pageRow = UIFactory.Row(left, 40f, 6f);
+            recipesPageButton = UIFactory.Button(pageRow, "Recipes", () => ShowBookPage(BookPage.Recipes), null, 18);
+            historyPageButton = UIFactory.Button(pageRow, "History", () => ShowBookPage(BookPage.History), null, 18);
+            pageRow.gameObject.SetActive(false);
             bookList = UIFactory.ScrollList(left, 6f);
 
             // Middle: the steps.
@@ -276,7 +249,7 @@ namespace Cooking.Prototype
             bookDeleteButton = UIFactory.Button(deleteRow, "Remove from the menu", DeleteFromMenu, new Color(0.35f, 0.2f, 0.2f, 1f), 16);
 
             RectTransform closeRow = UIFactory.Row(right, 46f);
-            UIFactory.Button(closeRow, "Close", ToggleRecipeBook, new Color(0.75f, 0.42f, 0.15f, 1f), 20);
+            UIFactory.Button(closeRow, "Back to the order", () => ShowTabletPage(TabletPage.Order), new Color(0.75f, 0.42f, 0.15f, 1f), 20);
 
             recipeBookOverlay.SetActive(false);
         }

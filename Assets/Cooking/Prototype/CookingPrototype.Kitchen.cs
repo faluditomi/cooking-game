@@ -1,57 +1,120 @@
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace Cooking.Prototype
 {
     /// <summary>
-    /// The Kitchen area (service only). A dish is one batch: everything goes into the wok or the pot
-    /// at once and comes off together. Afterwards, seasonings (salt, pepper, sugar, MSG2, citric acid,
-    /// chilli) can go on the plate to adjust the flavour. Nothing else goes on raw.
+    /// The workbench (service only), as on the Miro mock-up. Everything is press-and-hold:
+    /// <list type="bullet">
+    /// <item><b>Pantry</b>: ingredients piled by kind. Hold one to take a single unit; drop it on a
+    /// cutting board, the pot, the pan, a plate (seasonings only, on a cooked dish) or free desk space.
+    /// Anywhere else it goes back on its pile.</item>
+    /// <item><b>Clean plates</b>: an endless stack. A plate dropped on the desk goes to the nearest free
+    /// space. Empty plates go back on the stack; a plate with anything on it stays on the desk.</item>
+    /// <item><b>Pot and pan</b>: drop ingredients in, then click to light. A dish is one batch. Holding a
+    /// lit pot or pan takes it off the heat (its cycle pauses, the bar stays with it); drop it on a
+    /// plate to dish up, anywhere else to put it back. The pan is stirred by shaking it while held.</item>
+    /// <item><b>Food delivery</b>: dropping a plate here serves it.</item>
+    /// </list>
     /// </summary>
     public partial class CookingPrototype
     {
-        private enum Destination
+        private const int DeskSlotColumns = 3;
+        private const int DeskSlotRows = 2;
+
+        private class Plate
         {
-            Wok,
-            Pot,
-            Plate,
+            public readonly List<IngredientPortion> Items = new List<IngredientPortion>();
+            /// <summary>Ingredient cost of what's on it.</summary>
+            public float Cost;
+
+            public bool HasDish
+            {
+                get
+                {
+                    foreach(IngredientPortion portion in Items) if(!portion.IsRaw) return true;
+                    return false;
+                }
+            }
+        }
+
+        /// <summary>A free spot on the desk: holds one plate, or loose units of one kind.</summary>
+        private class DeskSlot
+        {
+            public RectTransform Rect;
+            public RectTransform Content;
+            public Plate Plate;
+            public IngredientPortion Loose;
+            public bool IsEmpty => Plate == null && Loose == null;
         }
 
         private class StationView
         {
             public CookingStation Station;
+            public RectTransform Rect;
+            public RectTransform Icons;
             public Text Contents;
             public Text Status;
             public TimingBar Bar;
-            public Button StartButton;
-            public Button TakeOffButton;
-            public Button BinButton;
-            public Text PadHint;
-            public bool? WasInDanger;
+            public Button EmptyButton;
+            /// <summary>Ingredient cost of what's in it, passed on to the plate.</summary>
+            public float Cost;
+        }
+
+        private enum Held
+        {
+            None,
+            Portion,
+            Plate,
+            Station,
+            Tool,
+        }
+
+        private enum Origin
+        {
+            Pantry,
+            Board,
+            Slot,
+            Stack,
+            Stove,
+            Hook,
         }
 
         private CookingStation wok;
         private CookingStation pot;
         private Gesture shakeGesture;
+        /// <summary>The plate being served, for judging and the result screen.</summary>
         private readonly List<IngredientPortion> plate = new List<IngredientPortion>();
-        /// <summary>Units picked in the kitchen stock list, waiting to be sent somewhere together.</summary>
-        private readonly Dictionary<(IngredientDefinition, PrepSteps), int> selection = new Dictionary<(IngredientDefinition, PrepSteps), int>();
+        private readonly List<DeskSlot> deskSlots = new List<DeskSlot>();
+        /// <summary>The plate the order page's radar shows: the last one something went onto.</summary>
+        private Plate focusPlate;
 
-        private RectTransform kitchenStockContent;
-        private readonly Dictionary<Destination, Button> sendButtons = new Dictionary<Destination, Button>();
-        private Text selectionText;
-        private Button clearSelectionButton;
         private StationView wokView;
         private StationView potView;
-        private GesturePadGraphic wokPad;
-        private Text plateText;
-        private RectTransform plateIcons;
-        private Button serveButton;
-        private Button binPlateButton;
+        private RectTransform pantryRect;
+        private RectTransform pantryContent;
+        private RectTransform plateStack;
+        private RectTransform deliveryRect;
+        private Image[] deliveryOutline;
+        private Text deliveryLabel;
         private Button previewButton;
         private FlavourRadarGraphic plateRadar;
+
+        // What's in hand
+        private Held held;
+        private Origin heldFrom;
+        private int heldIndex;
+        private IngredientPortion heldPortion;
+        private Plate heldPlate;
+        private StationView heldStation;
+        /// <summary>The pan was stirred during this lift: more shaking doesn't count until it's back on the heat.</summary>
+        private bool stirredThisLift;
+        private RectTransform ghost;
+        private TimingBar ghostBar;
+        private Text ghostStatus;
 
         private void CreateKitchenState()
         {
@@ -62,17 +125,29 @@ namespace Cooking.Prototype
 
         private void TickKitchen(float deltaTime)
         {
-            wok.Tick(deltaTime);
-            pot.Tick(deltaTime);
+            // Held off the heat, a pot or pan pauses and carries on where it left off when it's put back.
+            if(heldStation != wokView) wok.Tick(deltaTime);
+            if(heldStation != potView) pot.Tick(deltaTime);
             UpdateStationView(wokView);
             UpdateStationView(potView);
         }
 
+        /// <summary>Empties the stations and the desk (end of the cycle). Put stock back first with <see cref="ReturnDeskToStock"/>.</summary>
         private void ClearKitchen()
         {
+            DropWithoutEffect();
             wok.Clear();
             pot.Clear();
-            selection.Clear();
+            if(wokView != null) wokView.Cost = 0f;
+            if(potView != null) potView.Cost = 0f;
+            foreach(DeskSlot slot in deskSlots)
+            {
+                slot.Plate = null;
+                slot.Loose = null;
+            }
+
+            foreach(CuttingBoard board in boards) board.Units = null;
+            focusPlate = null;
             ClearPlate();
         }
 
@@ -81,156 +156,426 @@ namespace Cooking.Prototype
             plate.Clear();
         }
 
-        // ------------------------------------------------------------------ Actions
-
-        private int Selected(IngredientDefinition ingredient, PrepSteps prep)
+        /// <summary>Loose units on the desk and on the boards go back into stock, as prepped as they got.</summary>
+        private void ReturnDeskToStock()
         {
-            return selection.TryGetValue((ingredient, prep), out int count) ? count : 0;
-        }
+            DropWithoutEffect();
 
-        private int SelectedTotal
-        {
-            get
+            foreach(DeskSlot slot in deskSlots)
             {
-                int total = 0;
-                foreach(int count in selection.Values) total += count;
-                return total;
+                if(slot.Loose == null) continue;
+                inventory.Add(slot.Loose.ingredient, slot.Loose.prep, slot.Loose.quantity);
+                slot.Loose = null;
+            }
+
+            foreach(CuttingBoard board in boards)
+            {
+                if(board.Units == null) continue;
+                inventory.Add(board.Units.ingredient, board.Units.prep, board.Units.quantity);
+                board.Units = null;
             }
         }
 
-        /// <summary>Adds one more unit of <paramref name="entry"/> to the selection, up to what's in stock.</summary>
-        private void SelectMore(Inventory.Entry entry)
+        /// <summary>Raw or prepped units out on the desk or the boards (not in stock).</summary>
+        private bool DeskHasIngredients()
         {
-            if(phase != Phase.Service) return;
+            foreach(DeskSlot slot in deskSlots) if(slot.Loose != null) return true;
+            foreach(CuttingBoard board in boards) if(board.Units != null) return true;
+            return false;
+        }
 
-            int selected = Selected(entry.Ingredient, entry.Prep);
+        /// <summary>Units of <paramref name="ingredient"/> on the desk and boards, all of them or just those prepped as <paramref name="prep"/>.</summary>
+        private int OnDesk(IngredientDefinition ingredient, PrepSteps? prep = null)
+        {
+            int count = 0;
 
-            if(selected >= inventory.Count(entry.Ingredient, entry.Prep))
+            foreach(DeskSlot slot in deskSlots)
             {
-                Say("That's all the " + entry.Ingredient.DisplayName + " like that in stock.");
+                if(slot.Loose != null && slot.Loose.ingredient == ingredient && (prep == null || slot.Loose.prep == prep)) count += slot.Loose.quantity;
+            }
+
+            foreach(CuttingBoard board in boards)
+            {
+                if(board.Units != null && board.Units.ingredient == ingredient && (prep == null || board.Units.prep == prep)) count += board.Units.quantity;
+            }
+
+            return count;
+        }
+
+        private bool DeskOpen()
+        {
+            if(phase == Phase.Service && !overlayOpen) return true;
+            Say(phase == Phase.Morning ? "The stall opens when you start the day. Buy what you need on the tablet first." : "The stall is closed.", UIFactory.Bad);
+            return false;
+        }
+
+        // ------------------------------------------------------------------ Picking things up
+
+        private bool CanPickUp => held == Held.None && DeskOpen();
+
+        private void GrabFromPantry(Inventory.Entry entry, Vector2 screen)
+        {
+            if(!CanPickUp) return;
+            // Always just one, however many are in the pile.
+            if(!inventory.Take(entry.Ingredient, entry.Prep)) return;
+            HoldPortion(new IngredientPortion(entry.Ingredient, 1, entry.Prep), Origin.Pantry, 0, screen);
+        }
+
+        private void GrabFromSlot(DeskSlot slot, Vector2 screen)
+        {
+            if(!CanPickUp) return;
+
+            int index = deskSlots.IndexOf(slot);
+
+            if(slot.Plate != null)
+            {
+                Plate taken = slot.Plate;
+                slot.Plate = null;
+                HoldPlate(taken, Origin.Slot, index, screen);
+            }
+            else if(slot.Loose != null)
+            {
+                IngredientPortion taken = slot.Loose;
+                slot.Loose = null;
+                HoldPortion(taken, Origin.Slot, index, screen);
+            }
+        }
+
+        private void GrabCleanPlate(Vector2 screen)
+        {
+            if(!CanPickUp) return;
+            HoldPlate(new Plate(), Origin.Stack, 0, screen);
+        }
+
+        private void GrabStation(StationView view, Vector2 screen)
+        {
+            if(!CanPickUp) return;
+
+            CookingStation station = view.Station;
+
+            if(!station.IsCooking)
+            {
+                Say(station.IsEmpty ? "The " + station.Name.ToLowerInvariant() + " is empty. Drop ingredients in from the pantry or a board."
+                    : "Click the " + station.Name.ToLowerInvariant() + " to light it first.");
                 return;
             }
 
-            selection[(entry.Ingredient, entry.Prep)] = selected + 1;
+            held = Held.Station;
+            heldFrom = Origin.Stove;
+            heldStation = view;
+            stirredThisLift = false;
+
+            CreateGhost(screen, 220f, 92f);
+            VerticalLayoutGroup layout = UIFactory.Vertical(ghost.gameObject, 4f, 8);
+            layout.childForceExpandHeight = false;
+            ghost.GetComponent<Image>().color = new Color(0.13f, 0.12f, 0.14f, 0.95f);
+            Text title = UIFactory.Label(ghost, station.Name.ToUpperInvariant() + " (off the heat)", 15, TextAnchor.MiddleLeft, FontStyle.Bold, UIFactory.Accent);
+            UIFactory.Size(title, 20f, 0f);
+            // The status bar stays with the pan while it's off the stove.
+            ghostBar = new TimingBar(ghost, station, 18f);
+            ghostStatus = UIFactory.Label(ghost, "", 14, TextAnchor.MiddleLeft);
+            UIFactory.Size(ghostStatus, 20f, 0f);
+            UpdateGhostStation();
+
+            if(station.Stirs) shakeGesture.Begin(CanvasPoint(screen));
+            Say(station.Stirs ? "Pan off the heat. Shake it side to side in the green to stir one unit. Drop it on a plate to dish up, anywhere else to put it back."
+                : "Pot off the heat. Drop it on a plate to dish up, anywhere else to put it back.");
             RefreshAll();
         }
 
-        private void SelectLess(Inventory.Entry entry)
+        private void HoldPortion(IngredientPortion portion, Origin from, int index, Vector2 screen)
         {
-            int selected = Selected(entry.Ingredient, entry.Prep);
-            if(selected <= 1) selection.Remove((entry.Ingredient, entry.Prep));
-            else selection[(entry.Ingredient, entry.Prep)] = selected - 1;
+            held = Held.Portion;
+            heldFrom = from;
+            heldIndex = index;
+            heldPortion = portion;
+
+            CreateGhost(screen, 150f, 90f);
+            AddPile(ghost, portion.ingredient.Icon, Mathf.Min(portion.quantity, 3), 52f, new Vector2(0.5f, 0.62f));
+            Text label = UIFactory.Label(ghost, Describe(portion, true), 14, TextAnchor.LowerCenter, FontStyle.Bold);
+            UIFactory.Place(label.rectTransform, -0.3f, -0.1f, 1.3f, 0.3f);
+            label.raycastTarget = false;
             RefreshAll();
         }
 
-        private void ClearSelection()
+        private void HoldPlate(Plate taken, Origin from, int index, Vector2 screen)
         {
-            selection.Clear();
+            held = Held.Plate;
+            heldFrom = from;
+            heldIndex = index;
+            heldPlate = taken;
+            if(taken.Items.Count > 0) focusPlate = taken;
+
+            CreateGhost(screen, 110f, 110f);
+            BuildPlateVisual(ghost, taken);
+            SetDeliveryHighlight(true);
             RefreshAll();
         }
 
-        /// <summary>Drops selected units that are no longer in stock (prepped or used meanwhile).</summary>
-        private void ClampSelection()
+        // ------------------------------------------------------------------ Holding and dropping
+
+        /// <summary>Follows the pointer while something is held; drops it when the button comes up.</summary>
+        private void UpdateHeld()
         {
-            List<(IngredientDefinition, PrepSteps)> keys = new List<(IngredientDefinition, PrepSteps)>(selection.Keys);
+            if(held == Held.None) return;
 
-            foreach((IngredientDefinition ingredient, PrepSteps prep) key in keys)
+            Pointer pointer = Pointer.current;
+            Vector2 position = pointer != null ? pointer.position.ReadValue() : Vector2.zero;
+
+            if(pointer == null || !pointer.press.isPressed)
             {
-                int available = inventory.Count(key.ingredient, key.prep);
-                if(available <= 0) selection.Remove(key);
-                else if(selection[key] > available) selection[key] = available;
-            }
-        }
-
-        /// <summary>Moves everything selected to <paramref name="target"/> in one go.</summary>
-        private void SendSelection(Destination target)
-        {
-            if(phase != Phase.Service) return;
-
-            ClampSelection();
-            List<IngredientPortion> batch = new List<IngredientPortion>();
-
-            foreach(KeyValuePair<(IngredientDefinition, PrepSteps), int> pair in selection)
-            {
-                batch.Add(new IngredientPortion(pair.Key.Item1, pair.Value, pair.Key.Item2));
-            }
-
-            if(batch.Count == 0)
-            {
-                Say("Select some stock first: click a row once per unit.", UIFactory.Bad);
+                DropHeld(position);
                 return;
             }
 
-            CookingStation station = target == Destination.Wok ? wok : target == Destination.Pot ? pot : null;
+            MoveGhost(position);
 
-            if(station != null && !station.CanAddAll(batch, out string reason))
+            if(held == Held.Station)
             {
-                Say(reason, UIFactory.Bad);
+                if(heldStation.Station.Stirs) ShakeHeld(position);
+                UpdateGhostStation();
+            }
+            else if(held == Held.Tool)
+            {
+                MoveTool(position);
+            }
+        }
+
+        private void DropHeld(Vector2 screen)
+        {
+            Held what = held;
+            held = Held.None;
+            DestroyGhost();
+            SetDeliveryHighlight(false);
+
+            switch(what)
+            {
+                case Held.Portion: DropPortion(screen); break;
+                case Held.Plate: DropPlate(screen); break;
+                case Held.Station: DropStation(screen); break;
+                case Held.Tool: DropTool(); break;
+            }
+
+            RefreshAll();
+        }
+
+        /// <summary>Puts whatever is held back where it came from (the day ended, or a reset).</summary>
+        private void DropWithoutEffect()
+        {
+            if(held == Held.None) return;
+
+            Held what = held;
+            held = Held.None;
+            DestroyGhost();
+            SetDeliveryHighlight(false);
+
+            if(what == Held.Portion) ReturnPortion(heldPortion);
+            else if(what == Held.Plate) ReturnPlate(heldPlate);
+            else if(what == Held.Tool) DropTool();
+
+            heldPortion = null;
+            heldPlate = null;
+            heldStation = null;
+        }
+
+        private void DropPortion(Vector2 screen)
+        {
+            IngredientPortion portion = heldPortion;
+            heldPortion = null;
+            string name = Describe(portion, true);
+
+            int boardIndex = BoardAt(screen);
+
+            if(boardIndex >= 0)
+            {
+                if(!PutOnBoard(boardIndex, portion)) ReturnPortion(portion);
                 return;
             }
 
-            // Straight onto the plate: only seasonings, and only on a cooked dish.
-            if(station == null)
-            {
-                foreach(IngredientPortion portion in batch)
-                {
-                    if(portion.ingredient.IsSeasoning) continue;
-                    Say(portion.ingredient.DisplayName + " can't go on raw. Everything for a dish goes into the wok or pot at once; only seasonings go on after.", UIFactory.Bad);
-                    return;
-                }
-
-                if(!PlateHasDish)
-                {
-                    Say("Cook the dish first, then season it on the plate.", UIFactory.Bad);
-                    return;
-                }
-            }
-
-            float cost = 0f;
-            int units = 0;
-
-            foreach(IngredientPortion portion in batch)
-            {
-                inventory.Take(portion.ingredient, portion.prep, portion.quantity);
-                cost += portion.ingredient.Price * portion.quantity;
-                units += portion.quantity;
-            }
+            StationView station = StationAt(screen);
 
             if(station != null)
             {
-                station.AddAll(batch);
-                Say(units + (units == 1 ? " unit" : " units") + " into the " + station.Name.ToLowerInvariant() + (station.IsSoup ? " (soup)." : ".") + " Press Start when it's all in.");
-                LogCooking(station.Name, "Put in " + ListPortions(batch) + (station.IsSoup ? " (soup)." : "."));
-            }
-            else
-            {
-                foreach(IngredientPortion portion in batch) AddToPlate(portion);
-                Say("Seasoned the dish with " + ListPortions(batch) + ".");
-                LogCooking("Plate", "Seasoned with " + ListPortions(batch) + ".");
+                if(!station.Station.CanAdd(portion, out string reason))
+                {
+                    Say(reason, UIFactory.Bad);
+                    ReturnPortion(portion);
+                    return;
+                }
+
+                station.Station.Add(portion);
+                station.Cost += portion.ingredient.Price * portion.quantity;
+                LogCooking(station.Station.Name, "Put in " + ListPortions(new[] { portion }) + (station.Station.IsSoup ? " (soup)." : "."));
+                Say(name + " into the " + station.Station.Name.ToLowerInvariant() + (station.Station.IsSoup ? " (soup)" : "")
+                    + ". Click it to light it once everything's in.");
+                return;
             }
 
-            dishCost += cost;
-            selection.Clear();
-            RefreshAll();
+            DeskSlot slot = SlotAt(screen);
+
+            if(slot != null)
+            {
+                if(slot.Plate != null)
+                {
+                    if(!Season(slot.Plate, portion)) ReturnPortion(portion);
+                    return;
+                }
+
+                if(slot.Loose == null)
+                {
+                    slot.Loose = portion;
+                    Say(name + " on the desk.");
+                    return;
+                }
+
+                if(SameKind(slot.Loose, portion))
+                {
+                    slot.Loose.quantity += portion.quantity;
+                    return;
+                }
+
+                Say("Something else is there already.", UIFactory.Bad);
+                ReturnPortion(portion);
+                return;
+            }
+
+            if(Over(deliveryRect, screen)) Say("Only a plate goes here: put it on a plate first.", UIFactory.Bad);
+
+            // Over the pantry, or anywhere else: back on its pile.
+            if(Over(pantryRect, screen)) inventory.Add(portion.ingredient, portion.prep, portion.quantity);
+            else ReturnPortion(portion);
         }
 
-        private void StartStation(StationView view)
+        /// <summary>Back where it was picked up from.</summary>
+        private void ReturnPortion(IngredientPortion portion)
         {
-            if(view.Station.StartCooking())
+            if(portion == null) return;
+
+            if(heldFrom == Origin.Board && heldIndex >= 0 && heldIndex < boards.Count && boards[heldIndex].Units == null)
             {
-                Say(view.Station.Name + " on. Watch the bar.");
-                LogCooking(view.Station.Name, "Started" + (view.Station.IsSoup ? " the soup." : "."));
+                boards[heldIndex].Units = portion;
+                return;
             }
 
-            RefreshAll();
+            if(heldFrom == Origin.Slot && heldIndex >= 0 && heldIndex < deskSlots.Count && deskSlots[heldIndex].IsEmpty)
+            {
+                deskSlots[heldIndex].Loose = portion;
+                return;
+            }
+
+            inventory.Add(portion.ingredient, portion.prep, portion.quantity);
         }
 
-        private void TakeOff(StationView view)
+        private static bool SameKind(IngredientPortion a, IngredientPortion b)
         {
-            // One dish per plate: you can't add more cooked food to it afterwards.
-            if(PlateHasDish)
+            return a.ingredient == b.ingredient && a.prep == b.prep && a.cooking == b.cooking && a.IsRaw == b.IsRaw && (a.IsRaw || a.doneness == b.doneness);
+        }
+
+        /// <summary>A seasoning on a cooked dish. Nothing else goes on a plate raw.</summary>
+        private bool Season(Plate target, IngredientPortion portion)
+        {
+            if(!portion.ingredient.IsSeasoning)
             {
-                Say("There's already a dish on the plate. Serve it or bin it first.", UIFactory.Bad);
+                Say(portion.ingredient.DisplayName + " can't go on a plate raw. Everything for a dish is cooked in the pot or the pan; only seasonings go on after.", UIFactory.Bad);
+                return false;
+            }
+
+            if(!target.HasDish)
+            {
+                Say("Cook the dish first, then season it on the plate.", UIFactory.Bad);
+                return false;
+            }
+
+            AddToPlate(target, portion);
+            target.Cost += portion.ingredient.Price * portion.quantity;
+            focusPlate = target;
+            Say("Seasoned the dish with " + ListPortions(new[] { portion }) + ".");
+            LogCooking("Plate", "Seasoned with " + ListPortions(new[] { portion }) + ".");
+            return true;
+        }
+
+        private void DropPlate(Vector2 screen)
+        {
+            Plate dropped = heldPlate;
+            heldPlate = null;
+
+            if(Over(plateStack, screen))
+            {
+                if(dropped.Items.Count == 0) return;
+                Say("A plate with food on it stays on the desk. Serve it.", UIFactory.Bad);
+                ReturnPlate(dropped);
+                return;
+            }
+
+            if(Over(deliveryRect, screen))
+            {
+                if(!TryServe(dropped)) ReturnPlate(dropped);
+                return;
+            }
+
+            DeskSlot slot = SlotAt(screen);
+
+            if(slot != null && slot.IsEmpty)
+            {
+                slot.Plate = dropped;
+                return;
+            }
+
+            // Anywhere on the desk: the nearest free space.
+            if(Over(deskRect, screen))
+            {
+                DeskSlot nearest = NearestFreeSlot(screen);
+
+                if(nearest != null)
+                {
+                    nearest.Plate = dropped;
+                    return;
+                }
+
+                Say("No room on the desk.", UIFactory.Bad);
+            }
+
+            ReturnPlate(dropped);
+        }
+
+        private void ReturnPlate(Plate dropped)
+        {
+            if(dropped == null || heldFrom == Origin.Stack) return;
+
+            DeskSlot slot = heldIndex >= 0 && heldIndex < deskSlots.Count && deskSlots[heldIndex].IsEmpty ? deskSlots[heldIndex] : NearestFreeSlot(null);
+            if(slot != null) slot.Plate = dropped;
+        }
+
+        private void DropStation(Vector2 screen)
+        {
+            StationView view = heldStation;
+            heldStation = null;
+            shakeGesture.End();
+
+            DeskSlot slot = SlotAt(screen);
+
+            if(slot != null && slot.Plate != null)
+            {
+                DishUp(view, slot.Plate);
+                return;
+            }
+
+            if(slot != null || Over(deliveryRect, screen))
+            {
+                Say("Put a clean plate down first, from the stack. The " + view.Station.Name.ToLowerInvariant() + " is back on the heat.", UIFactory.Bad);
+                return;
+            }
+
+            Say("Back on the heat.");
+        }
+
+        /// <summary>Everything in the station onto <paramref name="target"/>, done as it is now.</summary>
+        private void DishUp(StationView view, Plate target)
+        {
+            // One dish per plate: no more cooked food once there's a dish on it.
+            if(target.HasDish)
+            {
+                Say("There's already a dish on that plate. Use a clean one. The " + view.Station.Name.ToLowerInvariant() + " is back on the heat.", UIFactory.Bad);
                 return;
             }
 
@@ -242,30 +587,131 @@ namespace Cooking.Prototype
             List<IngredientPortion> cooked = station.TakeOff();
             if(cooked.Count == 0) return;
 
-            foreach(IngredientPortion portion in cooked) AddToPlate(portion);
+            foreach(IngredientPortion portion in cooked) AddToPlate(target, portion);
+            target.Cost += view.Cost;
+            view.Cost = 0f;
+            focusPlate = target;
 
             if(wokSummary != null)
             {
                 LogCooking(station.Name, "Took it off: " + wokSummary + ".");
-                Say(station.Name + " onto the plate: " + wokSummary + ".", allPerfect ? UIFactory.Good : UIFactory.Bad);
+                Say(station.Name + " onto the plate: " + wokSummary + ". Drag the plate to the food delivery spot to serve.", allPerfect ? UIFactory.Good : UIFactory.Bad);
             }
             else
             {
                 LogCooking(station.Name, "Took it off at " + (progress * 100f).ToString("0") + "%: " + DonenessLabel(doneness) + ".");
-                Say(station.Name + " onto the plate: " + DonenessLabel(doneness) + ".", allPerfect ? UIFactory.Good : UIFactory.Bad);
+                Say(station.Name + " onto the plate: " + DonenessLabel(doneness) + ". Drag the plate to the food delivery spot to serve.", allPerfect ? UIFactory.Good : UIFactory.Bad);
+            }
+        }
+
+        private void ShakeHeld(Vector2 screen)
+        {
+            if(!shakeGesture.Move(CanvasPoint(screen))) return;
+
+            // One stir per lift: put it back on the heat to get to the green again.
+            if(stirredThisLift)
+            {
+                Say("Stirred. Put it back on the heat until the bar is green again.");
+                return;
+            }
+
+            switch(wok.Shake())
+            {
+                case ShakeResult.Stirred:
+                    stirredThisLift = true;
+                    Say("Stirred one in the green. " + WokSummary(wok) + ". Back on the heat for the next.", UIFactory.Good);
+                    break;
+                case ShakeResult.StirredOverdone:
+                    stirredThisLift = true;
+                    Say("Stirred one, but in the red: a bit burned. " + WokSummary(wok) + ".", UIFactory.Accent);
+                    break;
+                case ShakeResult.TooEarly:
+                    Say("Too early: the bar went back to the start. Shake in the green.", UIFactory.Bad);
+                    break;
+                case ShakeResult.KnockedBack:
+                    stirredThisLift = true;
+                    Say(wok.UnstirredCount == 0 ? "Everything's stirred. Drop it on a plate." : "Knocked back. Shake in the green to stir.");
+                    break;
+            }
+
+            RefreshStationContents(wokView);
+        }
+
+        private void AddToPlate(Plate target, IngredientPortion portion)
+        {
+            foreach(IngredientPortion existing in target.Items)
+            {
+                if(existing.ingredient == portion.ingredient && existing.prep == portion.prep
+                   && existing.cooking == portion.cooking && (existing.IsRaw || existing.doneness == portion.doneness))
+                {
+                    existing.quantity += portion.quantity;
+                    return;
+                }
+            }
+
+            target.Items.Add(new IngredientPortion(portion.ingredient, portion.quantity, portion.prep, portion.cooking, portion.doneness));
+        }
+
+        private bool TryServe(Plate dropped)
+        {
+            if(customer == null || !orderIn)
+            {
+                Say(customer == null ? "Nobody's at the counter." : "Wait for their order.", UIFactory.Bad);
+                return false;
+            }
+
+            if(dropped.Items.Count == 0)
+            {
+                Say("The plate is empty.", UIFactory.Bad);
+                return false;
+            }
+
+            plate.Clear();
+            plate.AddRange(dropped.Items);
+            dishCost = dropped.Cost;
+            if(focusPlate == dropped) focusPlate = null;
+
+            JudgeResult result = DishJudge.Judge(order, plate, customer, zones, rules, JudgeSettings());
+            FinishOrder(result);
+            return true;
+        }
+
+        private void StartStation(StationView view)
+        {
+            if(phase != Phase.Service || held != Held.None) return;
+
+            if(view.Station.IsEmpty)
+            {
+                Say("The " + view.Station.Name.ToLowerInvariant() + " is empty. Drop ingredients in from the pantry or a board first.");
+                return;
+            }
+
+            if(view.Station.IsCooking)
+            {
+                Say(view.Station.Stirs ? "Hold the pan to take it off the heat, and shake it to stir." : "Hold the pot and drop it on a plate when the bar is green.");
+                return;
+            }
+
+            if(view.Station.StartCooking())
+            {
+                Say(view.Station.Name + " on. Watch the bar.");
+                LogCooking(view.Station.Name, "Started" + (view.Station.IsSoup ? " the soup." : "."));
             }
 
             RefreshAll();
         }
 
-        /// <summary>True once a cooked batch is on the plate.</summary>
-        private bool PlateHasDish
+        /// <summary>Takes everything back out of an unlit station, into stock.</summary>
+        private void EmptyStation(StationView view)
         {
-            get
-            {
-                foreach(IngredientPortion portion in plate) if(!portion.IsRaw) return true;
-                return false;
-            }
+            if(view.Station.IsCooking || view.Station.IsEmpty) return;
+
+            foreach(IngredientPortion portion in view.Station.Contents) inventory.Add(portion.ingredient, portion.prep, portion.quantity);
+            LogCooking(view.Station.Name, "Took " + ListPortions(view.Station.Contents) + " back out.");
+            view.Station.Clear();
+            view.Cost = 0f;
+            Say("Took everything back out of the " + view.Station.Name.ToLowerInvariant() + ".");
+            RefreshAll();
         }
 
         /// <summary>"3/4 stirred (1 overcooked), 1 burnt, 0 not stirred".</summary>
@@ -278,59 +724,10 @@ namespace Cooking.Prototype
             return text;
         }
 
-        private void BinStation(StationView view)
-        {
-            LogCooking(view.Station.Name, "Binned " + ListPortions(view.Station.Contents) + ".");
-            view.Station.Clear();
-            Say("Binned the " + view.Station.Name.ToLowerInvariant() + ".");
-            RefreshAll();
-        }
-
-        private void AddToPlate(IngredientPortion portion)
-        {
-            foreach(IngredientPortion existing in plate)
-            {
-                if(existing.ingredient == portion.ingredient && existing.prep == portion.prep
-                   && existing.cooking == portion.cooking && (existing.IsRaw || existing.doneness == portion.doneness))
-                {
-                    existing.quantity += portion.quantity;
-                    return;
-                }
-            }
-
-            plate.Add(new IngredientPortion(portion.ingredient, portion.quantity, portion.prep, portion.cooking, portion.doneness));
-        }
-
-        private void BinPlate()
-        {
-            LogCooking("Plate", "Binned the plate: " + ListPortions(plate) + ".");
-            ClearPlate();
-            Say("Binned the plate.");
-            RefreshAll();
-        }
-
         private void TogglePreview()
         {
             livePreview = !livePreview;
             RefreshAll();
-        }
-
-        private void Serve()
-        {
-            if(customer == null || !orderIn)
-            {
-                Say(customer == null ? "Nobody's at the counter." : "Wait for their order.", UIFactory.Bad);
-                return;
-            }
-
-            if(plate.Count == 0)
-            {
-                Say("The plate is empty.", UIFactory.Bad);
-                return;
-            }
-
-            JudgeResult result = DishJudge.Judge(order, plate, customer, zones, rules, JudgeSettings());
-            FinishOrder(result);
         }
 
         private DishJudge.Settings JudgeSettings()
@@ -343,43 +740,6 @@ namespace Cooking.Prototype
             settings.CloseEnoughAt = closeEnoughAt;
             settings.CloseEnoughPay = closeEnoughPay;
             return settings;
-        }
-
-        // ------------------------------------------------------------------ Wok shaking
-
-        private void OnWokPressed(Vector2 position)
-        {
-            wokPad.AddTrailPoint(position, newStroke: true);
-            shakeGesture.Begin(position);
-        }
-
-        private void OnWokMoved(Vector2 position)
-        {
-            wokPad.AddTrailPoint(position);
-            if(!shakeGesture.Move(position)) return;
-
-            switch(wok.Shake())
-            {
-                case ShakeResult.Stirred:
-                    Say("Stirred one in the green. " + WokSummary(wok) + ".", UIFactory.Good);
-                    break;
-                case ShakeResult.StirredOverdone:
-                    Say("Stirred one, but in the red: a bit burned. " + WokSummary(wok) + ".", UIFactory.Accent);
-                    break;
-                case ShakeResult.TooEarly:
-                    Say("Too early: the bar went back to the start. Shake in the green.", UIFactory.Bad);
-                    break;
-                case ShakeResult.KnockedBack:
-                    Say(wok.UnstirredCount == 0 ? "Everything's stirred. Take it off." : "Knocked back. Shake in the green to stir.");
-                    break;
-            }
-
-            RefreshAll();
-        }
-
-        private void OnWokReleased()
-        {
-            shakeGesture.End();
         }
 
         /// <summary>"2× Rice, 1× Onion (peeled, sliced)" for the history.</summary>
@@ -402,263 +762,428 @@ namespace Cooking.Prototype
             return items.Count > 0 ? string.Join(", ", items) : "nothing";
         }
 
-        // ------------------------------------------------------------------ UI
+        // ------------------------------------------------------------------ Hit tests
 
-        private GameObject BuildKitchenArea(RectTransform root)
+        private static bool Over(RectTransform rect, Vector2 screen)
         {
-            BuildTicket(Column(root, "Ticket", 0f, 0.2f));
-
-            // Wide enough for "1× Synthetic Chicken sliced" on one line next to its icon.
-            RectTransform stock = Column(root, "Stock", 0.2f, 0.42f);
-            VerticalLayoutGroup stockLayout = UIFactory.Vertical(stock.gameObject, 8f, 14);
-            stockLayout.childForceExpandHeight = false;
-            Header(stock, "STOCK");
-            kitchenStockContent = UIFactory.ScrollList(stock);
-
-            selectionText = UIFactory.Label(stock, "", 17);
-            UIFactory.Size(selectionText, 24f, 0f);
-            RectTransform sendRow = UIFactory.Row(stock, 44f, 6f);
-            sendButtons[Destination.Wok] = UIFactory.Button(sendRow, "Wok", () => SendSelection(Destination.Wok), new Color(0.75f, 0.42f, 0.15f, 1f), 18);
-            sendButtons[Destination.Pot] = UIFactory.Button(sendRow, "Pot", () => SendSelection(Destination.Pot), new Color(0.75f, 0.42f, 0.15f, 1f), 18);
-            sendButtons[Destination.Plate] = UIFactory.Button(sendRow, "Plate", () => SendSelection(Destination.Plate), null, 18);
-            RectTransform clearRow = UIFactory.Row(stock, 34f, 6f);
-            clearSelectionButton = UIFactory.Button(clearRow, "Clear selection", ClearSelection, null, 16);
-
-            RectTransform stations = Column(root, "Stations", 0.42f, 0.67f, false);
-            VerticalLayoutGroup layout = UIFactory.Vertical(stations.gameObject, 10f, 0);
-            layout.childForceExpandHeight = false;
-            wokView = BuildStation(stations, wok, "WOK  <color=#77736d>shake in the green, once per unit</color>");
-            potView = BuildStation(stations, pot, "POT  <color=#77736d>take it off on the green line</color>");
-
-            BuildPlateColumn(Column(root, "Plate", 0.67f, 1f));
-            return root.gameObject;
+            return rect != null && rect.gameObject.activeInHierarchy && RectTransformUtility.RectangleContainsScreenPoint(rect, screen, null);
         }
 
-        private StationView BuildStation(RectTransform parent, CookingStation station, string title)
+        private DeskSlot SlotAt(Vector2 screen)
         {
-            StationView view = new StationView { Station = station };
+            foreach(DeskSlot slot in deskSlots) if(Over(slot.Rect, screen)) return slot;
+            return null;
+        }
 
-            RectTransform panel = UIFactory.Panel(parent, station.Name, UIFactory.PanelColor).rectTransform;
-            UIFactory.Size(panel, -1f, 1f);
-            UIFactory.Vertical(panel.gameObject, 8f, 14);
-            Header(panel, title);
-            view.Contents = UIFactory.Label(panel, "", 18);
-            UIFactory.Size(view.Contents, 48f, 0f);
-            view.Bar = new TimingBar(panel, station, 34f);
-            view.Status = UIFactory.Label(panel, "", 22, TextAnchor.MiddleLeft, FontStyle.Bold);
-            UIFactory.Size(view.Status, 28f, 0f);
+        private StationView StationAt(Vector2 screen)
+        {
+            if(Over(wokView.Rect, screen)) return wokView;
+            if(Over(potView.Rect, screen)) return potView;
+            return null;
+        }
 
-            if(station.Burns)
+        /// <summary>The free desk space nearest the pointer (or the first free one).</summary>
+        private DeskSlot NearestFreeSlot(Vector2? screen)
+        {
+            DeskSlot best = null;
+            float bestDistance = float.MaxValue;
+
+            foreach(DeskSlot slot in deskSlots)
             {
-                wokPad = BuildPad(panel, "Shake Pad", 80f, 1f, OnWokPressed, OnWokMoved, OnWokReleased);
-                wokPad.SetTrailColor(UIFactory.Accent);
-                view.PadHint = UIFactory.Label(wokPad.transform, "", 16, TextAnchor.MiddleCenter);
-                UIFactory.Stretch(view.PadHint.rectTransform);
+                if(!slot.IsEmpty) continue;
+                if(screen == null) return slot;
+
+                Vector2 centre = RectTransformUtility.WorldToScreenPoint(null, slot.Rect.TransformPoint(slot.Rect.rect.center));
+                float distance = (centre - screen.Value).sqrMagnitude;
+
+                if(distance < bestDistance)
+                {
+                    bestDistance = distance;
+                    best = slot;
+                }
             }
 
-            RectTransform row = UIFactory.Row(panel, 46f);
-            view.StartButton = UIFactory.Button(row, "Start", () => StartStation(view));
-            view.TakeOffButton = UIFactory.Button(row, "Take off", () => TakeOff(view), new Color(0.25f, 0.4f, 0.25f, 1f));
-            view.BinButton = UIFactory.Button(row, "Bin", () => BinStation(view), new Color(0.35f, 0.2f, 0.2f, 1f));
+            return best;
+        }
 
-            UpdateStationView(view);
+        private Vector2 CanvasPoint(Vector2 screen)
+        {
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, screen, null, out Vector2 local);
+            return local;
+        }
+
+        // ------------------------------------------------------------------ The thing in hand
+
+        private void CreateGhost(Vector2 screen, float width, float height)
+        {
+            DestroyGhost();
+            Image image = UIFactory.Panel(canvasRect, "Held", Color.clear);
+            image.raycastTarget = false;
+            ghost = image.rectTransform;
+            ghost.sizeDelta = new Vector2(width, height);
+            ghost.SetAsLastSibling();
+            MoveGhost(screen);
+        }
+
+        private void MoveGhost(Vector2 screen)
+        {
+            if(ghost != null) ghost.anchoredPosition = CanvasPoint(screen);
+        }
+
+        private void DestroyGhost()
+        {
+            if(ghost != null) Destroy(ghost.gameObject);
+            ghost = null;
+            ghostBar = null;
+            ghostStatus = null;
+        }
+
+        private void UpdateGhostStation()
+        {
+            if(ghostBar == null || heldStation == null) return;
+
+            CookingStation station = heldStation.Station;
+            ghostBar.Set(station.Progress, true);
+            ghostStatus.text = station.Stirs ? WokSummary(station) : (station.Progress * 100f).ToString("0") + "%  " + DonenessLabel(station.CurrentDoneness);
+        }
+
+        private void SetDeliveryHighlight(bool on)
+        {
+            if(deliveryOutline == null) return;
+            foreach(Image bar in deliveryOutline) bar.color = on ? UIFactory.Accent : new Color(1f, 1f, 1f, 0.5f);
+        }
+
+        // ------------------------------------------------------------------ UI
+
+        private void BuildDesk(Transform root)
+        {
+            Image desk = UIFactory.Panel(root, "Workbench", new Color(0.23f, 0.17f, 0.13f, 1f));
+            deskRect = desk.rectTransform;
+            UIFactory.Place(deskRect, ConversationWidth, 0f, 1f, DeskShare);
+
+            Image edge = UIFactory.Panel(deskRect, "Edge", new Color(0.36f, 0.27f, 0.2f, 1f));
+            edge.raycastTarget = false;
+            RectTransform edgeRect = edge.rectTransform;
+            edgeRect.anchorMin = new Vector2(0f, 1f);
+            edgeRect.anchorMax = Vector2.one;
+            edgeRect.offsetMin = new Vector2(0f, -8f);
+            edgeRect.offsetMax = Vector2.zero;
+
+            BuildDelivery(deskRect);
+
+            // Free desk space for plates and loose ingredients.
+            for(int row = 0; row < DeskSlotRows; row++)
+            {
+                for(int column = 0; column < DeskSlotColumns; column++)
+                {
+                    float x0 = 0.16f + column * (0.26f / DeskSlotColumns);
+                    float y1 = 0.97f - row * (0.35f / DeskSlotRows);
+                    deskSlots.Add(BuildDeskSlot(deskRect, x0, y1 - 0.35f / DeskSlotRows, x0 + 0.26f / DeskSlotColumns, y1));
+                }
+            }
+
+            potView = BuildStationTile(deskRect, pot, "COOKING (POT)", 0.43f, 0.59f);
+            wokView = BuildStationTile(deskRect, wok, "FRYING (PAN)", 0.61f, 0.77f);
+            BuildPlateStack(deskRect);
+            BuildBoards(deskRect);
+            BuildPantry(deskRect);
+        }
+
+        private void BuildDelivery(RectTransform desk)
+        {
+            Image area = UIFactory.Panel(desk, "Food Delivery", new Color(0f, 0f, 0f, 0.25f));
+            deliveryRect = area.rectTransform;
+            UIFactory.Place(deliveryRect, 0.03f, 0.71f, 0.15f, 0.97f);
+            deliveryOutline = UIFactory.Outline(deliveryRect, new Color(1f, 1f, 1f, 0.5f), 3f);
+            deliveryLabel = UIFactory.Label(deliveryRect, "", 15, TextAnchor.MiddleCenter, FontStyle.Bold, UIFactory.MutedText);
+            UIFactory.Stretch(deliveryLabel.rectTransform, 8f);
+            UIFactory.FitText(deliveryLabel);
+        }
+
+        private DeskSlot BuildDeskSlot(RectTransform desk, float xMin, float yMin, float xMax, float yMax)
+        {
+            DeskSlot slot = new DeskSlot();
+            Image back = UIFactory.Panel(desk, "Desk Space", new Color(0f, 0f, 0f, 0.12f));
+            slot.Rect = back.rectTransform;
+            UIFactory.Place(slot.Rect, xMin, yMin, xMax, yMax, 4f);
+            slot.Content = UIFactory.Rect(slot.Rect, "Content");
+            UIFactory.Stretch(slot.Content, 4f);
+            slot.Rect.gameObject.AddComponent<DragHandle>().Began = screen => GrabFromSlot(slot, screen);
+            return slot;
+        }
+
+        private StationView BuildStationTile(RectTransform desk, CookingStation station, string title, float xMin, float xMax)
+        {
+            StationView view = new StationView { Station = station };
+            Image tile = UIFactory.Panel(desk, station.Name, new Color(0.12f, 0.11f, 0.13f, 1f));
+            view.Rect = tile.rectTransform;
+            UIFactory.Place(view.Rect, xMin, 0.38f, xMax, 0.77f, 4f);
+            DragHandle handle = tile.gameObject.AddComponent<DragHandle>();
+            handle.Began = screen => GrabStation(view, screen);
+            handle.Clicked = () => StartStation(view);
+
+            VerticalLayoutGroup layout = UIFactory.Vertical(tile.gameObject, 4f, 8);
+            layout.childForceExpandHeight = false;
+            Text header = Header(tile.transform, title);
+            UIFactory.Size(header, 18f, 0f);
+            UIFactory.FitText(header);
+            view.Bar = new TimingBar(tile.transform, station, 16f);
+            view.Status = UIFactory.Label(tile.transform, "", 14, TextAnchor.MiddleLeft, FontStyle.Bold);
+            UIFactory.Size(view.Status, 36f, 0f);
+            UIFactory.FitText(view.Status);
+
+            view.Icons = UIFactory.Row(tile.transform, 40f, 2f);
+            HorizontalLayoutGroup iconLayout = view.Icons.GetComponent<HorizontalLayoutGroup>();
+            iconLayout.childForceExpandWidth = false;
+            iconLayout.childAlignment = TextAnchor.MiddleCenter;
+
+            view.Contents = UIFactory.Label(tile.transform, "", 13);
+            UIFactory.Size(view.Contents, 20f, 1f);
+            UIFactory.FitText(view.Contents);
+
+            RectTransform row = UIFactory.Row(tile.transform, 24f);
+            view.EmptyButton = UIFactory.Button(row, "Take it all out", () => EmptyStation(view), new Color(0.3f, 0.22f, 0.22f, 1f), 13);
             return view;
         }
 
-        private void BuildPlateColumn(RectTransform column)
+        private void BuildPlateStack(RectTransform desk)
         {
-            VerticalLayoutGroup layout = UIFactory.Vertical(column.gameObject, 10f, 16);
+            Image stack = UIFactory.Panel(desk, "Clean Plates", new Color(0f, 0f, 0f, 0.15f));
+            plateStack = stack.rectTransform;
+            UIFactory.Place(plateStack, 0.66f, 0.8f, 0.78f, 0.97f, 2f);
+            stack.gameObject.AddComponent<DragHandle>().Began = GrabCleanPlate;
+
+            for(int i = 0; i < 3; i++)
+            {
+                Image disc = UIFactory.Panel(plateStack, "Plate", new Color(0.86f, 0.84f, 0.79f, 1f));
+                disc.sprite = UIFactory.Circle;
+                disc.preserveAspect = true;
+                disc.raycastTarget = false;
+                UIFactory.Place(disc.rectTransform, 0.08f, 0.22f + i * 0.06f, 0.6f, 0.92f + i * 0.06f);
+                disc.rectTransform.anchoredPosition = new Vector2(i * 3f, 0f);
+            }
+
+            Text label = UIFactory.Label(plateStack, "Clean\nplates", 13, TextAnchor.MiddleRight, FontStyle.Bold, UIFactory.TextColor);
+            UIFactory.Stretch(label.rectTransform, 4f);
+        }
+
+        private void BuildPantry(RectTransform desk)
+        {
+            Image pantry = UIFactory.Panel(desk, "Pantry", new Color(0.12f, 0.11f, 0.13f, 1f));
+            pantryRect = pantry.rectTransform;
+            UIFactory.Place(pantryRect, 0.8f, 0.04f, 0.985f, 0.96f);
+            VerticalLayoutGroup layout = UIFactory.Vertical(pantry.gameObject, 4f, 8);
             layout.childForceExpandHeight = false;
-            Header(column, "PLATE");
-            plateIcons = UIFactory.Row(column, 52f, 6f);
-            HorizontalLayoutGroup iconLayout = plateIcons.GetComponent<HorizontalLayoutGroup>();
-            iconLayout.childForceExpandWidth = false;
-            iconLayout.childAlignment = TextAnchor.MiddleLeft;
-            plateText = UIFactory.Label(column, "", 19);
-            UIFactory.Size(plateText, 120f, 0f);
+            Text header = Header(pantry.transform, "PANTRY  <color=#77736d>hold to take one</color>");
+            UIFactory.FitText(header);
+            pantryContent = UIFactory.ScrollList(pantry.transform, 4f);
+        }
 
-            RectTransform row = UIFactory.Row(column, 52f);
-            serveButton = UIFactory.Button(row, "Serve", Serve, new Color(0.75f, 0.42f, 0.15f, 1f), 24);
-            binPlateButton = UIFactory.Button(row, "Bin plate", BinPlate, new Color(0.35f, 0.2f, 0.2f, 1f));
+        /// <summary>A small heap of the same picture, for a pile of units.</summary>
+        private static void AddPile(RectTransform parent, Sprite sprite, int count, float size, Vector2 anchor)
+        {
+            for(int i = 0; i < count; i++)
+            {
+                Image icon = UIFactory.Panel(parent, "Piece", sprite != null ? Color.white : Color.clear);
+                icon.sprite = sprite;
+                icon.preserveAspect = true;
+                icon.raycastTarget = false;
+                RectTransform rt = icon.rectTransform;
+                rt.anchorMin = rt.anchorMax = anchor;
+                rt.sizeDelta = new Vector2(size, size);
+                rt.anchoredPosition = new Vector2((i - (count - 1) * 0.5f) * size * 0.3f, (i % 2) * size * 0.12f);
+            }
+        }
 
-            RectTransform radarArea = UIFactory.Rect(column, "Radar");
-            UIFactory.Size(radarArea, 300f, 1f);
-            plateRadar = radarArea.gameObject.AddComponent<FlavourRadarGraphic>();
-            plateRadar.raycastTarget = false;
-            // No zones: just your dish and, when you know it, the order.
-            plateRadar.CreateLabels(UIFactory.Font, 16, UIFactory.MutedText);
+        /// <summary>A plate: a disc with what's on it.</summary>
+        private void BuildPlateVisual(RectTransform parent, Plate target)
+        {
+            Image disc = UIFactory.Panel(parent, "Plate", new Color(0.86f, 0.84f, 0.79f, 1f));
+            disc.sprite = UIFactory.Circle;
+            disc.preserveAspect = true;
+            disc.raycastTarget = false;
+            UIFactory.Place(disc.rectTransform, 0f, 0.12f, 1f, 1f);
 
-            Text legend = UIFactory.Label(column, "<color=#d9d9d9>Grey outline</color>: the order.  <color=#f28c33>Orange</color>: your dish so far.",
-                16, TextAnchor.UpperLeft, FontStyle.Normal, UIFactory.MutedText);
-            UIFactory.Size(legend, 24f, 0f);
+            int shown = 0;
+            foreach(IngredientPortion portion in target.Items)
+            {
+                if(shown >= 4) break;
+                AddPile(disc.rectTransform, portion.ingredient.Icon, 1, 34f, new Vector2(0.3f + (shown % 2) * 0.4f, 0.65f - (shown / 2) * 0.3f));
+                shown++;
+            }
 
-            RectTransform previewRow = UIFactory.Row(column, 36f);
-            previewButton = UIFactory.Button(previewRow, "", TogglePreview, null, 16);
+            string label = target.Items.Count == 0 ? "Empty plate" : target.HasDish ? DishLabel(target) : "Not cooked";
+            Text text = UIFactory.Label(parent, label, 12, TextAnchor.LowerCenter, FontStyle.Bold);
+            UIFactory.Place(text.rectTransform, -0.1f, -0.06f, 1.1f, 0.2f);
+            UIFactory.FitText(text);
+        }
+
+        private string DishLabel(Plate target)
+        {
+            RecipeDefinition match = CustomerRelationship.FindMatch(KnownRecipes(), target.Items);
+            return match != null && IsOnMenu(match) ? match.DisplayName : "A dish";
         }
 
         private void RefreshKitchen()
         {
-            if(plateText == null) return;
+            if(pantryContent == null) return;
 
-            ClampSelection();
-            if(area == Area.Kitchen) RebuildKitchenStock();
-
-            int selected = SelectedTotal;
-            selectionText.text = selected == 0
-                ? "<color=#a6a199>Click a row once per unit to select it.</color>"
-                : "<b>" + selected + (selected == 1 ? " unit" : " units") + "</b> selected. Send to:";
-            foreach(Button button in sendButtons.Values) button.interactable = selected > 0 && phase == Phase.Service;
-            sendButtons[Destination.Wok].interactable &= !wok.IsCooking;
-            sendButtons[Destination.Pot].interactable &= !pot.IsCooking;
-            clearSelectionButton.interactable = selected > 0;
+            RebuildPantry();
+            foreach(DeskSlot slot in deskSlots) RebuildSlot(slot);
+            RefreshBoards();
 
             RefreshStationContents(wokView);
             RefreshStationContents(potView);
             UpdateStationView(wokView);
             UpdateStationView(potView);
 
-            if(plate.Count == 0)
-            {
-                plateText.text = "<color=#a6a199>Empty.</color>";
-                UIFactory.ClearChildren(plateIcons);
-            }
-            else
-            {
-                StringBuilder sb = new StringBuilder();
-                foreach(IngredientPortion portion in plate) sb.Append(Describe(portion, true)).Append('\n');
-                sb.Append("<color=#a6a199>Ingredients used: $").Append(dishCost.ToString("0.00")).Append("</color>");
-                plateText.text = sb.ToString();
+            deliveryLabel.text = phase == Phase.Service && customer != null && orderIn
+                ? "FOOD DELIVERY\n<size=12><color=#a6a199>drop a plate here to serve " + customer.name + "</color></size>"
+                : "FOOD DELIVERY";
 
-                // One picture per ingredient on the plate.
-                UIFactory.ClearChildren(plateIcons);
-                foreach(IngredientPortion portion in plate) UIFactory.Icon(plateIcons, portion.ingredient.Icon, 48f);
-            }
-
-            serveButton.interactable = plate.Count > 0 && orderIn;
-            binPlateButton.interactable = plate.Count > 0;
             UIFactory.SetButtonText(previewButton, livePreview ? "Live flavour: on" : "Live flavour: off");
-
             plateRadar.ClearProfiles();
-            // The order only when it's a recipe you know (in the recipe book).
+            // The order only when it's a recipe you know (on the menu).
             if(orderIn && orderKnown) plateRadar.AddProfile(orderProfile, new Color(0.85f, 0.85f, 0.85f, 0.7f), false);
-            if(livePreview && plate.Count > 0) plateRadar.AddProfile(FlavourCalculator.Calculate(plate, rules), UIFactory.Accent, true);
+            if(livePreview && focusPlate != null && focusPlate.Items.Count > 0)
+            {
+                plateRadar.AddProfile(FlavourCalculator.Calculate(focusPlate.Items, rules), UIFactory.Accent, true);
+            }
         }
 
-        /// <summary>Kitchen stock rows: click adds a unit to the selection, − takes one back.</summary>
-        private void RebuildKitchenStock()
+        private void RebuildSlot(DeskSlot slot)
         {
-            UIFactory.ClearChildren(kitchenStockContent);
+            UIFactory.ClearChildren(slot.Content);
+
+            if(slot.Plate != null)
+            {
+                RectTransform holder = UIFactory.Rect(slot.Content, "Plate");
+                holder.anchorMin = holder.anchorMax = new Vector2(0.5f, 0.5f);
+                float size = Mathf.Min(slot.Rect.rect.width, slot.Rect.rect.height) - 12f;
+                holder.sizeDelta = new Vector2(Mathf.Max(60f, size), Mathf.Max(60f, size));
+                BuildPlateVisual(holder, slot.Plate);
+            }
+            else if(slot.Loose != null)
+            {
+                AddPile(slot.Content, slot.Loose.ingredient.Icon, Mathf.Min(slot.Loose.quantity, 3), 46f, new Vector2(0.5f, 0.6f));
+                Text label = UIFactory.Label(slot.Content, Describe(slot.Loose, true), 12, TextAnchor.LowerCenter, FontStyle.Bold);
+                UIFactory.Stretch(label.rectTransform);
+                UIFactory.FitText(label);
+            }
+        }
+
+        private void RebuildPantry()
+        {
+            UIFactory.ClearChildren(pantryContent);
             List<Inventory.Entry> entries = inventory.Entries();
 
             if(entries.Count == 0)
             {
-                Text empty = UIFactory.Label(kitchenStockContent, "<color=#a6a199>Out of stock. The store reopens tomorrow morning.</color>", 17);
-                UIFactory.Size(empty, 50f, 0f);
+                Text empty = UIFactory.Label(pantryContent, "<color=#a6a199>Empty. Ingredients come from the Shop on the tablet in the morning.</color>", 14);
+                UIFactory.Size(empty, 60f, 0f);
                 return;
             }
 
-            // Grouped: raw ingredients, prepped ones, and seasonings (which can also go on a cooked dish).
-            AddKitchenStockGroup("RAW", entries.FindAll(e => !e.Ingredient.IsSeasoning && e.Prep == PrepSteps.None));
-            AddKitchenStockGroup("PREPPED", entries.FindAll(e => !e.Ingredient.IsSeasoning && e.Prep != PrepSteps.None));
-            AddKitchenStockGroup("SEASONING", entries.FindAll(e => e.Ingredient.IsSeasoning));
+            AddPantryGroup("RAW", entries.FindAll(e => !e.Ingredient.IsSeasoning && e.Prep == PrepSteps.None));
+            AddPantryGroup("PREPPED", entries.FindAll(e => !e.Ingredient.IsSeasoning && e.Prep != PrepSteps.None));
+            AddPantryGroup("SEASONING", entries.FindAll(e => e.Ingredient.IsSeasoning));
         }
 
-        private void AddKitchenStockGroup(string title, List<Inventory.Entry> entries)
+        private void AddPantryGroup(string title, List<Inventory.Entry> entries)
         {
             if(entries.Count == 0) return;
 
-            Text header = Header(kitchenStockContent, title);
-            UIFactory.Size(header, 26f, 0f);
-            Color selectedColor = new Color(0.55f, 0.33f, 0.14f, 1f);
+            Text header = Header(pantryContent, title);
+            UIFactory.Size(header, 18f, 0f);
+
+            RectTransform grid = UIFactory.Rect(pantryContent, "Piles");
+            GridLayoutGroup layout = grid.gameObject.AddComponent<GridLayoutGroup>();
+            layout.cellSize = new Vector2(116f, 58f);
+            layout.spacing = new Vector2(4f, 4f);
+            layout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+            layout.constraintCount = 2;
+            int rows = (entries.Count + 1) / 2;
+            UIFactory.Size(grid, rows * 62f, 0f);
 
             foreach(Inventory.Entry entry in entries)
             {
                 Inventory.Entry captured = entry;
-                int selected = Selected(entry.Ingredient, entry.Prep);
+                Image cell = UIFactory.Panel(grid, entry.Ingredient.DisplayName, new Color(1f, 1f, 1f, 0.05f));
+                cell.gameObject.AddComponent<DragHandle>().Began = screen => GrabFromPantry(captured, screen);
 
-                RectTransform row = UIFactory.Row(kitchenStockContent, 38f, 4f);
-                HorizontalLayoutGroup rowLayout = row.GetComponent<HorizontalLayoutGroup>();
-                rowLayout.childForceExpandWidth = false;
-                UIFactory.Icon(row, entry.Ingredient.Icon, 38f);
+                // Each piece shown, up to a small heap.
+                AddPile(cell.rectTransform, entry.Ingredient.Icon, Mathf.Min(entry.Quantity, 3), 34f, new Vector2(0.22f, 0.5f));
 
-                string label = Describe(new IngredientPortion(entry.Ingredient, entry.Quantity, entry.Prep));
-                if(selected > 0) label = "<b>" + selected + "/</b>" + label;
-                Color color = selected > 0 ? selectedColor : UIFactory.ButtonColor;
-
-                Button pick = UIFactory.Button(row, label, () => SelectMore(captured), color, 16);
-                Text text = pick.GetComponentInChildren<Text>();
-                text.alignment = TextAnchor.MiddleLeft;
-                text.rectTransform.offsetMin = new Vector2(12f, 0f);
-                UIFactory.FitText(text);
-                pick.interactable = phase == Phase.Service;
-                UIFactory.Size(pick, 38f, 0f, -1f, 1f);
-
-                Button less = UIFactory.Button(row, "-", () => SelectLess(captured), null, 20);
-                less.interactable = selected > 0;
-                UIFactory.Size(less, 38f, 0f, 38f, 0f);
+                string prep = entry.Prep == PrepSteps.None ? "" : "\n<color=#f28c33>" + PrepLabel(entry.Prep) + "</color>";
+                Text label = UIFactory.Label(cell.rectTransform, entry.Ingredient.DisplayName + prep + "\n<color=#a6a199>× " + entry.Quantity + "</color>",
+                    12, TextAnchor.MiddleLeft);
+                UIFactory.Place(label.rectTransform, 0.44f, 0f, 1f, 1f, 2f);
+                UIFactory.FitText(label);
             }
+        }
+
+        private static string PrepLabel(PrepSteps prep)
+        {
+            List<string> steps = new List<string>();
+            if((prep & PrepSteps.Peeled) != 0) steps.Add("peeled");
+            if((prep & PrepSteps.Sliced) != 0) steps.Add("sliced");
+            if((prep & PrepSteps.Grated) != 0) steps.Add("grated");
+            return string.Join(", ", steps);
         }
 
         private void RefreshStationContents(StationView view)
         {
+            UIFactory.ClearChildren(view.Icons);
+            foreach(IngredientPortion portion in view.Station.Contents) UIFactory.Icon(view.Icons, portion.ingredient.Icon, 36f);
+
             if(view.Station.IsEmpty)
             {
                 view.Contents.text = view.Station.OneIngredientWithoutStock
                     ? "<color=#a6a199>Empty. Without a stock cube it boils one ingredient at a time.</color>"
-                    : "<color=#a6a199>Empty.</color>";
-                return;
+                    : "<color=#a6a199>Empty. Drop ingredients in.</color>";
+            }
+            else
+            {
+                StringBuilder sb = new StringBuilder();
+                if(view.Station.IsSoup) sb.Append("<color=#f28c33>Soup:</color> ");
+                foreach(IngredientPortion portion in view.Station.Contents) sb.Append(Describe(portion)).Append("  ");
+                view.Contents.text = sb.ToString();
             }
 
-            StringBuilder sb = new StringBuilder();
-            if(view.Station.IsSoup) sb.Append("<color=#f28c33>Soup:</color> ");
-            foreach(IngredientPortion portion in view.Station.Contents) sb.Append(Describe(portion)).Append("   ");
-            view.Contents.text = sb.ToString();
+            view.EmptyButton.interactable = !view.Station.IsEmpty && !view.Station.IsCooking;
         }
 
         private void UpdateStationView(StationView view)
         {
+            if(view == null) return;
+
             CookingStation station = view.Station;
             view.Bar.Set(station.Progress, station.IsCooking);
 
-            if(station.IsCooking && station.Stirs)
+            if(heldStation == view)
             {
-                string zone = station.IsInBlack ? "BURNING! Shake it" : station.Progress > station.PerfectEnd ? "red: a stir now overcooks"
-                    : station.Progress >= station.PerfectStart ? "green: shake to stir" : "heating up";
-                view.Status.text = zone + "   <size=17>" + WokSummary(station) + "</size>";
+                view.Status.text = "Off the heat (paused)";
+                view.Status.color = UIFactory.MutedText;
+            }
+            else if(station.IsCooking && station.Stirs)
+            {
+                string zone = station.IsInBlack ? "BURNING! Hold and shake" : station.Progress > station.PerfectEnd ? "Red: a stir now overcooks"
+                    : station.Progress >= station.PerfectStart ? "Green: hold and shake" : "Heating up";
+                view.Status.text = zone + "\n<size=12>" + WokSummary(station) + "</size>";
                 view.Status.color = station.IsInBlack ? UIFactory.Bad : station.Progress > station.PerfectEnd ? UIFactory.Accent
                     : station.Progress >= station.PerfectStart ? UIFactory.Good : UIFactory.MutedText;
             }
             else if(station.IsCooking)
             {
                 Doneness doneness = station.CurrentDoneness;
-                string label = DonenessLabel(doneness);
-                if(station.Burns && station.IsInDanger && doneness == Doneness.Perfect) label = "perfect, but SHAKE IT!";
-                view.Status.text = (station.Progress * 100f).ToString("0") + "%  " + label;
-                view.Status.color = doneness == Doneness.Perfect ? (station.IsInDanger ? UIFactory.Accent : UIFactory.Good)
-                    : doneness == Doneness.Undercooked ? UIFactory.MutedText : UIFactory.Bad;
+                view.Status.text = (station.Progress * 100f).ToString("0") + "%  " + DonenessLabel(doneness)
+                                   + (doneness == Doneness.Perfect ? "\n<size=12>hold and drop on a plate</size>" : "");
+                view.Status.color = doneness == Doneness.Perfect ? UIFactory.Good : doneness == Doneness.Undercooked ? UIFactory.MutedText : UIFactory.Bad;
             }
             else
             {
-                view.Status.text = station.IsEmpty ? "Idle" : "Loaded. Press Start.";
-                view.Status.color = UIFactory.MutedText;
-            }
-
-            view.StartButton.interactable = !station.IsCooking && !station.IsEmpty;
-            view.TakeOffButton.interactable = station.IsCooking;
-            view.BinButton.interactable = !station.IsEmpty;
-
-            if(view.PadHint != null)
-            {
-                bool cooking = station.IsCooking;
-
-                if(view.WasInDanger != cooking)
-                {
-                    view.WasInDanger = cooking;
-                    // While it fries the pad shows the side-to-side guide; otherwise just how to use it.
-                    wokPad.SetGuide(cooking ? GestureGuide.SideToSide : GestureGuide.None, UIFactory.Accent);
-                    view.PadHint.text = cooking ? "" : "Shake pad: hold and drag side to side here. One shake in the green stirs one unit.";
-                    view.PadHint.color = UIFactory.MutedText;
-                }
+                view.Status.text = station.IsEmpty ? "Off" : "Loaded. Click to light it.";
+                view.Status.color = station.IsEmpty ? UIFactory.MutedText : UIFactory.Accent;
             }
         }
     }

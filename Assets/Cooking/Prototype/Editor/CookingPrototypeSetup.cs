@@ -64,6 +64,59 @@ namespace Cooking.Prototype.EditorTools
             Debug.Log("[Cooking] Built " + ScenePath + ". Press Play to cook.");
         }
 
+        private const string BillboardRoot = "Assets/Art Assets/Bilboards Decorations";
+
+        /// <summary>
+        /// Puts the billboard ads and frame on the prototype in the open scene, with point filtering so
+        /// the pixel art stays sharp. Safe to run again; does nothing when the art isn't in the project.
+        /// </summary>
+        [MenuItem("Custom Tools/Cooking Prototype/Assign Market Art")]
+        public static void AssignMarketArt()
+        {
+            CookingPrototype prototype = Object.FindAnyObjectByType<CookingPrototype>();
+
+            if(prototype == null)
+            {
+                Debug.LogWarning("[Cooking] Open the prototype scene first.");
+                return;
+            }
+
+            List<Sprite> ads = new List<Sprite>();
+
+            if(AssetDatabase.IsValidFolder(BillboardRoot + "/1 Ad/128x64"))
+            {
+                foreach(string guid in AssetDatabase.FindAssets("t:Texture2D", new[] { BillboardRoot + "/1 Ad/128x64" }))
+                {
+                    Sprite ad = LoadPixelSprite(AssetDatabase.GUIDToAssetPath(guid));
+                    if(ad != null) ads.Add(ad);
+                }
+            }
+
+            Sprite frame = LoadPixelSprite(BillboardRoot + "/2 Billboard/128x64.png");
+            prototype.SetMarketArt(ads, frame);
+            EditorUtility.SetDirty(prototype);
+            EditorSceneManager.MarkSceneDirty(prototype.gameObject.scene);
+            EditorSceneManager.SaveScene(prototype.gameObject.scene);
+            Debug.Log("[Cooking] Market art: " + ads.Count + " ads" + (frame != null ? " and the billboard frame." : ", no frame found."));
+        }
+
+        private static Sprite LoadPixelSprite(string path)
+        {
+            TextureImporter importer = AssetImporter.GetAtPath(path) as TextureImporter;
+            if(importer == null) return null;
+
+            if(importer.textureType != TextureImporterType.Sprite || importer.filterMode != FilterMode.Point
+               || importer.textureCompression != TextureImporterCompression.Uncompressed)
+            {
+                importer.textureType = TextureImporterType.Sprite;
+                importer.filterMode = FilterMode.Point;
+                importer.textureCompression = TextureImporterCompression.Uncompressed;
+                importer.SaveAndReimport();
+            }
+
+            return AssetDatabase.LoadAssetAtPath<Sprite>(path);
+        }
+
         [MenuItem("Custom Tools/Cooking Prototype/Open Scene")]
         public static void OpenScene()
         {
