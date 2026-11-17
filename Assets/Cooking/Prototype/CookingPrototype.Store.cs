@@ -94,6 +94,7 @@ namespace Cooking.Prototype
             }
 
             spentToday += total;
+            Play(sounds.register, 0.8f, 0f);
             Say("Bought " + units + " units for $" + total.ToString("0.00") + ". They're in your stock.", UIFactory.Good);
             RefreshAll();
         }

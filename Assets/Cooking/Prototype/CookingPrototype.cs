@@ -190,6 +190,7 @@ namespace Cooking.Prototype
             CreateKitchenState();
             EnsureEventSystem();
             ApplySkin();
+            InitAudio();
             BuildUI();
             InitNpcs();
             StartDay();
@@ -202,6 +203,7 @@ namespace Cooking.Prototype
             TickSpeech(Time.deltaTime);
             // Whatever is held follows the pointer, and drops when the button comes up.
             UpdateHeld();
+            UpdateCookingSounds();
 
             if(overlayOpen || phase != Phase.Service) return;
 
@@ -315,6 +317,7 @@ namespace Cooking.Prototype
                 }
 
                 spentToday += total;
+                Play(sounds.register, 0.8f, 0f);
                 Say("Bought " + units + " units for $" + total.ToString("0.00") + ".", UIFactory.Good);
             }
 
@@ -369,6 +372,7 @@ namespace Cooking.Prototype
             orderKnown = false;
 
             Say(customer.name + " is at the counter (" + (servedToday + 1) + " of " + todaysRegulars + ").");
+            Play(sounds.arrive, 0.6f, 0f);
             BeginVisit();
             RefreshAll();
         }
@@ -537,6 +541,7 @@ namespace Cooking.Prototype
             }
 
             summaryBody.text = sb.ToString();
+            Play(sounds.dayEnd, 0.8f, 0f);
             summaryOverlay.SetActive(true);
             overlayOpen = true;
             RefreshAll();
@@ -899,6 +904,7 @@ namespace Cooking.Prototype
 
             resultTitle.text = title;
             resultTitle.color = color;
+            PlayVerdict(result);
             BuildDishPicture(resultPicture, plate);
 
             // What they say comes from the dialogue catalog (it plays right after anything they were

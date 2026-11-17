@@ -167,6 +167,7 @@ namespace Cooking.Prototype
             }
 
             toolHooks[step].alpha = 0.25f;
+            Play(sounds.pickup, 0.6f);
             foreach(CuttingBoard board in boards) board.Pad.SetGuide(ToolGuide(step), new Color(1f, 0.85f, 0.6f, 0.6f));
             Say("Picked up the " + ToolName(step) + ". " + ToolInstruction(step));
         }
@@ -197,11 +198,14 @@ namespace Cooking.Prototype
             board.Pad.AddTrailPoint(local);
             if(prepGesture == null || !prepGesture.Move(local)) return;
 
+            PlayToolStroke(heldTool);
+
             UpdateBoardProgress();
             if(!prepGesture.IsComplete) return;
 
             PrepSteps done = heldTool;
             board.Units.prep |= done;
+            Play(sounds.prepDone, 0.6f, 0f);
             prepGesture = null;
             LogCooking("Prep", done + " " + board.Units.quantity + "× " + board.Units.ingredient.DisplayName + " during the order.");
             Say(Describe(board.Units, true) + ". Another tool, or drag it into the pot or pan.", UIFactory.Good);

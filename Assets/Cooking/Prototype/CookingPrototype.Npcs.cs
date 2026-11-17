@@ -246,7 +246,13 @@ namespace Cooking.Prototype
 
             int before = Mathf.FloorToInt(typed);
             typed = Mathf.Min(length, typed + deltaTime * typewriterSpeed);
-            if(Mathf.FloorToInt(typed) != before) RefreshSpeech();
+
+            if(Mathf.FloorToInt(typed) != before)
+            {
+                RefreshSpeech();
+                char latest = speech[speech.Count - 1][Mathf.Clamp(Mathf.FloorToInt(typed) - 1, 0, length - 1)];
+                if(!char.IsWhiteSpace(latest)) TypeBlip();
+            }
         }
 
         private void RefreshSpeech()
