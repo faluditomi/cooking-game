@@ -112,7 +112,7 @@ namespace Cooking.Prototype
         {
             VerticalLayoutGroup layout = UIFactory.Vertical(shelf.gameObject, 12f, 16);
             layout.childForceExpandHeight = false;
-            Header(shelf, "SHELF  <color=#77736d>pick ingredients into the cart, or shop by dish on the Recipes tab</color>");
+            Header(shelf, "SHELF  <color=#77736d>pick ingredients into the cart, or a whole dish from the bundles below</color>");
 
             RectTransform grid = UIFactory.Rect(shelf, "Grid");
             GridLayoutGroup gridLayout = grid.gameObject.AddComponent<GridLayoutGroup>();

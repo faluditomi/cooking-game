@@ -43,6 +43,14 @@ namespace Cooking.Prototype
         [SerializeField] private Sprite potSprite;
         [SerializeField] private Sprite boardSprite;
         [SerializeField] private Sprite plateSprite;
+        [SerializeField] private Sprite spoonSprite;
+
+        [Header("Labels")]
+        [Tooltip("Pantry and desk ingredients show \"x2 Pak Choi\" under them. Off: the name shows only above what's held. Also switchable on the title screen.")]
+        [SerializeField] private bool ingredientLabels = true;
+
+        /// <summary>When a warning toast over the desk hides again (unscaled time).</summary>
+        private float toastUntil;
 
         [Header("UI skin")]
         [Tooltip("Kenney's UI Pack: Sci-fi (CC0), from Assets/Art Assets/UI Skin. Set by Custom Tools → Cooking Prototype → Assign UI Skin. Empty keeps the flat look.")]
@@ -104,8 +112,9 @@ namespace Cooking.Prototype
         }
 
         /// <summary>Sets the cookware sprites. Used by the editor's Render Cookware Sprites menu.</summary>
-        public void SetCookwareArt(Sprite knife, Sprite peeler, Sprite grater, Sprite pan, Sprite pot, Sprite board, Sprite plateArt)
+        public void SetCookwareArt(Sprite knife, Sprite peeler, Sprite grater, Sprite pan, Sprite pot, Sprite board, Sprite plateArt, Sprite spoon)
         {
+            spoonSprite = spoon;
             knifeSprite = knife;
             peelerSprite = peeler;
             graterSprite = grater;
@@ -212,6 +221,11 @@ namespace Cooking.Prototype
 
         private void LateUpdate()
         {
+            if(messageText != null && messageText.transform.parent.gameObject.activeSelf && Time.unscaledTime > toastUntil)
+            {
+                messageText.transform.parent.gameObject.SetActive(false);
+            }
+
             SyncTablet();
             UpdateTutorialHighlight();
         }
@@ -236,44 +250,56 @@ namespace Cooking.Prototype
             BuildConversation(root);
             BuildMarket(root);
             BuildDesk(root);
+            BuildToast(root);
             BuildTablet(root);
             BuildTutorial(root);
             BuildTitle(root);
         }
 
-        /// <summary>Left, full height: the stall, who's at the counter and what they say, and the latest hint.</summary>
+        /// <summary>Left, full height: who's at the counter (just their name) and what they say, newest at the top.</summary>
         private void BuildConversation(Transform root)
         {
             RectTransform panel = UIFactory.Panel(root, "Conversation", UIFactory.PanelDark).rectTransform;
             UIFactory.Place(panel, 0f, 0f, ConversationWidth, 1f);
-            VerticalLayoutGroup layout = UIFactory.Vertical(panel.gameObject, 8f, 18);
+            VerticalLayoutGroup layout = UIFactory.Vertical(panel.gameObject, 12f, 22);
             layout.childForceExpandHeight = false;
 
-            Text stall = UIFactory.Label(panel, "Emphis's Stall", 26, TextAnchor.MiddleLeft, FontStyle.Bold, UIFactory.Accent);
-            UIFactory.Size(stall, 34f, 0f);
+            sidebarCustomer = UIFactory.Label(panel, "", 30, TextAnchor.UpperLeft, FontStyle.Bold, UIFactory.Accent);
+            UIFactory.Size(sidebarCustomer, 40f, 0f);
 
-            RectTransform stats = UIFactory.Row(panel, 34f, 8f);
-            dayText = UIFactory.Label(stats, "", 19, TextAnchor.MiddleLeft);
-            moneyText = UIFactory.Label(stats, "", 26, TextAnchor.MiddleRight, FontStyle.Bold, UIFactory.Good);
-
-            Image divider = UIFactory.Panel(panel, "Divider", new Color(1f, 1f, 1f, 0.08f));
-            UIFactory.Size(divider, 2f, 0f);
-
-            Header(panel, "AT THE COUNTER");
-            sidebarCustomer = UIFactory.Label(panel, "", 26, TextAnchor.UpperLeft, FontStyle.Bold, UIFactory.Accent);
-
-            // The newest line sits at the bottom; older ones scroll off the top.
+            // Newest line on top; older ones move down and off the bottom.
             RectTransform speechBox = UIFactory.Rect(panel, "Speech");
             UIFactory.Size(speechBox, 80f, 1f);
             speechBox.gameObject.AddComponent<RectMask2D>();
-            sidebarSpeech = UIFactory.Label(speechBox, "", 20, TextAnchor.LowerLeft, FontStyle.Italic);
+            sidebarSpeech = UIFactory.Label(speechBox, "", 21, TextAnchor.UpperLeft, FontStyle.Italic);
             UIFactory.Stretch(sidebarSpeech.rectTransform);
+        }
 
-            Image messageBack = UIFactory.Panel(panel, "Hint", UIFactory.PanelColor);
-            UIFactory.Size(messageBack, 92f, 0f);
-            messageText = UIFactory.Label(messageBack.transform, "", 17, TextAnchor.MiddleLeft);
-            UIFactory.Stretch(messageText.rectTransform, 10f);
+        /// <summary>A short warning over the desk when something can't be done (it fades on its own).</summary>
+        private void BuildToast(Transform root)
+        {
+            Image back = UIFactory.Panel(root, "Toast", new Color(0.12f, 0.06f, 0.06f, 0.92f));
+            back.raycastTarget = false;
+            RectTransform rt = back.rectTransform;
+            rt.anchorMin = rt.anchorMax = new Vector2(ConversationWidth + (1f - ConversationWidth) * 0.42f, DeskShare);
+            rt.pivot = new Vector2(0.5f, 1f);
+            rt.sizeDelta = new Vector2(760f, 46f);
+            rt.anchoredPosition = new Vector2(0f, -14f);
+            messageText = UIFactory.Label(rt, "", 17, TextAnchor.MiddleCenter);
+            UIFactory.Stretch(messageText.rectTransform, 8f);
             UIFactory.FitText(messageText);
+            back.gameObject.SetActive(false);
+        }
+
+        /// <summary>Shows a warning in the toast for a few seconds.</summary>
+        private void ShowToast(string text, Color color)
+        {
+            if(messageText == null) return;
+            messageText.text = text;
+            messageText.color = color;
+            messageText.transform.parent.gameObject.SetActive(true);
+            messageText.transform.parent.SetAsLastSibling();
+            toastUntil = Time.unscaledTime + 3f;
         }
 
         /// <summary>Top right: the night market, billboards, the customer, and the prep tools on the stall roof.</summary>
@@ -375,7 +401,7 @@ namespace Cooking.Prototype
                 Color color = Color.HSVToRGB(hue, 0.4f, 0.65f);
                 npcBody.color = color;
                 npcHead.color = Color.Lerp(color, Color.white, 0.35f);
-                npcName.text = customer.name + "\n<size=16><color=#a6a199>" + StageLabel(Relationship(customer).Stage) + "</color></size>";
+                npcName.text = "";
             }
             else
             {
@@ -406,8 +432,9 @@ namespace Cooking.Prototype
             HorizontalLayoutGroup barLayout = UIFactory.Horizontal(bar.gameObject, 4f, 4);
             barLayout.childForceExpandWidth = false;
 
-            tabletTabs[TabletPage.Order] = TabletTab(bar, "Order", TabletPage.Order);
-            tabletTabs[TabletPage.Recipes] = TabletTab(bar, "Recipes", TabletPage.Recipes);
+            tabletTabs[TabletPage.Order] = TabletTab(bar, "Current Order", TabletPage.Order);
+            UIFactory.Size(tabletTabs[TabletPage.Order], -1f, -1f, 140f, 0f);
+            tabletTabs[TabletPage.Recipes] = TabletTab(bar, "Menu", TabletPage.Recipes);
             tabletTabs[TabletPage.History] = TabletTab(bar, "History", TabletPage.History);
             tabletTabs[TabletPage.Shop] = TabletTab(bar, "Shop", TabletPage.Shop);
             RectTransform spacer = UIFactory.Rect(bar, "Spacer");
@@ -463,8 +490,10 @@ namespace Cooking.Prototype
             UIFactory.SkinBar(ticket.TimerFillImage, UIFactory.Good);
             ticket.TimerFill = ticket.TimerFillImage.rectTransform;
             UIFactory.Place(ticket.TimerFill, 0f, 0f, 1f, 1f);
-            ticket.Timer = UIFactory.Label(left, "", 15, TextAnchor.MiddleLeft, FontStyle.Bold);
-            UIFactory.Size(ticket.Timer, 20f, 0f);
+            RectTransform timerRow = UIFactory.Row(left, 22f, 6f);
+            ticket.Timer = UIFactory.Label(timerRow, "", 15, TextAnchor.MiddleLeft, FontStyle.Bold);
+            dayText = UIFactory.Label(timerRow, "", 15, TextAnchor.MiddleCenter, FontStyle.Normal, UIFactory.MutedText);
+            moneyText = UIFactory.Label(timerRow, "", 18, TextAnchor.MiddleRight, FontStyle.Bold, UIFactory.Good);
 
             ticket.Line = UIFactory.Label(left, "", 14, TextAnchor.UpperLeft, FontStyle.Italic);
             RectTransform scroll = UIFactory.ScrollList(left, 0f);
@@ -483,12 +512,6 @@ namespace Cooking.Prototype
             // No zones: just your dish and, when you know it, the order.
             plateRadar.CreateLabels(UIFactory.Font, 12, UIFactory.MutedText);
 
-            Text legend = UIFactory.Label(right, "<color=#d9d9d9>Grey</color>: the order  <color=#f28c33>Orange</color>: your plate",
-                12, TextAnchor.UpperLeft, FontStyle.Normal, UIFactory.MutedText);
-            UIFactory.Size(legend, 16f, 0f);
-
-            RectTransform previewRow = UIFactory.Row(right, 24f);
-            previewButton = UIFactory.Button(previewRow, "", TogglePreview, null, 13);
         }
     }
 }

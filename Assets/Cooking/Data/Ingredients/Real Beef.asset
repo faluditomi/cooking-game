@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Real Beef
   m_EditorClassIdentifier: Cooking.Runtime::Cooking.IngredientDefinition
   displayName: '"Real Beef"'
-  icon: {fileID: -5411344580343966902, guid: 56a4875e64b833e4fb7e02a465749e92, type: 3}
+  icon: {fileID: -7778422155671652288, guid: 18e304862b70e084182316c0c97f868c, type: 3}
   price: 8
   bulk: 1
   flavour:

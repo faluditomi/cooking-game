@@ -51,14 +51,11 @@ namespace Cooking.Prototype
             if(pieces.Count == 0) pieces.AddRange(seasonings.GetRange(0, Mathf.Min(3, seasonings.Count)));
 
             RectTransform frame = UIFactory.Rect(root, "Frame");
+            // (The plate itself: see PlateImage.)
             UIFactory.Stretch(frame);
             frame.gameObject.AddComponent<AspectRatioFitter>().aspectMode = AspectRatioFitter.AspectMode.FitInParent;
 
-            Image plateImage = UIFactory.Panel(frame, "Plate", plateSprite != null ? Color.white : new Color(0.86f, 0.84f, 0.79f, 1f));
-            plateImage.sprite = plateSprite != null ? plateSprite : UIFactory.Circle;
-            plateImage.preserveAspect = true;
-            plateImage.raycastTarget = false;
-            UIFactory.Stretch(plateImage.rectTransform);
+            PlateImage(frame);
 
             if(soup)
             {
@@ -109,6 +106,34 @@ namespace Cooking.Prototype
                 pinch.GetComponent<LayoutElement>().ignoreLayout = true;
                 UIFactory.Place(pinch.rectTransform, 0.66f, 0.06f, 0.94f, 0.34f);
             }
+        }
+
+        /// <summary>
+        /// A plate filling <paramref name="parent"/>: a dark outline ring so it reads on any background,
+        /// the plate, and a soft shadow on its lower rim for depth.
+        /// </summary>
+        private void PlateImage(RectTransform parent)
+        {
+            Image outline = UIFactory.Panel(parent, "Plate Outline", new Color(0.12f, 0.1f, 0.09f, 0.9f));
+            outline.sprite = UIFactory.Circle;
+            outline.raycastTarget = false;
+            UIFactory.Stretch(outline.rectTransform);
+
+            Image plate = UIFactory.Panel(parent, "Plate", plateSprite != null ? Color.white : new Color(0.86f, 0.84f, 0.79f, 1f));
+            plate.sprite = plateSprite != null ? plateSprite : UIFactory.Circle;
+            plate.preserveAspect = true;
+            plate.raycastTarget = false;
+            UIFactory.Place(plate.rectTransform, 0.03f, 0.03f, 0.97f, 0.97f);
+
+            // Shading: the lower half of the rim sits in shadow, the well is a touch darker than the rim.
+            Image shade = UIFactory.Panel(parent, "Plate Shade", new Color(0f, 0f, 0f, 0.16f));
+            shade.sprite = UIFactory.Circle;
+            shade.raycastTarget = false;
+            UIFactory.Place(shade.rectTransform, 0.06f, 0.03f, 0.94f, 0.82f);
+            Image well = UIFactory.Panel(parent, "Plate Well", new Color(1f, 1f, 1f, 0.12f));
+            well.sprite = UIFactory.Circle;
+            well.raycastTarget = false;
+            UIFactory.Place(well.rectTransform, 0.2f, 0.22f, 0.8f, 0.82f);
         }
 
         /// <summary>Where piece <paramref name="index"/> of <paramref name="count"/> sits: a sunflower spiral, so they spread evenly.</summary>

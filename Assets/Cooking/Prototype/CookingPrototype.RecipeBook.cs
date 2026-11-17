@@ -90,8 +90,9 @@ namespace Cooking.Prototype
             Color active = new Color(0.75f, 0.42f, 0.15f, 1f);
             recipesPageButton.GetComponent<Image>().color = bookPage == BookPage.Recipes ? active : UIFactory.ButtonColor;
             historyPageButton.GetComponent<Image>().color = bookPage == BookPage.History ? active : UIFactory.ButtonColor;
-            bookShopGroup.SetActive(bookPage == BookPage.Recipes);
-            bookHistoryInfo.gameObject.SetActive(bookPage == BookPage.History);
+            // No shopping here any more: that's the Shop's job.
+            bookShopGroup.SetActive(false);
+            bookHistoryInfo.gameObject.SetActive(false);
             bookDeleteButton.transform.parent.gameObject.SetActive(false);
             if(bookPage != BookPage.History) historySaveRow.SetActive(false);
 
@@ -101,7 +102,7 @@ namespace Cooking.Prototype
                 return;
             }
 
-            bookRadarHeader.text = "FLAVOUR";
+            bookRadarHeader.text = "FLAVOUR PROFILE";
             RebuildBookList();
 
             if(bookRecipe == null)
@@ -124,7 +125,6 @@ namespace Cooking.Prototype
             title.Append("<b>").Append(recipe.DisplayName).Append("</b>\n<size=18><color=#a6a199>");
             title.Append(DishType(recipe)).Append("   ");
             if(!IsOnMenu(recipe)) title.Append("<color=#f28c33>Not on the menu</color>   ");
-            if(!string.IsNullOrEmpty(recipe.Origin)) title.Append("Origin: ").Append(recipe.Origin).Append("   ");
             title.Append("Menu price $").Append(DishJudge.MenuPrice(recipe, margin).ToString("0.00"));
             title.Append("   Ingredients $").Append(recipe.CalculateIngredientCost().ToString("0.00")).Append("</color>");
             title.Append("</size>");
@@ -166,15 +166,12 @@ namespace Cooking.Prototype
             UIFactory.ClearChildren(bookList);
 
             // Only the menu. Dishes you didn't save (or took off) live in the cooking history.
-            Text menuHeader = Header(bookList, "MENU");
-            UIFactory.Size(menuHeader, 24f, 0f);
 
             foreach(RecipeDefinition recipe in VisibleMenu())
             {
                 RecipeDefinition captured = recipe;
                 bool selected = recipe == bookRecipe;
-                bool ordered = orderIn && recipe == order;
-                string label = recipe.DisplayName + (ordered ? "  <color=#f28c33>ordered</color>" : "");
+                string label = recipe.DisplayName;
                 Button button = UIFactory.Button(bookList, label, () => SelectRecipe(captured),
                     selected ? new Color(0.75f, 0.42f, 0.15f, 1f) : UIFactory.ButtonColor, 18);
                 Text text = button.GetComponentInChildren<Text>();
@@ -192,11 +189,15 @@ namespace Cooking.Prototype
             UIFactory.Stretch(page);
             recipeBookOverlay = page.gameObject;
 
-            RectTransform panel = UIFactory.Panel(page, "Book", UIFactory.PanelColor).rectTransform;
+            RectTransform panel = UIFactory.Rect(page, "Book");
             UIFactory.Stretch(panel, 8f);
 
-            // Left: recipes you know.
-            RectTransform left = UIFactory.Panel(panel, "Recipes", UIFactory.PanelDark).rectTransform;
+            // The selected dish and its flavour profile share one page, indented from the list.
+            Image sheet = UIFactory.Panel(panel, "Page", UIFactory.PanelColor);
+            UIFactory.Place(sheet.rectTransform, 0.24f, 0f, 1f, 1f, 6f);
+
+            // Left: the menu, with no background of its own.
+            RectTransform left = UIFactory.Rect(panel, "Recipes");
             UIFactory.Place(left, 0f, 0f, 0.24f, 1f, 12f);
             VerticalLayoutGroup leftLayout = UIFactory.Vertical(left.gameObject, 8f, 14);
             leftLayout.childForceExpandHeight = false;
@@ -222,12 +223,12 @@ namespace Cooking.Prototype
             RectTransform stepsScroll = UIFactory.ScrollList(middle, 0f);
             bookSteps = UIFactory.Label(stepsScroll, "", 19);
 
-            // Right: flavour and shopping.
-            RectTransform right = UIFactory.Panel(panel, "Flavour and Shopping", UIFactory.PanelDark).rectTransform;
-            UIFactory.Place(right, 0.66f, 0f, 1f, 1f, 12f);
+            // Right: the flavour profile, on the same page.
+            RectTransform right = UIFactory.Rect(panel, "Flavour");
+            UIFactory.Place(right, 0.66f, 0f, 1f, 1f, 18f);
             VerticalLayoutGroup rightLayout = UIFactory.Vertical(right.gameObject, 10f, 14);
             rightLayout.childForceExpandHeight = false;
-            bookRadarHeader = Header(right, "FLAVOUR");
+            bookRadarHeader = Header(right, "FLAVOUR PROFILE");
 
             RectTransform radarArea = UIFactory.Rect(right, "Radar");
             UIFactory.Size(radarArea, 260f, 1f);
@@ -258,8 +259,6 @@ namespace Cooking.Prototype
             RectTransform deleteRow = UIFactory.Row(right, 38f);
             bookDeleteButton = UIFactory.Button(deleteRow, "Remove from the menu", DeleteFromMenu, new Color(0.35f, 0.2f, 0.2f, 1f), 16);
 
-            RectTransform closeRow = UIFactory.Row(right, 46f);
-            UIFactory.Button(closeRow, "Back to the order", () => ShowTabletPage(TabletPage.Order), new Color(0.75f, 0.42f, 0.15f, 1f), 20);
 
             recipeBookOverlay.SetActive(false);
         }

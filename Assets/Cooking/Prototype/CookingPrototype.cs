@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+    using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -623,8 +623,10 @@ namespace Cooking.Prototype
             foreach(IngredientPortion portion in recipe.Portions)
             {
                 if(portion == null || !portion.IsValid) continue;
-                boiled |= (portion.cooking & CookMethods.Boiled) != 0;
-                fried |= (portion.cooking & CookMethods.Fried) != 0;
+                // Boiled and then fried (like the rice in fried rice) ends up fried.
+                bool friedToo = (portion.cooking & CookMethods.Fried) != 0;
+                boiled |= (portion.cooking & CookMethods.Boiled) != 0 && !friedToo;
+                fried |= friedToo;
             }
 
             return boiled && fried ? "Soup, with fried bits" : boiled ? "Soup" : fried ? "Fried" : "Neither (raw)";
@@ -637,7 +639,7 @@ namespace Cooking.Prototype
             string phaseLabel = phase == Phase.Morning ? "Morning"
                 : phase == Phase.Service ? (closing ? "Last customer" : dayTimer ? FormatTime(dayTimeLeft) + " left" : "Open")
                 : "Closed";
-            dayText.text = (practiceDay ? "Practice day" : "Cycle " + day) + "  ·  " + (practiceDay && phase == Phase.Service ? "No clock" : phaseLabel);
+            dayText.text = practiceDay ? "Practice day" : "Cycle " + day;
 
             phaseButton.interactable = phase == Phase.Morning;
 
@@ -704,14 +706,14 @@ namespace Cooking.Prototype
         {
             if(phase == Phase.Service && dayTimer && dayText != null && !practiceDay)
             {
-                dayText.text = "Cycle " + day + "  ·  " + (closing ? "Last customer" : FormatTime(dayTimeLeft) + " left");
+                dayText.text = "Cycle " + day;
             }
 
             if(!dayTimer) return;
 
             float share = daySeconds > 0f ? Mathf.Clamp01(dayTimeLeft / daySeconds) : 0f;
             Color color = share < 0.15f ? UIFactory.Bad : share < 0.35f ? UIFactory.Accent : UIFactory.Good;
-            string label = FormatTime(dayTimeLeft) + " left today";
+            string label = closing ? "Last customer" : FormatTime(dayTimeLeft) + " left today";
 
             foreach(TicketView ticket in tickets)
             {
@@ -808,7 +810,6 @@ namespace Cooking.Prototype
             StringBuilder sb = new StringBuilder();
             sb.Append("<size=24><b>").Append(recipe.DisplayName).Append("</b></size>\n");
             sb.Append("<color=#a6a199>").Append(DishType(recipe));
-            if(!string.IsNullOrEmpty(recipe.Origin)) sb.Append(" · Origin: ").Append(recipe.Origin);
             if(!IsOnMenu(recipe)) sb.Append(" · not on the menu");
             sb.Append("</color>\n\n");
 
@@ -828,17 +829,16 @@ namespace Cooking.Prototype
                 sb.Append("- ").Append(Describe(new IngredientPortion(portion.ingredient, portion.quantity, portion.prep))).Append("  ").Append(readiness).Append('\n');
             }
 
-            sb.Append("<color=#a6a199>Steps: Recipes tab.</color>\n");
+            sb.Append("<color=#a6a199>Steps: Menu tab.</color>\n");
             sb.Append("\nMenu price <b>$").Append(DishJudge.MenuPrice(recipe, margin).ToString("0.00")).Append("</b>");
 
             return sb.ToString();
         }
 
+        /// <summary>Feedback for the player. Only warnings show (a short toast over the desk); the rest of the old hint text is gone.</summary>
         private void Say(string text, Color? color = null)
         {
-            if(messageText == null) return;
-            messageText.text = text;
-            messageText.color = color ?? UIFactory.TextColor;
+            if(color.HasValue && color.Value == UIFactory.Bad) ShowToast(text, UIFactory.TextColor);
         }
 
         /// <summary>"Similar to the order: 76% (flavour 82%, ingredients 70%) → Close enough".</summary>

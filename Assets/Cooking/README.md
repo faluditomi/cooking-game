@@ -111,26 +111,31 @@ Cooking Prototype**, into `Builds/` (git-ignored):
 
 The layout follows the "Screen layout mock-up" on the Miro board:
 
-- **Conversation** (left, full height): the stall, the cycle and time left, your money, who's at
-  the counter, and what they say, typed out with the newest line at the bottom. Under it, the latest
-  hint. It clears when the customer leaves.
+- **Conversation** (left, full height): just the customer's name and what they say, typed out with
+  the newest line at the top. It clears when the customer leaves. Warnings (can't afford the cart,
+  the pot's full) show for a few seconds as a toast over the desk.
 - **Market** (top right): the night market with billboard ads (CraftPix pack, new ads each cycle),
-  the customer as a placeholder figure at the bottom left, and the **prep tools** (knife, peeler,
-  grater) hanging from the stall roof.
+  the customer at the bottom left (no name or state under them), and the **tools** (knife, peeler,
+  grater, spoon) hanging from the stall roof, unlabelled.
 - **Workbench** (bottom right), all press-and-hold drags:
-  - **Pantry** (right): your stock (`Inventory`), grouped into **raw**, **prepped** and
-    **seasoning**, each pile showing its pieces. Holding a pile takes **one** unit. Drop it on a
-    cutting board, the pot, the pan, a plate (seasonings only, on a cooked dish) or free desk
-    space. Dropped anywhere else, it goes back on its pile.
-  - **Desk space** (top left, six spots): plates and loose ingredients. Hold a loose pile to take
-    all of it.
-  - **Clean plates**: an endless stack. A plate dropped on the desk goes to the nearest free spot.
+  - **Pantry** (right): your stock (`Inventory`) in three columns, grouped into **raw**,
+    **prepped** and **seasoning**, with no panel behind it. Each pile shows its pieces (one unit
+    shows one piece) and a label like "x2 Pak Choi". The title screen switches the labels between
+    **always** and **only when held** (`ingredientLabels`); a held ingredient always shows its name.
+    Holding a pile takes **one** unit. Drop it on a cutting board, the pot, the pan, a plate
+    (seasonings only, on a cooked dish) or free desk space. Dropped anywhere else, it goes back.
+  - **Desk space**: no grid. Plates and loose ingredients go where you drop them, anywhere in the
+    L-shaped free area (a band along the top, plus the block above the tablet), nudged to the
+    nearest spot where they don't overlap. Hold a loose pile to take all of it.
+  - **Clean plates**: an endless stack of outlined, shaded plates. Taking one needs room on the desk.
     An empty plate can go back on the stack; a plate with anything on it stays on the desk.
-  - **Food delivery**: drop a plate here to serve it.
-  - **Cooking station (pot)** and **frying station (pan)**: drop ingredients in, then click the
-    station to light it.
+  - **Food delivery**: a dotted outline about 1.5x a plate; it pulses green while you hold a plate
+    with food. Drop the plate on it to serve.
+  - **Stoves**: the pot (**Boil**) and the pan (**Fry**) sit on two drawn stoves, labelled on taped
+    paper. A small bar rides on each pot. They start cooking with the first thing in.
   - **Prep section**: two cutting boards.
-  - **Tablet**, built into the table (bottom left). Small, it shows the **Order** page. **Recipes**,
+  - **Tablet**, built into the table (bottom left). Small, it shows the **Current Order** page (the
+    timer, cycle and money at the top). **Menu**,
     **History** and, in the morning, **Shop** open it big over the right side, as do the Dish
     Served and End of Cycle pages. **Shrink** puts it back.
 
@@ -147,7 +152,7 @@ tinted in code, so the colours stay as before. **Custom Tools → Cooking Protot
 puts them on the prototype; **Build Scene** runs it too. `UIFactory` applies the skin: every panel in
 `PanelColor` or `PanelDark` and every button gets it automatically. Without the sprites the UI stays flat.
 
-The cookware (knife, peeler, box grater, wok, pot, cutting board, plate) is rendered from the CC0
+The cookware (knife, peeler, box grater, wooden spoon, wok, pot, cutting board, plate) is rendered from the CC0
 [3D Cooking Assets](https://milkandbanana.itch.io/) pack by MilkAndBanana:
 **Custom Tools → Cooking Prototype → Render Cookware Sprites** (`CookwareSprites.cs`) renders each
 model into a trimmed, transparent PNG in `Assets/Art Assets/Cookware` and assigns them to the
@@ -155,8 +160,8 @@ prototype. The pack's FBX files import without colour, so the tool reads the sha
 one of its GLB files. Only the rendered PNGs are in git; the 3D pack is needed just to re-render
 (say, with a different angle in the tool's item list). Without the sprites the game falls back to
 plain shapes. The pot and pan are drawn with what's in them heaped inside, and water over the
-pieces once a soup is cooking. Lifting one takes just the pot or pan (its bar stays on the station); the
-knife and peeler hang upright but are held flat by the handle, blade to the left.
+pieces once a soup is cooking. The pot and pan can be picked up even when empty, and their bar
+goes with them. The knife and peeler hang upright but are held flat by the handle, blade to the left.
 
 ### The cycle
 
@@ -165,8 +170,7 @@ units per prep state ("3× Onion raw", "2× Onion peeled, sliced").
 
 1. **Morning** (untimed). The tablet opens big on the **Shop**. Fill a cart (`ShoppingCart`):
    ingredients one at a time from the shelf (−, +1, +5), a whole dish from the **Bundles** tiles
-   (one serving of a menu dish), or from the **Recipes** tab (**+ One serving**, **+ What's
-   missing**). Nothing is bought until you pay. The cart column also has the day-timer switch and
+   (one serving of a menu dish). Nothing is bought until you pay. The cart column also has the day-timer switch and
    who's coming today. The workbench is locked: prepping is part of the timed day (meeting
    decision).
 2. **Buy and start the day** (Shop tab) pays for the cart, starts the timer and opens the stall.
@@ -184,20 +188,20 @@ units per prep state ("3× Onion raw", "2× Onion peeled, sliced").
      or you let go, so moving off the board mid-stroke doesn't reset it.
      Letting go hangs the tool back up. **Peeling comes first**: something sliced or grated can't
      be peeled. Prepped units stay on the board; hold the board to take all of them.
-   - **A dish is one batch**: everything for it goes into the pot or the pan before you light it.
-     Holding a lit station **takes it off the heat**: its cycle pauses and its bar goes with it.
-     Drop it on a plate to dish up; anywhere else puts it back and the cycle carries on. A plate
-     with a dish on it takes no more cooked food. **Take it all out** returns an unlit station's
-     contents to the pantry.
-   - **Pan**: every unit needs one stir (3× tofu + 1× rice: 4 stirs). Lift the pan and shake it
-     side to side. The bar has four zones. **Grey**: a shake is too early and sends the bar back to
-     the start. **Green**: stirs one unit perfectly. **Red**: stirs one unit, a bit burned
-     (overcooked: bitter). A counted shake sends the bar back to the middle of the grey, so it's
-     one stir per lift: put it back to heat up again. Reaching the **black** burns one unit, and
-     leaving it at the end burns another every 2 s. Units never stirred come off undercooked.
-   - **Pot**: dish it up on the narrow green line, or it overcooks. Without a stock cube it boils
-     one ingredient at a time; with one, it's a soup and takes anything. Everything in it comes
-     off with the same doneness.
+   - **Stations** (`CookingStation`): the pot or pan starts cooking as soon as one thing is in, and
+     takes more while it cooks. The bar has three zones. **Blue** (the first half): undercooked.
+     **Orange**: just right. **Red**: ruined, and it can't come back. The food darkens as it goes
+     (browner in the orange, nearly black in the red).
+   - **Pan**: lift it and shake it side to side (four strokes, so one move doesn't count). A shake
+     in the orange sends the bar back to the start of the orange, and the food gets browner; an early
+     shake does nothing.
+   - **Pot**: stir it with the **spoon** from the roof (four strokes over the pot), which does the
+     same as shaking the pan. (The knife stirs too.) Without a stock cube it boils one ingredient at
+     a time; with one, it's a soup and takes anything.
+   - Holding a station **takes it off the heat**: its cycle pauses and its bar goes with it. Drop it
+     on a plate to dish up, on the other station to pour it in (rice has to be **boiled before it's
+     fried**: boil it, then pour the pot into the pan), or on the pantry to put the raw contents
+     back. Anywhere else puts it back on its stove.
    - **Seasoning**: drop salt, pepper, sugar, MSG2, citric acid or chilli
      (`IngredientDefinition.isSeasoning`) on a plate with a cooked dish. Nothing else goes on raw.
      Chilli and MSG2 give their full taste grated, half unprepped (`fullFlavourPrep`). For a
@@ -222,7 +226,7 @@ units per prep state ("3× Onion raw", "2× Onion peeled, sliced").
 - **Dish pictures** (`CookingPrototype.Pictures.cs`): a dish is drawn as its ingredient sprites heaped
   on a plate. Fried pieces come out golden with brown char marks (darker, and more of them, if
   something burnt); a soup sits in a layer of broth. Seasonings are a pinch on the rim. Shown on the
-  desk's plates, the Dish Served page, the Recipes and History pages and lists, and the bundles.
+  desk's plates, the Dish Served page, the Menu and History pages and lists, and the bundles.
 - **Time's up**: when the timer runs out, the customer at the counter still gets their order
   ("Last customer"); nobody else comes. Those who never got there are listed as not making it
   before closing.
@@ -245,10 +249,10 @@ player to actually do it:
 
 1. Welcome: buy in the morning, cook for the regulars, pay the rent; today is practice.
 2. Shop: click the Soup on the rock bundle, then Buy and start the day.
-3. The Man orders Soup on the rock; the Order page and the Recipes tab.
+3. The Man orders Soup on the rock; the Current Order page and the Menu tab.
 4. Drag a potato from the pantry onto a cutting board, and peel it with the peeler from the roof.
-5. Drag the peeled potato, the soup cube and the salts into the pot, and click it to light it.
-6. Put a clean plate on the desk; when the bar is green, lift the pot onto it.
+5. Drag the peeled potato, the soup cube and the salts into the pot (it starts with the first).
+6. Put a clean plate on the desk; when the bar is orange, lift the pot onto it (the spoon holds it there).
 7. Drag the plate to the food delivery spot; the Dish Served page; Continue.
 8. What real days add (every regular, a timer, rent), the pan, favourites and secret cravings.
    **Start cycle 1** then begins the real game fresh (starting money, empty pantry, the morning
@@ -338,13 +342,15 @@ reveals the flavour only after serving.
 
 ### Recipe book (`CookingPrototype.RecipeBook.cs`, `RecipeGuide.cs`)
 
-The tablet's **Recipes** tab opens it any time. It lists the menu only;
-dishes you didn't save (or took off) are in the cooking history. For the selected dish it shows:
+The tablet's **Menu** tab opens it any time. It lists the menu only (no background behind the
+list); dishes you didn't save (or took off) are in the cooking history. The selected dish and its
+flavour profile share one page:
 
 - **Steps** (`RecipeGuide`): what to buy (with how many you have), what to prep with which tool
   ("peel (peeler), then slice (knife)"), which station cooks what and how (pot: the soup cube
-  makes it a soup; wok: take it off in the green, shake in the red; raw straight to the plate), and serving.
-- **Flavour**: the dish alone on the radar. No zones, and no "tastes like", which could give away
+  makes it a soup; take it off in the orange, stir or shake to hold it there; boiled-then-fried:
+  pour the pot into the pan; raw straight to the plate), and serving.
+- **Flavour Profile**: the dish alone on the radar. No zones, and no "tastes like", which could give away
   what customers want.
 - **Shopping**: have/need per ingredient (stock + cart), with **+ One serving** and **+ What's
   missing** to fill the store cart. These only work in the morning.
@@ -414,17 +420,14 @@ built around dishes from the design doc that aren't on the menu; one way to hit 
   lines drop story hints too.
 - **Cooking history.** Each visit is recorded from the moment the customer arrives
   (`HistoryEntry`) as a full report on the recipe book's **History** page. On the left you filter
-  by regular and pick an order (newest first). In the middle is the report:
-  - **Order:** the dish, their order lines, and how long after ordering it was served.
-  - **What was said:** every line with a timestamp, labelled Order, Musing, Hurrying, Reaction or Clue.
-  - **What was cooked:** a timestamped log of units put into the wok/pot/plate, stations started
-    and taken off (at what %, doneness, wok shakes), anything binned, and prep done during the order.
-  - **Served**, **to make it again** (the dish's name or "Nameless", and its recipe steps), the
-    dish's **flavour profile** per axis next to the order's when you knew the order (orange = more,
-    blue = less), and the **result** (verdict, similarity breakdown, pay, ingredient cost, profit).
+  by regular and pick an order (newest first). The header is the dish, who it was for, the cycle
+  and the verdict. The report:
+  - **Ordered:** the dish name.
+  - **Received:** what was on the plate, written like the order card's lines.
+  - **Receipt:** dish price, cash received, ingredients, a line, and the profit.
+  - **Transcript:** everything they said.
 
-  On the right is that dish on the radar (with the order's outline when you knew it), plus what you
-  know about that regular's secret desire (their clues so far, or the recipe you found). For a dish
+  On the right is that dish on the radar (with the order's outline when you knew it). For a dish
   that isn't on the menu there's a name field: **Save dish** saves it as your own recipe, so
   regulars can order it by name.
 - **Unlocking.** Hitting the desire is their dream meal (the dream order scene, and they become

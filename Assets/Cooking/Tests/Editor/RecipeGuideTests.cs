@@ -40,7 +40,7 @@ namespace Cooking.Tests
         }
 
         [Test]
-        public void FriedDish_ListsBuyPrepAndWok()
+        public void FriedDish_ListsBuyPrepAndPan()
         {
             IngredientDefinition onion = Ingredient("Onion");
             IngredientDefinition rice = Ingredient("Rice");
@@ -52,7 +52,7 @@ namespace Cooking.Tests
             StringAssert.Contains("2× Onion", steps);
             StringAssert.Contains("have 1", steps);
             StringAssert.Contains("As they are: Rice", steps);
-            StringAssert.Contains("<b>Wok</b>", steps);
+            StringAssert.Contains("<b>Pan</b>", steps);
             StringAssert.DoesNotContain("<b>Pot</b>", steps);
         }
 

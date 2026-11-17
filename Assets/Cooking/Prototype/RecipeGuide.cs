@@ -78,7 +78,7 @@ namespace Cooking.Prototype
 
                 if(stock != null)
                 {
-                    sb.Append("Drop them all in before lighting it: the ").Append(stock.ingredient.DisplayName).Append(" makes it a soup.");
+                    sb.Append("Drop them all in: the ").Append(stock.ingredient.DisplayName).Append(" makes it a soup.");
                 }
                 else if(DistinctIngredients(boiled) > 1)
                 {
@@ -89,18 +89,21 @@ namespace Cooking.Prototype
                     sb.Append("Drop it in the pot.");
                 }
 
-                sb.Append(" Click to light it, and lift it onto a plate on the green line.\n");
+                bool intoPan = fried.Count > 0 && boiled.TrueForAll(p => fried.Contains(p));
+                sb.Append(" It starts with the first thing in. While the bar is orange, ")
+                  .Append(intoPan ? "pour it into the pan" : "lift it onto a plate")
+                  .Append("; stir with the spoon to hold it there.\n");
             }
 
             if(fried.Count > 0)
             {
-                sb.Append("  <b>Wok</b>: ").Append(List(fried)).Append(".\n    ")
-                  .Append("Drop them all in, then click to light it. Each time the bar is green, lift the pan and shake it to stir one; then lift it onto a plate.\n");
+                sb.Append("  <b>Pan</b>: ").Append(List(fried)).Append(".\n    ")
+                  .Append("It starts with the first thing in. While the bar is orange, lift the pan and shake it to hold it there; then lift it onto a plate.\n");
             }
 
             if(boiled.Count > 0 && fried.Count > 0 && boiled.Exists(p => fried.Contains(p)))
             {
-                sb.Append("  <color=").Append(Muted).Append(">Some of it is boiled and then fried: pot first, then the wok.</color>\n");
+                sb.Append("  <color=").Append(Muted).Append(">Some of it is boiled and then fried: boil it first, then pour the pot into the pan.</color>\n");
             }
 
             if(raw.Count > 0) sb.Append("  <b>Raw</b>: ").Append(List(raw)).Append(" straight onto the plate (seasonings can also go on the cooked dish).\n");

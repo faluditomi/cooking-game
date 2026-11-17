@@ -217,49 +217,6 @@ namespace Cooking.Tests
         }
 
         [Test]
-        public void Pot_Batch_WithStockCube_GoesInTogether()
-        {
-            IngredientDefinition cube = Ingredient("Soup Cube", stock: true);
-            IngredientDefinition potato = Ingredient("Potato");
-            IngredientDefinition salt = Ingredient("Salt");
-            CookingStation pot = CookingStation.CreatePot();
-
-            // Cube listed last: it still goes in first, so everything joins the soup.
-            IngredientPortion[] batch = { new IngredientPortion(potato, 1), new IngredientPortion(salt, 2), new IngredientPortion(cube, 1) };
-
-            Assert.IsTrue(pot.AddAll(batch));
-            Assert.IsTrue(pot.IsSoup);
-            Assert.AreEqual(3, pot.Contents.Count);
-        }
-
-        [Test]
-        public void Pot_Batch_WithoutStock_MustBeOneIngredient()
-        {
-            IngredientDefinition potato = Ingredient("Potato");
-            IngredientDefinition salt = Ingredient("Salt");
-            CookingStation pot = CookingStation.CreatePot();
-
-            Assert.IsTrue(pot.CanAddAll(new[] { new IngredientPortion(potato, 1), new IngredientPortion(potato, 1, PrepSteps.Peeled) }, out _));
-            Assert.IsFalse(pot.AddAll(new[] { new IngredientPortion(potato, 1), new IngredientPortion(salt, 1) }));
-            Assert.IsTrue(pot.IsEmpty, "a refused batch adds nothing");
-
-            pot.Add(new IngredientPortion(potato, 1));
-            Assert.IsFalse(pot.CanAddAll(new[] { new IngredientPortion(salt, 1) }, out _), "a different ingredient joining a stockless pot");
-        }
-
-        [Test]
-        public void Station_Batch_RefusedWhileCooking()
-        {
-            CookingStation wok = CookingStation.CreateWok();
-            IngredientDefinition rice = Ingredient("Rice");
-            wok.Add(new IngredientPortion(rice, 1));
-            wok.StartCooking();
-
-            Assert.IsFalse(wok.CanAddAll(new[] { new IngredientPortion(rice, 1) }, out string reason));
-            StringAssert.Contains("cooking", reason);
-        }
-
-        [Test]
         public void Wok_TakesAnyMix()
         {
             CookingStation wok = CookingStation.CreateWok();

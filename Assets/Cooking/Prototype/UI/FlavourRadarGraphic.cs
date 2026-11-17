@@ -203,13 +203,6 @@ namespace Cooking.Prototype
             {
                 AddLine(vh, Point(i, Value(entry.Profile, i)), Point(i + 1, Value(entry.Profile, i + 1)), entry.Filled ? 3f : 2f, entry.Color);
             }
-
-            for(int i = 0; i < count; i++)
-            {
-                Vector2 p = Point(i, Value(entry.Profile, i));
-                float s = entry.Filled ? 5f : 3.5f;
-                AddQuad(vh, p + new Vector2(-s, -s), p + new Vector2(-s, s), p + new Vector2(s, s), p + new Vector2(s, -s), entry.Color);
-            }
         }
 
         private static void AddLine(VertexHelper vh, Vector2 a, Vector2 b, float width, Color lineColor)

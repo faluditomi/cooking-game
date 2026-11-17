@@ -249,7 +249,9 @@ namespace Cooking.Prototype.EditorTools
                 foreach(Item item in items)
                 {
                     // Everything goes into the same station, seasonings included.
-                    portions.Add(new IngredientPortion(Ingredient(item.Name), item.Quantity, item.Prep, method));
+                    // Rice has to be boiled before it can be fried.
+                    CookMethods cooking = item.Name == "Rice" && (method & CookMethods.Fried) != 0 ? method | CookMethods.Boiled : method;
+                    portions.Add(new IngredientPortion(Ingredient(item.Name), item.Quantity, item.Prep, cooking));
                 }
 
                 recipe = ScriptableObject.CreateInstance<RecipeDefinition>();

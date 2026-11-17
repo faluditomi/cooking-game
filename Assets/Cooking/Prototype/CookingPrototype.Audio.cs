@@ -55,7 +55,6 @@ namespace Cooking.Prototype
         private AudioSource boilSource;
         private AudioSource ambienceSource;
         private float lastBlip;
-        private int lastBurnt;
 
         /// <summary>Sets the clips. Used by the editor's Assign Sounds menu.</summary>
         public void SetSounds(SoundSet set)
@@ -117,8 +116,7 @@ namespace Cooking.Prototype
             if(ambienceSource != null) ambienceSource.volume = ambienceVolume;
 
             // Something in the pan just burnt.
-            if(wok.BurntCount > lastBurnt) Play(sounds.burn, 0.7f);
-            lastBurnt = wok.IsCooking ? wok.BurntCount : 0;
+            // (The burn itself plays from UpdateStationView when a station goes into the red.)
         }
 
         private static void Fade(AudioSource source, float target)

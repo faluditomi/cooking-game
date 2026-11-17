@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Salt
   m_EditorClassIdentifier: Cooking.Runtime::Cooking.IngredientDefinition
   displayName: Salt
-  icon: {fileID: 4156040404677804693, guid: ac33b485f081461449ae66214f14b18d, type: 3}
+  icon: {fileID: 8501574125571966252, guid: f6f9cbf6885119343966e105c5cb3355, type: 3}
   price: 0.5
   bulk: 0.1
   flavour:
