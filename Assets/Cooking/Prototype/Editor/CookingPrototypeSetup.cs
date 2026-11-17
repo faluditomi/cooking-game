@@ -66,6 +66,7 @@ namespace Cooking.Prototype.EditorTools
             AssignMarketArt();
             CookwareSprites.AssignToScene();
             UiSkinSetup.Assign();
+            SoundSetup.Assign();
 
             Selection.activeGameObject = root;
             Debug.Log("[Cooking] Built " + ScenePath + ". Press Play to cook.");

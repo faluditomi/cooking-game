@@ -236,6 +236,30 @@ units per prep state ("3× Onion raw", "2× Onion peeled, sliced").
 - **Faces** in the history's lists (the regular's picture, or a placeholder), and **bundle tiles**
   that list what they add.
 
+### Sound (`CookingPrototype.Audio.cs`, `Audio/`)
+
+Sound effects and a market ambience; the music is coming separately. Every clip is synthesized from
+sine waves and filtered noise by `Audio/Source/synth_sounds.py` (plain Python 3, no packages), so
+there are no samples or licences involved: edit a sound's function there and re-run it to change it.
+**Custom Tools → Cooking Prototype → Assign Sounds** (`SoundSetup.cs`) imports them and puts them on
+the prototype; **Build Scene** runs it too.
+
+- **Ambience**: a busy sci-fi food street at night, looping all the time (about 27 s). Synthesized voices
+  (vowel formants) in short exchanges now and then, near or far, with quiet stretches between; hover traffic passing, a soft synth drone over
+  the city, plates and cutlery from the other stalls, the odd till, a neighbour's fryer, a flickering
+  neon sign and a distant PA chime, all through a small reverb. Re-make it alone with
+  `python synth_sounds.py ambience_loop`.
+- **Cooking**: the pan sizzles (louder as it heats) and the pot bubbles while they're lit and on the
+  heat; both go quiet when lifted off. A hiss when something in the pan burns.
+- **Hands**: picking up and putting down ingredients, plates, the pot and pan and the tools; a
+  stroke sound per knife, peeler or grater stroke and a chime when a board's prep is done; a toss per
+  shake of the pan, a tick for a stir and a dull note for shaking too early.
+- **Service**: a door chime when someone arrives, a soft blip as their lines type out, a bell when
+  you serve, coins when they pay (a chime for a dream meal, a dull note when they don't), the till
+  when you buy, and a low gong at the end of the cycle. Every button clicks.
+
+Volumes are on the `Cooking Prototype` object (`sfxVolume`, `ambienceVolume`, `cookingVolume`).
+
 ### Minigames (`Prototype/Minigames/`)
 
 From the design doc's cooking section. Each is a held drag that feeds a `Gesture`: a prep tool

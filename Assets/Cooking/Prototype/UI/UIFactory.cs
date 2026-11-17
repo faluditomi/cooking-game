@@ -28,6 +28,9 @@ namespace Cooking.Prototype
             }
         }
 
+        /// <summary>Called on every button click (the click sound).</summary>
+        public static System.Action Clicked;
+
         private static Sprite circle;
 
         /// <summary>A soft-edged white disc, made at runtime (for heads, plates and other round shapes).</summary>
@@ -199,6 +202,7 @@ namespace Cooking.Prototype
             colors.disabledColor = new Color(0.5f, 0.5f, 0.5f, 0.3f);
             button.colors = colors;
             if(onClick != null) button.onClick.AddListener(onClick);
+            button.onClick.AddListener(() => Clicked?.Invoke());
 
             Text label = Label(image.transform, text, fontSize, TextAnchor.MiddleCenter);
             Stretch(label.rectTransform, 4f);

@@ -274,6 +274,7 @@ namespace Cooking.Prototype
             heldStation = view;
             stirredThisLift = false;
 
+            Play(sounds.pickup, 0.7f, 0.05f, 0.8f);
             // Just the pot or pan; its bar stays on the station.
             CreateGhost(screen, 240f, 250f);
             Cookware lifted = BuildCookware(ghost, station);
@@ -292,6 +293,7 @@ namespace Cooking.Prototype
             heldIndex = index;
             heldPortion = portion;
 
+            Play(sounds.pickup, 0.6f);
             CreateGhost(screen, 150f, 90f);
             AddPile(ghost, portion.ingredient.Icon, Mathf.Min(portion.quantity, 3), 52f, new Vector2(0.5f, 0.62f));
             Text label = UIFactory.Label(ghost, Describe(portion, true), 14, TextAnchor.LowerCenter, FontStyle.Bold);
@@ -308,6 +310,7 @@ namespace Cooking.Prototype
             heldPlate = taken;
             if(taken.Items.Count > 0) focusPlate = taken;
 
+            Play(sounds.plate, 0.35f, 0.08f, 1.3f);
             CreateGhost(screen, 110f, 110f);
             BuildPlateVisual(ghost, taken);
             SetDeliveryHighlight(true);
@@ -352,10 +355,10 @@ namespace Cooking.Prototype
 
             switch(what)
             {
-                case Held.Portion: DropPortion(screen); break;
-                case Held.Plate: DropPlate(screen); break;
-                case Held.Station: DropStation(screen); break;
-                case Held.Tool: DropTool(); break;
+                case Held.Portion: DropPortion(screen); Play(sounds.place, 0.6f); break;
+                case Held.Plate: DropPlate(screen); Play(sounds.plate, 0.6f); break;
+                case Held.Station: DropStation(screen); Play(sounds.place, 0.8f, 0.04f, 0.8f); break;
+                case Held.Tool: DropTool(); Play(sounds.place, 0.3f, 0.05f, 1.6f); break;
             }
 
             RefreshAll();
@@ -626,6 +629,8 @@ namespace Cooking.Prototype
         {
             if(!shakeGesture.Move(CanvasPoint(screen))) return;
 
+            Play(sounds.shake, 0.7f, 0.1f);
+
             // One stir per lift: put it back on the heat to get to the green again.
             if(stirredThisLift)
             {
@@ -637,13 +642,16 @@ namespace Cooking.Prototype
             {
                 case ShakeResult.Stirred:
                     stirredThisLift = true;
+                    Play(sounds.stir, 0.6f, 0.02f);
                     Say("Stirred one in the green. " + WokSummary(wok) + ". Back on the heat for the next.", UIFactory.Good);
                     break;
                 case ShakeResult.StirredOverdone:
                     stirredThisLift = true;
+                    Play(sounds.stir, 0.5f, 0.02f, 0.8f);
                     Say("Stirred one, but in the red: a bit burned. " + WokSummary(wok) + ".", UIFactory.Accent);
                     break;
                 case ShakeResult.TooEarly:
+                    Play(sounds.tooEarly, 0.6f, 0f);
                     Say("Too early: the bar went back to the start. Shake in the green.", UIFactory.Bad);
                     break;
                 case ShakeResult.KnockedBack:
@@ -689,6 +697,7 @@ namespace Cooking.Prototype
             dishCost = dropped.Cost;
             if(focusPlate == dropped) focusPlate = null;
 
+            Play(sounds.serve, 0.8f, 0f);
             JudgeResult result = DishJudge.Judge(order, plate, customer, zones, rules, JudgeSettings());
             if(customer.alwaysPaysAsStranger && Relationship(customer).Stage == NpcStage.Stranger) result = DishJudge.PayInFull(result);
             FinishOrder(result);
@@ -713,6 +722,7 @@ namespace Cooking.Prototype
 
             if(view.Station.StartCooking())
             {
+                Play(sounds.burn, 0.35f, 0.05f, 1.4f);
                 Say(view.Station.Name + " on. Watch the bar.");
                 LogCooking(view.Station.Name, "Started" + (view.Station.IsSoup ? " the soup." : "."));
             }
