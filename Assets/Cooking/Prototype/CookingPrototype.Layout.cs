@@ -64,6 +64,7 @@ namespace Cooking.Prototype
         private Image npcBody;
         private Image npcHead;
         private Text npcName;
+        private Image npcPortrait;
         private Text marketHint;
         private readonly List<Image> billboardSlots = new List<Image>();
 
@@ -275,8 +276,16 @@ namespace Cooking.Prototype
             npcHead.raycastTarget = false;
             UIFactory.Place(npcHead.rectTransform, 0.2f, 0.56f, 0.8f, 0.95f);
 
+            // A regular with art stands here instead of the placeholder.
+            npcPortrait = UIFactory.Panel(market, "Portrait", Color.white);
+            npcPortrait.preserveAspect = true;
+            npcPortrait.raycastTarget = false;
+            UIFactory.Place(npcPortrait.rectTransform, 0f, -0.04f, 0.2f, 0.98f);
+            npcPortrait.rectTransform.pivot = new Vector2(0.5f, 0f);
+            npcPortrait.gameObject.SetActive(false);
+
             npcName = UIFactory.Label(market, "", 22, TextAnchor.LowerLeft, FontStyle.Bold, UIFactory.TextColor);
-            UIFactory.Place(npcName.rectTransform, 0.16f, 0.04f, 0.5f, 0.3f);
+            UIFactory.Place(npcName.rectTransform, 0.2f, 0.04f, 0.5f, 0.3f);
 
             marketHint = UIFactory.Label(market, "", 20, TextAnchor.MiddleCenter, FontStyle.Italic, UIFactory.MutedText);
             UIFactory.Place(marketHint.rectTransform, 0.3f, 0.02f, 0.98f, 0.18f);
@@ -325,7 +334,10 @@ namespace Cooking.Prototype
             if(npcFigure == null) return;
 
             bool here = phase == Phase.Service && customer != null;
-            npcFigure.SetActive(here);
+            Sprite portrait = here ? customer.portrait : null;
+            npcFigure.SetActive(here && portrait == null);
+            npcPortrait.gameObject.SetActive(portrait != null);
+            npcPortrait.sprite = portrait;
 
             if(here)
             {

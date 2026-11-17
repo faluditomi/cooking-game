@@ -17,6 +17,12 @@ namespace Cooking.Prototype
         [Min(1)] public int likedMealsToFamiliar = 3;
         [Tooltip("Dishes they order at first. Empty means anything on the menu. Liked dishes get added as you go.")]
         public List<RecipeDefinition> orders = new List<RecipeDefinition>();
+        [Tooltip("Their first liked meals aren't really food to them (the Sleeper). The first dish that tastes good (inside a desirable flavour zone) and isn't one of them replaces the whole list, and makes them Familiar on its own.")]
+        public bool firstTasteReplacesLikes;
+        [Tooltip("They pay full price for anything they'll eat while they're still Strangers (the Sleeper doesn't know food yet).")]
+        public bool alwaysPaysAsStranger;
+        [Tooltip("Their picture at the counter. Optional: without one they're a placeholder figure.")]
+        public Sprite portrait;
         [Tooltip("Hitting this zone is their dream meal. Optional.")]
         public FlavourZone secretDesire;
         [Tooltip("The dream meal also needs all of these on the plate. They win over refusals: a dream meal is eaten even with something they'd otherwise refuse.")]

@@ -254,7 +254,8 @@ Price is the **ordered** dish's ingredient cost × `margin`. Customers come from
 
 - **The Woman**: starts out liking MSBeef fried rice (Real Beef™ only), Synthetic soup and Calorice, and refuses Beef. Secretly craves *Their lost love's soup*, a sweet and sour beef soup: her dream needs Beef, and wins over the refusal.
 - **The Man**: refuses synthetic chicken. Craves *An honest broth* (filling, a little to chew, a touch sweet).
-- **The Sleeper**: orders boiled synthetic chicken, a recipe only NPCs know (it's not on the menu or in the book). Craves *Mother's fire* (very hot, savoury, not sweet).
+- **The Sleeper** (Miro board): their first liked meals aren't really food: a potato, a peeled potato, an MSG2 cube and boiled synthetic chicken. None of them are on the menu or in the book, and the first three are served raw (any raw ingredient can go on a clean plate; a raw plate takes no cooked dish). They don't know food yet, so as a Stranger they pay full price for anything they'll eat (`alwaysPaysAsStranger`). The first dish that actually tastes good (inside a desirable flavour zone) and isn't one of those replaces the whole list and makes them Familiar on its own (`firstTasteReplacesLikes`). Craves *Mother's fire* (very hot, savoury, not sweet).
+- **Pictures**: the Woman and the Sleeper stand at the counter with their art from the Miro board (`Customer.portrait`, in `Assets/Art Assets/Characters`, trimmed). The others are placeholder figures for now.
 - **A generic Eyesider**: orders anything on the menu, craves nothing.
 
 Customer lines and other settings (margin, station speed, live preview) are on the

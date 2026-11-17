@@ -38,6 +38,8 @@ namespace Cooking.Prototype
         public float Tip;
 
         public bool IsPaid => Payment > 0f;
+        /// <summary>Paid in full only because they don't know good food from bad yet (see <see cref="DishJudge.PayInFull"/>).</summary>
+        public bool PaidAnyway;
 
         /// <summary>The top tiers: exact, very close, or their dream meal. Liked meals make them Familiar.</summary>
         public bool IsLiked => IsPaid && (Verdict == Verdict.Ordered || Verdict == Verdict.VeryClose || Verdict == Verdict.DreamMeal);
@@ -142,6 +144,20 @@ namespace Cooking.Prototype
             }
 
             result.Payment = result.Price * result.PayShare;
+            return result;
+        }
+
+        /// <summary>
+        /// Full price for anything they'll eat (not a refusal), for a customer who can't tell good
+        /// food from bad yet. What they thought of it (the verdict) stays as it was.
+        /// </summary>
+        public static JudgeResult PayInFull(JudgeResult result)
+        {
+            if(result.Verdict == Verdict.Refused || result.PayShare >= 1f) return result;
+
+            result.PayShare = 1f;
+            result.Payment = result.Price;
+            result.PaidAnyway = true;
             return result;
         }
 

@@ -23,6 +23,11 @@ namespace Cooking.Prototype
         public RecipeDefinition NewLikedMeal;
         /// <summary>True when this serve was their dream meal for the first time.</summary>
         public bool FoundDream;
+        /// <summary>
+        /// The first good-tasting dish for someone whose first liked meals aren't really food
+        /// (<see cref="Customer.firstTasteReplacesLikes"/>): it replaced them all.
+        /// </summary>
+        public bool FirstTaste;
 
         public bool StageChanged => Before != After;
     }
@@ -47,6 +52,8 @@ namespace Cooking.Prototype
         /// <summary>Meals they liked: their exact order, very close to it, or their dream meal.</summary>
         public int LikedCount { get; private set; }
         public RecipeDefinition DreamMeal { get; private set; }
+        /// <summary>For <see cref="Customer.firstTasteReplacesLikes"/>: they've had a dish that tastes good, and their first liked meals are gone.</summary>
+        public bool HasTasted { get; private set; }
 
         /// <summary>Closest any served dish has come to their secret desire (radar distance). Infinity until the first.</summary>
         public float BestDesireDistance { get; private set; } = float.PositiveInfinity;
@@ -111,7 +118,32 @@ namespace Cooking.Prototype
                     change.FoundDream = true;
                 }
 
+                // Real food at last: their first liked meals go.
+                if(Customer.firstTasteReplacesLikes && !HasTasted)
+                {
+                    HasTasted = true;
+                    likedMeals.Clear();
+                }
+
                 Stage = NpcStage.Friendly;
+            }
+            else if(Customer.firstTasteReplacesLikes && !HasTasted)
+            {
+                // Their first liked meals (a raw potato, an MSG2 cube...) don't count towards
+                // anything. The first dish that actually tastes good replaces them all, and that one
+                // dish makes them Familiar.
+                bool firstLike = FindMatch(Customer.orders, served) != null;
+
+                if(!firstLike && result.Verdict != Verdict.Refused && TastesGood(result))
+                {
+                    HasTasted = true;
+                    LikedCount++;
+                    likedMeals.Clear();
+                    change.NewLikedMeal = FindMatch(known, served) ?? CreateMeal(Nameless, served);
+                    likedMeals.Add(change.NewLikedMeal);
+                    change.FirstTaste = true;
+                    if(Stage == NpcStage.Stranger) Stage = NpcStage.Familiar;
+                }
             }
             else if(result.IsLiked)
             {
@@ -129,6 +161,12 @@ namespace Cooking.Prototype
 
             change.After = Stage;
             return change;
+        }
+
+        /// <summary>A dish inside one of the desirable flavour zones.</summary>
+        public static bool TastesGood(JudgeResult result)
+        {
+            return result.BestZone.Zone != null && result.BestZone.Score >= 1f;
         }
 
         /// <summary>The first of <paramref name="recipes"/> the plate makes exactly, or null.</summary>
