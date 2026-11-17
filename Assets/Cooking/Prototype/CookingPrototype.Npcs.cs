@@ -212,6 +212,8 @@ namespace Cooking.Prototype
                     break;
             }
 
+            // Once they've had their dream meal they always ask for it, whatever the line says.
+            if(relationship.DreamMeal != null) pick = relationship.DreamMeal;
             SetOrder(pick ?? DefaultOrder());
         }
 
@@ -301,7 +303,8 @@ namespace Cooking.Prototype
             ClearSpeech();
 
             CustomerRelationship relationship = Relationship(customer);
-            visitLiked = relationship.PickLiked(random);
+            // Once they've had their dream meal, that's what they ask for.
+            visitLiked = relationship.DreamMeal ?? relationship.PickLiked(random);
             currentEntry = new HistoryEntry
             {
                 Day = day,

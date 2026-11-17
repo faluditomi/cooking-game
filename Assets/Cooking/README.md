@@ -217,6 +217,25 @@ units per prep state ("3× Onion raw", "2× Onion peeled, sliced").
    stock; plates and whatever is in the stations are binned. **Prepped stock spoils; raw stock
    carries over.**
 
+### From the design doc (this round)
+
+- **Dish pictures** (`CookingPrototype.Pictures.cs`): a dish is drawn as its ingredient sprites heaped
+  on a plate. Fried pieces come out golden with brown char marks (darker, and more of them, if
+  something burnt); a soup sits in a layer of broth. Seasonings are a pinch on the rim. Shown on the
+  desk's plates, the Dish Served page, the Recipes and History pages and lists, and the bundles.
+- **Time's up**: when the timer runs out, the customer at the counter still gets their order
+  ("Last customer"); nobody else comes. Those who never got there are listed as not making it
+  before closing.
+- **Staying away**: after food they didn't pay for (or refused), a regular may skip the next cycle
+  or two (`stayAwayChance`, 50%). They always come back, and someone always turns up. The morning
+  list says who's staying away. The Sleeper, paying anyway as a Stranger, doesn't mind.
+- **Dream meal**: once found, it's what they always order.
+- **Just as tasty**: a dish that isn't the order but lands in the same desirable flavour zone as the
+  order (and nothing on it is badly cooked) is liked. A genuinely different dish is paid in full and
+  tipped (`SameZoneTip`, 20%); a near miss of the order is paid as very close.
+- **Faces** in the history's lists (the regular's picture, or a placeholder), and **bundle tiles**
+  that list what they add.
+
 ### Minigames (`Prototype/Minigames/`)
 
 From the design doc's cooking section. Each is a held drag that feeds a `Gesture`: a prep tool

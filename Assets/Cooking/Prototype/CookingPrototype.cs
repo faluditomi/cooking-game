@@ -43,6 +43,8 @@ namespace Cooking.Prototype
         [SerializeField, Min(30f)] private float daySeconds = 360f;
         [Tooltip("Seconds between one customer leaving and the next arriving (random in this range).")]
         [SerializeField] private Vector2 arrivalDelay = new Vector2(1f, 6f);
+        [Tooltip("Chance a regular stays away for a cycle or two after food they didn't pay for (they always come back).")]
+        [SerializeField, Range(0f, 1f)] private float stayAwayChance = 0.5f;
 
         [Header("Orders")]
         [Tooltip("Menu price = ingredient cost × margin.")]
@@ -112,6 +114,12 @@ namespace Cooking.Prototype
         private float dayTimeLeft;
         /// <summary>Today's regulars still to come, in arrival order.</summary>
         private readonly List<Customer> arrivals = new List<Customer>();
+        /// <summary>How many regulars come today (some may be staying away).</summary>
+        private int todaysRegulars;
+        /// <summary>Time's up, but the customer at the counter still gets their order; nobody else comes.</summary>
+        private bool closing;
+        /// <summary>Regulars staying away after bad food, and for how many more cycles.</summary>
+        private readonly Dictionary<Customer, int> awayFor = new Dictionary<Customer, int>();
         /// <summary>When the next customer arrives (Time.time), while the counter is empty.</summary>
         private float nextArrivalAt;
         /// <summary>The menu as the scene set it up, for restarting.</summary>
@@ -130,6 +138,8 @@ namespace Cooking.Prototype
         private bool orderIn;
         /// <summary>Ingredient cost of what went into the current dish.</summary>
         private float dishCost;
+        /// <summary>Cycles the current customer will now stay away (0 if they're coming back as usual), for the result page.</summary>
+        private int stayingAway;
 
         // Shared UI
         private Text dayText;
@@ -141,6 +151,7 @@ namespace Cooking.Prototype
         private Text resultTitle;
         private Text resultBody;
         private RectTransform resultScroll;
+        private RectTransform resultPicture;
         private FlavourRadarGraphic resultRadar;
         private Button resultButton;
         private GameObject summaryOverlay;
@@ -197,15 +208,24 @@ namespace Cooking.Prototype
             // The kitchen keeps cooking and the clock keeps running whichever area you're in.
             TickKitchen(Time.deltaTime);
 
-            if(dayTimer)
+            if(dayTimer && !closing)
             {
                 dayTimeLeft -= Time.deltaTime;
 
-                if(dayTimeLeft <= 0f)
+                if(dayTimeLeft <= 0f && !closing)
                 {
                     dayTimeLeft = 0f;
-                    EndDay();
-                    return;
+
+                    if(customer == null)
+                    {
+                        EndDay();
+                        return;
+                    }
+
+                    // The one at the counter still gets their order; nobody else comes today.
+                    closing = true;
+                    Say("Time's up. Finish " + customer.name + "'s order; nobody else is coming today.", UIFactory.Accent);
+                    RefreshAll();
                 }
             }
 
@@ -234,9 +254,36 @@ namespace Cooking.Prototype
             resultOverlay.SetActive(false);
             ClearSpeech();
 
-            // Everyone comes once a cycle, in a new order each time.
+            closing = false;
+
+            // Everyone comes once a cycle, in a new order each time, except anyone staying away
+            // after bad food (design doc: they miss a day or two, but always come back).
             arrivals.Clear();
-            arrivals.AddRange(customers);
+            List<Customer> away = new List<Customer>();
+
+            foreach(Customer regular in customers)
+            {
+                if(awayFor.TryGetValue(regular, out int cycles) && cycles > 0)
+                {
+                    awayFor[regular] = cycles - 1;
+                    away.Add(regular);
+                }
+                else
+                {
+                    arrivals.Add(regular);
+                }
+            }
+
+            // Never an empty day: someone always turns up.
+            if(arrivals.Count == 0 && away.Count > 0)
+            {
+                Customer back = away[random.Next(away.Count)];
+                awayFor[back] = 0;
+                away.Remove(back);
+                arrivals.Add(back);
+            }
+
+            todaysRegulars = arrivals.Count;
             for(int i = arrivals.Count - 1; i > 0; i--)
             {
                 int j = random.Next(i + 1);
@@ -245,7 +292,9 @@ namespace Cooking.Prototype
 
             ShuffleBillboards();
             ShowTabletPage(TabletPage.Shop);
-            Say("Cycle " + day + ". Fill the cart for " + customers.Count + " regulars, then buy and start the day. Prepping starts with the day.");
+            Say("Cycle " + day + ". Fill the cart for " + todaysRegulars + (todaysRegulars == 1 ? " regular" : " regulars")
+                + (away.Count > 0 ? " (" + string.Join(", ", away.ConvertAll(c => c.name)) + " won't come today)" : "")
+                + ", then buy and start the day. Prepping starts with the day.");
         }
 
         /// <summary>The morning button: pays for the cart and opens the stall.</summary>
@@ -290,7 +339,7 @@ namespace Cooking.Prototype
             order = null;
             orderIn = false;
 
-            if(arrivals.Count == 0)
+            if(arrivals.Count == 0 || closing)
             {
                 EndDay();
                 return;
@@ -308,6 +357,7 @@ namespace Cooking.Prototype
             overlayOpen = false;
             resultOverlay.SetActive(false);
             dishCost = 0f;
+            stayingAway = 0;
             ClearPlate();
 
             customer = arrivals[0];
@@ -318,7 +368,7 @@ namespace Cooking.Prototype
             orderProfile = FlavourProfile.Zero;
             orderKnown = false;
 
-            Say(customer.name + " is at the counter (" + (servedToday + 1) + " of " + customers.Count + ").");
+            Say(customer.name + " is at the counter (" + (servedToday + 1) + " of " + todaysRegulars + ").");
             BeginVisit();
             RefreshAll();
         }
@@ -359,9 +409,25 @@ namespace Cooking.Prototype
             if(result.IsLiked) likedToday++;
 
             RelationshipChange change = RecordServe(result);
+            MaybeStayAway(result);
             ShowResult(result, change);
             ClearPlate();
             RefreshAll();
+        }
+
+        /// <summary>
+        /// After bad food (not paid for, or refused) a regular may stay away for a cycle or two
+        /// (design doc). They always come back. Someone who doesn't know food yet doesn't mind.
+        /// </summary>
+        private void MaybeStayAway(JudgeResult result)
+        {
+            bool bad = !result.IsPaid || result.Verdict == Verdict.Refused;
+            if(!bad || result.PaidAnyway || customer == null || random.NextDouble() >= stayAwayChance) return;
+
+            int cycles = random.Next(1, 3);
+            awayFor[customer] = cycles;
+            stayingAway = cycles;
+            progressToday.Add(customer.name + " didn't like it and will stay away for " + (cycles == 1 ? "a cycle." : "a couple of cycles."));
         }
 
         /// <summary>Continue on the result screen. An unsaved dish stays Nameless.</summary>
@@ -389,6 +455,8 @@ namespace Cooking.Prototype
             List<Customer> missed = new List<Customer>();
             if(customer != null) missed.Add(customer);
             missed.AddRange(arrivals);
+            // Who never got to the counter (rather than leaving it hungry).
+            List<Customer> neverCame = new List<Customer>(arrivals);
             arrivals.Clear();
             customer = null;
             order = null;
@@ -404,7 +472,7 @@ namespace Cooking.Prototype
 
             StringBuilder sb = new StringBuilder();
             if(missed.Count > 0) sb.Append("<color=#e5594d>Time's up.</color> ");
-            sb.Append("Served <b>").Append(servedToday).Append("</b> of ").Append(customers.Count)
+            sb.Append("Served <b>").Append(servedToday).Append("</b> of ").Append(todaysRegulars)
               .Append(", <b>").Append(likedToday).Append("</b> liked what they got.\n\n");
 
             // Dishes and who for.
@@ -419,7 +487,10 @@ namespace Cooking.Prototype
                   .Append("  <color=#a6a199>").Append(VerdictLabel(entry.Verdict)).Append(" · $").Append(entry.Paid.ToString("0.00")).Append("</color>\n");
             }
 
-            foreach(Customer left in missed) sb.Append("  <color=#e5594d>").Append(left.name).Append(" left without eating.</color>\n");
+            foreach(Customer left in missed)
+            {
+                sb.Append("  <color=#e5594d>").Append(left.name).Append(neverCame.Contains(left) ? " didn't make it before closing." : " left without eating.").Append("</color>\n");
+            }
             if(!any && missed.Count == 0) sb.Append("  <color=#a6a199>None.</color>\n");
 
             float profit = earnedToday - spentToday - stallRent;
@@ -500,6 +571,7 @@ namespace Cooking.Prototype
             ClearKitchen();
             history.Clear();
             relationships.Clear();
+            awayFor.Clear();
             bookRecipe = null;
             selectedEntry = null;
             InitNpcs();
@@ -550,7 +622,7 @@ namespace Cooking.Prototype
             moneyText.text = "$" + money.ToString("0.00");
 
             string phaseLabel = phase == Phase.Morning ? "Morning"
-                : phase == Phase.Service ? (dayTimer ? FormatTime(dayTimeLeft) + " left" : "Open")
+                : phase == Phase.Service ? (closing ? "Last customer" : dayTimer ? FormatTime(dayTimeLeft) + " left" : "Open")
                 : "Closed";
             dayText.text = "Cycle " + day + "  ·  " + phaseLabel;
 
@@ -619,7 +691,7 @@ namespace Cooking.Prototype
         {
             if(phase == Phase.Service && dayTimer && dayText != null)
             {
-                dayText.text = "Cycle " + day + "  ·  " + FormatTime(dayTimeLeft) + " left";
+                dayText.text = "Cycle " + day + "  ·  " + (closing ? "Last customer" : FormatTime(dayTimeLeft) + " left");
             }
 
             if(!dayTimer) return;
@@ -653,6 +725,12 @@ namespace Cooking.Prototype
                 CustomerRelationship relationship = Relationship(regular);
                 sb.Append("<color=#f28c33>").Append(regular.name).Append("</color> <color=#77736d>(")
                   .Append(StageLabel(relationship.Stage)).Append(")</color>: ");
+
+                if(phase == Phase.Morning && !arrivals.Contains(regular))
+                {
+                    sb.Append("<color=#e5594d>staying away today</color>\n");
+                    continue;
+                }
 
                 List<string> dishes = new List<string>();
                 if(relationship.DreamMeal != null) dishes.Add(DishName(relationship.DreamMeal) + " <color=#f28c33>(dream)</color>");
@@ -797,6 +875,11 @@ namespace Cooking.Prototype
                     title = "Wrong order, bad food. They won't pay"; line = customer.dislikedLine; color = UIFactory.Bad; break;
             }
 
+            if(result.SameZone && result.Verdict == Verdict.VeryClose)
+            {
+                title = "Wrong order, but just as tasty. They pay in full and tip";
+            }
+
             if(change.FirstTaste)
             {
                 title = "They've never tasted anything like it. They liked it";
@@ -809,8 +892,14 @@ namespace Cooking.Prototype
                 color = UIFactory.Accent;
             }
 
+            if(stayingAway > 0)
+            {
+                title += ". They'll stay away for " + (stayingAway == 1 ? "a cycle" : "a couple of cycles");
+            }
+
             resultTitle.text = title;
             resultTitle.color = color;
+            BuildDishPicture(resultPicture, plate);
 
             // What they say comes from the dialogue catalog (it plays right after anything they were
             // saying), or the customer's fallback line when the catalog has nothing for this moment.
@@ -891,7 +980,12 @@ namespace Cooking.Prototype
             VerticalLayoutGroup layout = UIFactory.Vertical(right.gameObject, 12f, 0);
             layout.childForceExpandHeight = false;
 
-            resultTitle = UIFactory.Label(right, "", 30, TextAnchor.UpperLeft, FontStyle.Bold);
+            RectTransform titleRow = UIFactory.Row(right, 150f, 16f);
+            titleRow.GetComponent<HorizontalLayoutGroup>().childForceExpandWidth = false;
+            resultPicture = UIFactory.Rect(titleRow, "Dish Picture");
+            UIFactory.Size(resultPicture, 150f, 0f, 150f, 0f);
+            resultTitle = UIFactory.Label(titleRow, "", 30, TextAnchor.MiddleLeft, FontStyle.Bold);
+            UIFactory.Size(resultTitle, -1f, -1f, -1f, 1f);
 
             // What they say and the report scroll; the title, name field and Continue stay put.
             resultScroll = UIFactory.ScrollList(right, 14f);

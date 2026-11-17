@@ -263,6 +263,50 @@ namespace Cooking.Tests
             return f;
         }
 
+        /// <summary>For tests about similarity alone (zones would make a same-flavour dish liked).</summary>
+        private static readonly FlavourZone[] NoZones = new FlavourZone[0];
+
+        [Test]
+        public void Judge_DifferentDish_InTheSameZoneAsTheOrder_IsLiked_PaidInFull_AndTipped()
+        {
+            JudgeFixture f = Fixture();
+            IngredientDefinition otherSalty = Ingredient("Other salty", new FlavourProfile { salty = 9f }, price: 1f);
+            List<IngredientPortion> dish = new List<IngredientPortion> { new IngredientPortion(otherSalty, 1, cooking: CookMethods.Fried) };
+
+            JudgeResult result = DishJudge.Judge(f.Order, dish, new Customer(), f.Zones, null, Settings);
+
+            Assert.AreEqual(Verdict.VeryClose, result.Verdict);
+            Assert.IsTrue(result.SameZone);
+            Assert.AreEqual(4f, result.Payment, 0.0001f);
+            Assert.AreEqual(4f * Settings.SameZoneTip, result.Tip, 0.0001f);
+            Assert.IsTrue(result.IsLiked);
+        }
+
+        [Test]
+        public void Judge_SameZone_DoesNotSaveABurntDish()
+        {
+            JudgeFixture f = Fixture();
+            IngredientDefinition otherSalty = Ingredient("Other salty", new FlavourProfile { salty = 9f }, price: 1f);
+            List<IngredientPortion> dish = new List<IngredientPortion> { new IngredientPortion(otherSalty, 1, cooking: CookMethods.Fried, doneness: Doneness.Burnt) };
+
+            JudgeResult result = DishJudge.Judge(f.Order, dish, new Customer(), f.Zones, null, Settings);
+
+            Assert.IsFalse(result.SameZone);
+            Assert.AreEqual(0f, result.Tip);
+        }
+
+        [Test]
+        public void Judge_DifferentDish_InAnotherZone_IsNotPaid()
+        {
+            JudgeFixture f = Fixture();
+            List<IngredientPortion> dish = new List<IngredientPortion> { new IngredientPortion(f.Sweet, 1, cooking: CookMethods.Fried) };
+
+            JudgeResult result = DishJudge.Judge(f.Order, dish, new Customer(), f.Zones, null, Settings);
+
+            Assert.IsFalse(result.SameZone);
+            Assert.IsFalse(result.IsPaid);
+        }
+
         private static DishJudge.Settings Settings
         {
             get
@@ -291,7 +335,7 @@ namespace Cooking.Tests
             // Tastes the same (no rules), but raw instead of boiled: flavour 100%, ingredients 50% → 75%.
             List<IngredientPortion> dish = new List<IngredientPortion> { new IngredientPortion(f.Salty, 1) };
 
-            JudgeResult result = DishJudge.Judge(f.Order, dish, new Customer(), f.Zones, null, Settings);
+            JudgeResult result = DishJudge.Judge(f.Order, dish, new Customer(), NoZones, null, Settings);
 
             Assert.AreEqual(Verdict.CloseEnough, result.Verdict);
             Assert.AreEqual(0.75f, result.Similarity.Combined, 0.0001f);
@@ -314,7 +358,7 @@ namespace Cooking.Tests
                 new IngredientPortion(f.Salty, 1),
             };
 
-            JudgeResult result = DishJudge.Judge(order, dish, new Customer(), f.Zones, null, Settings);
+            JudgeResult result = DishJudge.Judge(order, dish, new Customer(), NoZones, null, Settings);
 
             Assert.AreEqual(Verdict.VeryClose, result.Verdict);
             Assert.AreEqual(16f * 0.8f, result.Payment, 0.0001f);
@@ -328,7 +372,7 @@ namespace Cooking.Tests
             RecipeDefinition order = Recipe(new IngredientPortion(f.Salty, 4, cooking: CookMethods.Fried));
             List<IngredientPortion> dish = new List<IngredientPortion> { new IngredientPortion(f.Salty, 4, cooking: CookMethods.Fried, doneness: Doneness.Burnt) };
 
-            JudgeResult result = DishJudge.Judge(order, dish, new Customer(), f.Zones, null, Settings);
+            JudgeResult result = DishJudge.Judge(order, dish, new Customer(), NoZones, null, Settings);
 
             Assert.IsFalse(result.ExactMatch);
             Assert.AreEqual(0.5f, result.Similarity.Ingredients, 0.0001f, "badly cooked units count half");

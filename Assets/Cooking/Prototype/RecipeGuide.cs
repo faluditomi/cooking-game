@@ -38,7 +38,7 @@ namespace Cooking.Prototype
             }
 
             // 2. Prep
-            sb.Append("\n<b>2. Prep</b>  <color=").Append(Muted).Append(">on the prep board, one unit at a time</color>\n");
+            sb.Append("\n<b>2. Prep</b>  <color=").Append(Muted).Append(">on a cutting board, one kind at a time: hold a tool from the roof and work over the board</color>\n");
             List<string> asTheyAre = new List<string>();
             bool anyPrep = false;
 
@@ -78,7 +78,7 @@ namespace Cooking.Prototype
 
                 if(stock != null)
                 {
-                    sb.Append("Select them all and send them in together: the ").Append(stock.ingredient.DisplayName).Append(" makes it a soup.");
+                    sb.Append("Drop them all in before lighting it: the ").Append(stock.ingredient.DisplayName).Append(" makes it a soup.");
                 }
                 else if(DistinctIngredients(boiled) > 1)
                 {
@@ -86,16 +86,16 @@ namespace Cooking.Prototype
                 }
                 else
                 {
-                    sb.Append("Send it to the pot.");
+                    sb.Append("Drop it in the pot.");
                 }
 
-                sb.Append(" Start, and take it off on the green line.\n");
+                sb.Append(" Click to light it, and lift it onto a plate on the green line.\n");
             }
 
             if(fried.Count > 0)
             {
                 sb.Append("  <b>Wok</b>: ").Append(List(fried)).Append(".\n    ")
-                  .Append("Select them all and send them to the wok together. Start, take it off in the green, and shake it in the red so it doesn't burn.\n");
+                  .Append("Drop them all in, then click to light it. Each time the bar is green, lift the pan and shake it to stir one; then lift it onto a plate.\n");
             }
 
             if(boiled.Count > 0 && fried.Count > 0 && boiled.Exists(p => fried.Contains(p)))
@@ -103,10 +103,10 @@ namespace Cooking.Prototype
                 sb.Append("  <color=").Append(Muted).Append(">Some of it is boiled and then fried: pot first, then the wok.</color>\n");
             }
 
-            if(raw.Count > 0) sb.Append("  <b>Raw</b>: ").Append(List(raw)).Append(" straight onto the plate.\n");
+            if(raw.Count > 0) sb.Append("  <b>Raw</b>: ").Append(List(raw)).Append(" straight onto the plate (seasonings can also go on the cooked dish).\n");
 
             // 4. Serve
-            sb.Append("\n<b>4. Serve</b>\n  Everything on one plate, then Serve. Badly cooked parts don't count as the order.");
+            sb.Append("\n<b>4. Serve</b>\n  Everything on one plate, then drop it on the food delivery spot. Badly cooked parts don't count as the order.");
             return sb.ToString();
         }
 

@@ -158,7 +158,7 @@ namespace Cooking.Prototype
             Header(shelf, "BUNDLES  <color=#77736d>all the ingredients for one serving</color>");
             bundleGrid = UIFactory.Rect(shelf, "Bundles");
             GridLayoutGroup bundleLayout = bundleGrid.gameObject.AddComponent<GridLayoutGroup>();
-            bundleLayout.cellSize = new Vector2(196f, 64f);
+            bundleLayout.cellSize = new Vector2(196f, 96f);
             bundleLayout.spacing = new Vector2(8f, 8f);
             bundleLayout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
             bundleLayout.constraintCount = 4;
@@ -178,8 +178,16 @@ namespace Cooking.Prototype
             foreach(RecipeDefinition recipe in visible)
             {
                 RecipeDefinition captured = recipe;
-                string label = recipe.DisplayName + "\n<size=14><color=#a6a199>$" + recipe.CalculateIngredientCost().ToString("0.00") + " · " + DishType(recipe) + "</color></size>";
-                Button button = UIFactory.Button(bundleGrid, label, () => AddServingToCart(captured), new Color(0.24f, 0.27f, 0.36f, 1f), 17);
+                List<string> parts = new List<string>();
+                foreach(KeyValuePair<IngredientDefinition, int> need in ShoppingCart.Needs(recipe)) parts.Add(need.Value + " " + need.Key.DisplayName);
+
+                string label = "<b>" + recipe.DisplayName + "</b>  <size=13><color=#a6a199>$" + recipe.CalculateIngredientCost().ToString("0.00")
+                               + " · " + DishType(recipe) + "</color></size>\n<size=12><color=#c9c4bb>" + string.Join(", ", parts) + "</color></size>";
+                Button button = UIFactory.Button(bundleGrid, label, () => AddServingToCart(captured), new Color(0.24f, 0.27f, 0.36f, 1f), 15);
+                Text text = button.GetComponentInChildren<Text>();
+                text.alignment = TextAnchor.MiddleLeft;
+                UIFactory.FitText(text);
+                PinLeft(button, DishIcon(button.transform, recipe.Portions, 62f), 62f);
                 button.interactable = phase == Phase.Morning;
             }
         }

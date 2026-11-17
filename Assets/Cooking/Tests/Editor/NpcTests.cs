@@ -124,6 +124,19 @@ namespace Cooking.Tests
         }
 
         [Test]
+        public void OnceFound_TheyAlwaysOrderTheirDreamMeal()
+        {
+            IngredientDefinition rice = Ingredient("Rice");
+            Customer customer = new Customer { orders = new List<RecipeDefinition> { Recipe("Rice", new IngredientPortion(rice, 1)) } };
+            CustomerRelationship relationship = new CustomerRelationship(customer);
+            relationship.Record(Result(Verdict.DreamMeal), new List<IngredientPortion> { new IngredientPortion(rice, 2, PrepSteps.None, CookMethods.Fried, Doneness.Perfect) });
+            Track(relationship.DreamMeal);
+
+            System.Random random = new System.Random(3);
+            for(int i = 0; i < 20; i++) Assert.AreEqual(relationship.DreamMeal, relationship.PickOrder(random, null));
+        }
+
+        [Test]
         public void OnlyExactAndVeryClose_CountAsLiked()
         {
             Customer customer = new Customer { likedMealsToFamiliar = 1 };
