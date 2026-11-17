@@ -204,13 +204,14 @@ namespace Cooking.Prototype
             // Whatever is held follows the pointer, and drops when the button comes up.
             UpdateHeld();
             UpdateCookingSounds();
+            UpdateTutorial();
 
             if(overlayOpen || phase != Phase.Service) return;
 
             // The kitchen keeps cooking and the clock keeps running whichever area you're in.
             TickKitchen(Time.deltaTime);
 
-            if(dayTimer && !closing)
+            if(dayTimer && !closing && !TutorialActive)
             {
                 dayTimeLeft -= Time.deltaTime;
 
@@ -450,6 +451,12 @@ namespace Cooking.Prototype
         {
             if(phase != Phase.Service) return;
 
+            if(practiceDay)
+            {
+                FinishPracticeDay();
+                return;
+            }
+
             phase = Phase.DayOver;
             resultOverlay.SetActive(false);
             tabletPage = TabletPage.Order;
@@ -574,6 +581,7 @@ namespace Cooking.Prototype
             ReturnDeskToStock();
             inventory.Clear();
             ClearKitchen();
+            EndTutorial();
             history.Clear();
             relationships.Clear();
             awayFor.Clear();
@@ -629,7 +637,7 @@ namespace Cooking.Prototype
             string phaseLabel = phase == Phase.Morning ? "Morning"
                 : phase == Phase.Service ? (closing ? "Last customer" : dayTimer ? FormatTime(dayTimeLeft) + " left" : "Open")
                 : "Closed";
-            dayText.text = "Cycle " + day + "  ·  " + phaseLabel;
+            dayText.text = (practiceDay ? "Practice day" : "Cycle " + day) + "  ·  " + (practiceDay && phase == Phase.Service ? "No clock" : phaseLabel);
 
             phaseButton.interactable = phase == Phase.Morning;
 
@@ -694,7 +702,7 @@ namespace Cooking.Prototype
 
         private void UpdateTicketTimers()
         {
-            if(phase == Phase.Service && dayTimer && dayText != null)
+            if(phase == Phase.Service && dayTimer && dayText != null && !practiceDay)
             {
                 dayText.text = "Cycle " + day + "  ·  " + (closing ? "Last customer" : FormatTime(dayTimeLeft) + " left");
             }
@@ -811,7 +819,9 @@ namespace Cooking.Prototype
                 // Whether stock (plus whatever is on the prep board) is ready exactly as the recipe wants it prepped.
                 int ready = inventory.Count(portion.ingredient, portion.prep) + OnDesk(portion.ingredient, portion.prep);
                 int total = inventory.Total(portion.ingredient) + OnDesk(portion.ingredient);
-                string readiness = ready >= portion.quantity ? "<color=#73cc73>ready</color>"
+                string cooking = InStation(portion.ingredient, portion.prep, portion.quantity);
+                string readiness = cooking != null ? "<color=#73cc73>" + cooking + "</color>"
+                    : ready >= portion.quantity ? "<color=#73cc73>ready</color>"
                     : total >= portion.quantity ? "<color=#f28c33>needs prep</color>"
                     : "<color=#e5594d>short</color>";
                 // Prep only: how it's cooked is the dish type above, and repeating it wraps the narrow ticket.

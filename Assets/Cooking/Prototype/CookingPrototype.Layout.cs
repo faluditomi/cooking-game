@@ -213,6 +213,7 @@ namespace Cooking.Prototype
         private void LateUpdate()
         {
             SyncTablet();
+            UpdateTutorialHighlight();
         }
 
         // ------------------------------------------------------------------ UI construction
@@ -236,6 +237,7 @@ namespace Cooking.Prototype
             BuildMarket(root);
             BuildDesk(root);
             BuildTablet(root);
+            BuildTutorial(root);
             BuildTitle(root);
         }
 

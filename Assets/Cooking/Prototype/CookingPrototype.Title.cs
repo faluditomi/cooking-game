@@ -23,6 +23,11 @@ namespace Cooking.Prototype
 
         private void StartGame()
         {
+            StartGame(false);
+        }
+
+        private void StartGame(bool withTutorial)
+        {
             titleOverlay.SetActive(false);
             overlayOpen = false;
 
@@ -31,6 +36,9 @@ namespace Cooking.Prototype
                 titleNeedsReset = false;
                 RestartGame();
             }
+
+            // The first cycle, guided.
+            if(withTutorial) StartTutorial();
         }
 
         private static void QuitGame()
@@ -63,7 +71,9 @@ namespace Cooking.Prototype
             UIFactory.Size(subtitle, 110f, 0f);
 
             RectTransform startRow = UIFactory.Row(panel, 64f);
-            UIFactory.Button(startRow, "Start", StartGame, new Color(0.75f, 0.42f, 0.15f, 1f), 30);
+            UIFactory.Button(startRow, "Play with tutorial", () => StartGame(true), new Color(0.75f, 0.42f, 0.15f, 1f), 30);
+            RectTransform playRow = UIFactory.Row(panel, 52f);
+            UIFactory.Button(playRow, "Play", () => StartGame(false), null, 24);
 #if !UNITY_WEBGL
             // A browser tab can't be quit from the game, so WebGL has no Quit.
             RectTransform quitRow = UIFactory.Row(panel, 48f);
