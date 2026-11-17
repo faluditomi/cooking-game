@@ -292,9 +292,11 @@ namespace Cooking.Prototype
                 UIFactory.FitText(board.Label);
 
                 Image progressBack = UIFactory.Panel(padRect, "Progress", new Color(0f, 0f, 0f, 0.35f));
+                UIFactory.SkinBar(progressBack, new Color(0.25f, 0.18f, 0.12f, 0.8f));
                 progressBack.raycastTarget = false;
                 UIFactory.Place(progressBack.rectTransform, 0.05f, 0.9f, 0.95f, 0.95f);
                 Image fill = UIFactory.Panel(progressBack.transform, "Fill", UIFactory.Good);
+                UIFactory.SkinBar(fill, UIFactory.Good);
                 fill.raycastTarget = false;
                 board.ProgressFill = fill.rectTransform;
                 UIFactory.Place(board.ProgressFill, 0f, 0f, 0f, 1f);
