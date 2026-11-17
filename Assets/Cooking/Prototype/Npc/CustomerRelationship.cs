@@ -83,13 +83,13 @@ namespace Cooking.Prototype
         }
 
         /// <summary>
-        /// What they order by default: their dream meal half the time once found, otherwise one of
-        /// their liked meals, or anything on <paramref name="menu"/> if they have none. Their order
-        /// dialogue can name a specific dish instead.
+        /// What they order by default: their dream meal once found (design doc: they always ask for
+        /// it), otherwise one of their liked meals, or anything on <paramref name="menu"/> if they
+        /// have none.
         /// </summary>
         public RecipeDefinition PickOrder(System.Random random, IReadOnlyList<RecipeDefinition> menu)
         {
-            if(DreamMeal != null && (likedMeals.Count == 0 || random.Next(2) == 0)) return DreamMeal;
+            if(DreamMeal != null) return DreamMeal;
             return PickLiked(random) ?? (menu != null && menu.Count > 0 ? menu[random.Next(menu.Count)] : null);
         }
 

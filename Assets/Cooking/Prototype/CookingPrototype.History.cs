@@ -53,6 +53,7 @@ namespace Cooking.Prototype
 
             if(selectedEntry == null)
             {
+                UIFactory.ClearChildren(bookPicture);
                 bookTitle.text = "<b>Cooking history</b>\n<size=18><color=" + Muted + ">Nothing served yet"
                                  + (historyFilter != null ? " to " + historyFilter.name : "") + ".</color></size>";
                 bookSteps.text = "<color=" + Muted + ">Every order you serve is kept here as a full report: what they ordered and said, "
@@ -61,6 +62,7 @@ namespace Cooking.Prototype
             else
             {
                 HistoryEntry entry = selectedEntry;
+                BuildDishPicture(bookPicture, entry.Served);
                 bookTitle.text = "<b>" + DishName(entry.Dish, "Nothing") + "</b> <size=22>for " + entry.Customer.name + "</size>\n<size=18><color=" + Muted + ">Cycle "
                                  + entry.Day + ", customer " + entry.Visit + " · " + StageLabel(entry.Stage) + " · ordered " + OrderedName(entry) + " · "
                                  + VerdictLabel(entry.Verdict) + "</color></size>";
@@ -85,8 +87,9 @@ namespace Cooking.Prototype
             {
                 if(regular == null) continue;
                 Customer captured = regular;
-                AddListButton(regular.name + "  <size=14><color=" + Muted + ">" + StageLabel(Relationship(regular).Stage) + "</color></size>",
-                    historyFilter == regular, () => FilterHistory(captured), 34f);
+                Button whoButton = AddListButton(regular.name + "  <size=14><color=" + Muted + ">" + StageLabel(Relationship(regular).Stage) + "</color></size>",
+                    historyFilter == regular, () => FilterHistory(captured), 40f);
+                PinLeft(whoButton, FaceIcon(whoButton.transform, regular, 32f), 32f);
             }
 
             Text orders = Header(bookList, "ORDERS  <color=#77736d>" + entries.Count + ", newest first</color>");
@@ -95,20 +98,24 @@ namespace Cooking.Prototype
             for(int i = entries.Count - 1; i >= 0; i--)
             {
                 HistoryEntry entry = entries[i];
-                string label = DishName(entry.Dish, "Nothing") + "  <size=14><color=" + Muted + ">cycle " + entry.Day + " · " + entry.Customer.name + "</color></size>"
-                               + "\n<size=14>" + VerdictLabel(entry.Verdict) + " <color=" + Muted + ">· $" + entry.Paid.ToString("0.00")
-                               + (string.IsNullOrEmpty(entry.Clue) ? "" : " · clue") + "</color></size>";
-                AddListButton(label, entry == selectedEntry, () => SelectEntry(entry), 52f);
+                // Who it was for is the face; the rest on three short lines.
+                string label = "<b>" + DishName(entry.Dish, "Nothing") + "</b>\n<size=13>" + VerdictLabel(entry.Verdict) + "</size>\n<size=13><color=" + Muted
+                               + ">cycle " + entry.Day + " · $" + entry.Paid.ToString("0.00") + (string.IsNullOrEmpty(entry.Clue) ? "" : " · clue") + "</color></size>";
+                Button row = AddListButton(label, entry == selectedEntry, () => SelectEntry(entry), 70f);
+                PinLeft(row, FaceIcon(row.transform, entry.Customer, 44f), 44f);
+                PinRight(row, DishIcon(row.transform, entry.Served, 46f), 46f);
             }
         }
 
-        private void AddListButton(string label, bool selected, UnityEngine.Events.UnityAction onClick, float height)
+        private Button AddListButton(string label, bool selected, UnityEngine.Events.UnityAction onClick, float height)
         {
             Button button = UIFactory.Button(bookList, label, onClick, selected ? new Color(0.75f, 0.42f, 0.15f, 1f) : UIFactory.ButtonColor, 17);
             Text text = button.GetComponentInChildren<Text>();
             text.alignment = TextAnchor.MiddleLeft;
             text.rectTransform.offsetMin = new Vector2(12f, 0f);
+            UIFactory.FitText(text);
             UIFactory.Size(button, height, 0f);
+            return button;
         }
 
         // ------------------------------------------------------------------ Middle: the report

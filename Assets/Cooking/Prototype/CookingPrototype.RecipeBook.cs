@@ -26,6 +26,7 @@ namespace Cooking.Prototype
         private GameObject bookShopGroup;
         private Text bookHistoryInfo;
         private Button recipesPageButton;
+        private RectTransform bookPicture;
         private Button historyPageButton;
         private Button bookDeleteButton;
 
@@ -106,6 +107,7 @@ namespace Cooking.Prototype
             if(bookRecipe == null)
             {
                 bookTitle.text = "No recipes yet.";
+                UIFactory.ClearChildren(bookPicture);
                 bookSteps.text = "";
                 bookNeeds.text = "";
                 bookServingButton.interactable = false;
@@ -116,6 +118,7 @@ namespace Cooking.Prototype
 
             RecipeDefinition recipe = bookRecipe;
             FlavourProfile profile = recipe.CalculateProfile(rules);
+            BuildDishPicture(bookPicture, recipe.Portions);
 
             StringBuilder title = new StringBuilder();
             title.Append("<b>").Append(recipe.DisplayName).Append("</b>\n<size=18><color=#a6a199>");
@@ -177,7 +180,8 @@ namespace Cooking.Prototype
                 Text text = button.GetComponentInChildren<Text>();
                 text.alignment = TextAnchor.MiddleLeft;
                 text.rectTransform.offsetMin = new Vector2(12f, 0f);
-                UIFactory.Size(button, 42f, 0f);
+                UIFactory.Size(button, 52f, 0f);
+                PinLeft(button, DishIcon(button.transform, recipe.Portions, 44f), 44f);
             }
         }
 
@@ -208,7 +212,13 @@ namespace Cooking.Prototype
             UIFactory.Place(middle, 0.24f, 0f, 0.66f, 1f, 18f);
             VerticalLayoutGroup middleLayout = UIFactory.Vertical(middle.gameObject, 12f, 0);
             middleLayout.childForceExpandHeight = false;
-            bookTitle = UIFactory.Label(middle, "", 32, TextAnchor.UpperLeft, FontStyle.Normal, UIFactory.TextColor);
+            RectTransform titleRow = UIFactory.Row(middle, 130f, 14f);
+            titleRow.GetComponent<HorizontalLayoutGroup>().childForceExpandWidth = false;
+            bookPicture = UIFactory.Rect(titleRow, "Dish Picture");
+            UIFactory.Size(bookPicture, 130f, 0f, 130f, 0f);
+            bookTitle = UIFactory.Label(titleRow, "", 32, TextAnchor.MiddleLeft, FontStyle.Normal, UIFactory.TextColor);
+            UIFactory.Size(bookTitle, -1f, -1f, -1f, 1f);
+            UIFactory.FitText(bookTitle);
             RectTransform stepsScroll = UIFactory.ScrollList(middle, 0f);
             bookSteps = UIFactory.Label(stepsScroll, "", 19);
 

@@ -1097,19 +1097,9 @@ namespace Cooking.Prototype
         /// <summary>A plate: a disc with what's on it.</summary>
         private void BuildPlateVisual(RectTransform parent, Plate target)
         {
-            Image disc = UIFactory.Panel(parent, "Plate", plateSprite != null ? Color.white : new Color(0.86f, 0.84f, 0.79f, 1f));
-            disc.sprite = plateSprite != null ? plateSprite : UIFactory.Circle;
-            disc.preserveAspect = true;
-            disc.raycastTarget = false;
-            UIFactory.Place(disc.rectTransform, 0f, 0.12f, 1f, 1f);
-
-            int shown = 0;
-            foreach(IngredientPortion portion in target.Items)
-            {
-                if(shown >= 4) break;
-                AddPile(disc.rectTransform, portion.ingredient.Icon, 1, 34f, new Vector2(0.3f + (shown % 2) * 0.4f, 0.65f - (shown / 2) * 0.3f));
-                shown++;
-            }
+            RectTransform picture = UIFactory.Rect(parent, "Dish");
+            UIFactory.Place(picture, 0f, 0.12f, 1f, 1f);
+            BuildDishPicture(picture, target.Items);
 
             string label = target.Items.Count == 0 ? "Empty plate" : target.HasDish || HasRawFood(target) ? DishLabel(target) : "Seasoning";
             Text text = UIFactory.Label(parent, label, 12, TextAnchor.LowerCenter, FontStyle.Bold);

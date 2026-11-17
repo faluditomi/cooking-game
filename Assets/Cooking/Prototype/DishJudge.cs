@@ -38,6 +38,8 @@ namespace Cooking.Prototype
         public float Tip;
 
         public bool IsPaid => Payment > 0f;
+        /// <summary>Not the order, but just as tasty: it lands in the same desirable flavour zone as the order did.</summary>
+        public bool SameZone;
         /// <summary>Paid in full only because they don't know good food from bad yet (see <see cref="DishJudge.PayInFull"/>).</summary>
         public bool PaidAnyway;
 
@@ -68,6 +70,8 @@ namespace Cooking.Prototype
             public float CloseEnoughPay;
             /// <summary>Tip for a dream meal, as a share of the price.</summary>
             public float DreamTip;
+            /// <summary>Tip for a dish that isn't the order but lands in the same flavour zone, as a share of the price.</summary>
+            public float SameZoneTip;
 
             public static Settings Default => new Settings
             {
@@ -78,6 +82,7 @@ namespace Cooking.Prototype
                 CloseEnoughAt = 0.55f,
                 CloseEnoughPay = 0.6f,
                 DreamTip = 1f,
+                SameZoneTip = 0.2f,
             };
         }
 
@@ -132,6 +137,17 @@ namespace Cooking.Prototype
                 result.Verdict = Verdict.Ordered;
                 result.PayShare = 1f;
             }
+            else if(InSameZone(result, order, zones, falloff) && WellCooked(dish))
+            {
+                // Design doc: a dish they didn't order is liked if its flavour falls in the same
+                // desirable zone their order did. A different dish that's just as tasty is paid in
+                // full and tipped; a near miss of the order is liked and paid as very close.
+                bool different = result.Similarity.Combined < settings.CloseEnoughAt;
+                result.Verdict = Verdict.VeryClose;
+                result.SameZone = true;
+                result.PayShare = different ? 1f : settings.VeryClosePay;
+                if(different) result.Tip = result.Price * settings.SameZoneTip;
+            }
             else if(result.Similarity.Combined >= settings.VeryCloseAt)
             {
                 result.Verdict = Verdict.VeryClose;
@@ -159,6 +175,24 @@ namespace Cooking.Prototype
             result.Payment = result.Price;
             result.PaidAnyway = true;
             return result;
+        }
+
+        /// <summary>Nothing on the plate burnt, overcooked or undercooked.</summary>
+        private static bool WellCooked(IReadOnlyList<IngredientPortion> dish)
+        {
+            foreach(IngredientPortion portion in dish)
+            {
+                if(portion != null && portion.IsValid && !portion.IsRaw && portion.doneness != Doneness.Perfect) return false;
+            }
+
+            return true;
+        }
+
+        private static bool InSameZone(JudgeResult result, RecipeDefinition order, IReadOnlyList<FlavourZone> zones, float falloff)
+        {
+            if(order == null || zones == null || result.BestZone.Zone == null || result.BestZone.Score < 1f) return false;
+            FlavourZoneMatch ordered = FlavourEvaluator.FindBestZone(result.Ordered, zones, falloff);
+            return ordered.Zone == result.BestZone.Zone && ordered.Score >= 1f;
         }
 
         private static bool HasFood(IReadOnlyList<IngredientPortion> dish)
