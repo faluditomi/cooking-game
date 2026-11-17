@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Sugar
   m_EditorClassIdentifier: Cooking.Runtime::Cooking.IngredientDefinition
   displayName: Sugar
-  icon: {fileID: -609665583616834061, guid: abb12a36fb839984e997ba6ead53e6d6, type: 3}
+  icon: {fileID: -8961586611324625149, guid: 8827d3070a3ef074384e11e09e4af687, type: 3}
   price: 0.5
   bulk: 0.1
   flavour:

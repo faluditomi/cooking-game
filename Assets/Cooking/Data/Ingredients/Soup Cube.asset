@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Soup Cube
   m_EditorClassIdentifier: Cooking.Runtime::Cooking.IngredientDefinition
   displayName: Soup Cube
-  icon: {fileID: 1254976186270791833, guid: 691d7150841849140a133927518168fa, type: 3}
+  icon: {fileID: 8319818459693923895, guid: 808639802c9b21c4a9271771162493fc, type: 3}
   price: 2
   bulk: 0.5
   flavour:

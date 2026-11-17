@@ -25,6 +25,13 @@ namespace Cooking.Prototype
         private readonly List<CuttingBoard> boards = new List<CuttingBoard>();
         private readonly Dictionary<PrepSteps, CanvasGroup> toolHooks = new Dictionary<PrepSteps, CanvasGroup>();
         private PrepSteps heldTool;
+        /// <summary>The spoon on the hanger: it stirs the pot (not a prep step; a value no prep uses).</summary>
+        private const PrepSteps Spoon = (PrepSteps)(1 << 7);
+        /// <summary>Strokes of the spoon (or, as an easter egg, the knife) for one stir of the pot.</summary>
+        private const int StirStrokes = 4;
+        private Gesture stirGesture;
+        private bool stirring;
+        private int stirStrokes;
         private Gesture prepGesture;
         /// <summary>The board the held tool is over, or -1.</summary>
         private int gestureBoard = -1;
@@ -93,6 +100,7 @@ namespace Cooking.Prototype
                 case PrepSteps.Sliced: return "knife";
                 case PrepSteps.Peeled: return "peeler";
                 case PrepSteps.Grated: return "grater";
+                case Spoon: return "spoon";
                 default: return "hands";
             }
         }
@@ -149,7 +157,7 @@ namespace Cooking.Prototype
                 Image picture = UIFactory.Icon(ghost, toolSprite, 0f);
                 UIFactory.Stretch(picture.rectTransform);
 
-                if(step != PrepSteps.Grated)
+                if(step == PrepSteps.Sliced || step == PrepSteps.Peeled)
                 {
                     // Knife and peeler hang upright but are held flat: blade to the left, edge down,
                     // with the pointer on the handle.
@@ -168,12 +176,22 @@ namespace Cooking.Prototype
 
             toolHooks[step].alpha = 0.25f;
             Play(sounds.pickup, 0.6f);
-            foreach(CuttingBoard board in boards) board.Pad.SetGuide(ToolGuide(step), new Color(1f, 0.85f, 0.6f, 0.6f));
-            Say("Picked up the " + ToolName(step) + ". " + ToolInstruction(step));
+            stirring = false;
+            stirStrokes = 0;
+            if(step != Spoon) foreach(CuttingBoard board in boards) board.Pad.SetGuide(ToolGuide(step), new Color(1f, 0.85f, 0.6f, 0.6f));
         }
 
         private void MoveTool(Vector2 screen)
         {
+            if((heldTool == Spoon || heldTool == PrepSteps.Sliced) && prepGesture == null && Over(potView.Rect, screen))
+            {
+                StirPot(screen);
+                return;
+            }
+
+            stirring = false;
+            if(heldTool == Spoon) return;
+
             int index = BoardAt(screen);
 
             // Once the tool has started on a board it stays locked to it until the prep is done or
@@ -216,7 +234,7 @@ namespace Cooking.Prototype
         {
             CuttingBoard board = boards[index];
 
-            if(board.Units == null) return;
+            if(board.Units == null || heldTool == Spoon) return;
 
             if((board.Units.prep & heldTool) != 0)
             {
@@ -244,8 +262,32 @@ namespace Cooking.Prototype
             board.Pad.AddTrailPoint(local, newStroke: true);
         }
 
+        /// <summary>The spoon moved back and forth over the pot: a few strokes make one stir, which holds it in the orange.</summary>
+        private void StirPot(Vector2 screen)
+        {
+            if(stirGesture == null) stirGesture = new BackAndForthGesture(vertical: false, requiredStrokes: int.MaxValue, minTravel: 35f);
+
+            Vector2 point = CanvasPoint(screen);
+
+            if(!stirring)
+            {
+                stirring = true;
+                stirGesture.Begin(point);
+                return;
+            }
+
+            if(!stirGesture.Move(point)) return;
+
+            Play(sounds.peel, 0.35f, 0.15f, 0.7f);
+            if(++stirStrokes < StirStrokes) return;
+
+            stirStrokes = 0;
+            if(pot.Settle()) Play(sounds.stir, 0.5f, 0.03f);
+        }
+
         private void DropTool()
         {
+            stirring = false;
             prepGesture?.End();
             prepGesture = null;
             gestureBoard = -1;
@@ -269,7 +311,7 @@ namespace Cooking.Prototype
         private void BuildBoards(RectTransform desk)
         {
             RectTransform section = UIFactory.Rect(desk, "Prep Section");
-            UIFactory.Place(section, 0.395f, 0.03f, 0.785f, 0.34f);
+            UIFactory.Place(section, 0.395f, 0.02f, 0.69f, 0.27f);
 
             for(int i = 0; i < 2; i++)
             {
@@ -319,14 +361,16 @@ namespace Cooking.Prototype
             bar.raycastTarget = false;
             UIFactory.Place(bar.rectTransform, 0f, 0.9f, 1f, 0.96f);
 
-            AddTool(rail, PrepSteps.Sliced, "KNIFE", "slice", 0.06f, 0.3f);
-            AddTool(rail, PrepSteps.Peeled, "PEELER", "peel", 0.38f, 0.62f);
-            AddTool(rail, PrepSteps.Grated, "GRATER", "grate", 0.7f, 0.94f);
+            AddTool(rail, PrepSteps.Sliced, "KNIFE", "slice", 0.03f, 0.23f);
+            AddTool(rail, PrepSteps.Peeled, "PEELER", "peel", 0.27f, 0.47f);
+            AddTool(rail, PrepSteps.Grated, "GRATER", "grate", 0.51f, 0.71f);
+            AddTool(rail, Spoon, "SPOON", "stir", 0.75f, 0.95f);
         }
 
         private Sprite ToolSprite(PrepSteps step)
         {
-            return step == PrepSteps.Sliced ? knifeSprite : step == PrepSteps.Peeled ? peelerSprite : step == PrepSteps.Grated ? graterSprite : null;
+            return step == PrepSteps.Sliced ? knifeSprite : step == PrepSteps.Peeled ? peelerSprite : step == PrepSteps.Grated ? graterSprite
+                : step == Spoon ? spoonSprite : null;
         }
 
         private void AddTool(RectTransform rail, PrepSteps step, string name, string verb, float xMin, float xMax)
@@ -340,17 +384,13 @@ namespace Cooking.Prototype
 
             if(sprite != null)
             {
-                // The tool itself hangs from the hook; its name sits small beside it.
+                // The tool itself hangs from the hook; no name needed.
                 Image picture = UIFactory.Panel(rail, name, Color.white);
                 picture.sprite = sprite;
                 picture.preserveAspect = true;
                 UIFactory.Place(picture.rectTransform, xMin, -0.05f, xMax, 0.86f);
                 picture.gameObject.AddComponent<DragHandle>().Began = screen => GrabTool(step, screen);
                 toolHooks[step] = picture.gameObject.AddComponent<CanvasGroup>();
-
-                Text caption = UIFactory.Label(rail, name + "\n<size=11><color=#a6a199>hold to " + verb + "</color></size>", 13, TextAnchor.LowerLeft,
-                    FontStyle.Bold, UIFactory.TextColor);
-                UIFactory.Place(caption.rectTransform, xMax - 0.02f, 0f, xMax + 0.1f, 0.4f);
                 return;
             }
 

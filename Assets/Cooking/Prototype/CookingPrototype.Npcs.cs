@@ -259,7 +259,8 @@ namespace Cooking.Prototype
         {
             StringBuilder sb = new StringBuilder();
 
-            for(int i = 0; i < speech.Count; i++)
+            // Newest first: what they're saying now is at the top.
+            for(int i = speech.Count - 1; i >= 0; i--)
             {
                 bool newest = i == speech.Count - 1;
                 string line = newest ? speech[i].Substring(0, Mathf.Clamp(Mathf.FloorToInt(typed), 0, speech[i].Length)) : speech[i];
@@ -281,16 +282,15 @@ namespace Cooking.Prototype
 
             if(phase == Phase.Service && customer != null)
             {
-                sidebarCustomer.text = customer.name + "\n<size=16><color=#a6a199>" + StageLabel(Relationship(customer).Stage)
-                                       + (orderIn ? " · wants " + DishName(order) : " · ordering") + "</color></size>";
+                sidebarCustomer.text = customer.name;
             }
             else if(phase == Phase.Service)
             {
-                sidebarCustomer.text = "<color=#a6a199>Nobody at the counter</color>";
+                sidebarCustomer.text = "";
             }
             else
             {
-                sidebarCustomer.text = "<color=#a6a199>" + (phase == Phase.Morning ? "Customers come when the day starts." : "Closed.") + "</color>";
+                sidebarCustomer.text = "";
             }
         }
 

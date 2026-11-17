@@ -64,8 +64,7 @@ namespace Cooking.Prototype
                 HistoryEntry entry = selectedEntry;
                 BuildDishPicture(bookPicture, entry.Served);
                 bookTitle.text = "<b>" + DishName(entry.Dish, "Nothing") + "</b> <size=22>for " + entry.Customer.name + "</size>\n<size=18><color=" + Muted + ">Cycle "
-                                 + entry.Day + ", customer " + entry.Visit + " · " + StageLabel(entry.Stage) + " · ordered " + OrderedName(entry) + " · "
-                                 + VerdictLabel(entry.Verdict) + "</color></size>";
+                                 + entry.Day + " · " + VerdictLabel(entry.Verdict) + "</color></size>";
                 bookSteps.text = Report(entry);
             }
 
@@ -127,79 +126,35 @@ namespace Cooking.Prototype
         }
 
         /// <summary>The full report for one order.</summary>
+        /// <summary>
+        /// The report for one order: what they ordered, what they received (written like the order
+        /// card), the receipt, and the whole conversation.
+        /// </summary>
         private string Report(HistoryEntry entry)
         {
             StringBuilder sb = new StringBuilder();
 
-            // Order
-            sb.Append("<b>ORDER</b>\n");
-            sb.Append("  ").Append(OrderedName(entry));
-            if(!string.IsNullOrEmpty(entry.OrderLine)) sb.Append("  <i><color=#c8c3ba>\"").Append(entry.OrderLine).Append("\"</color></i>");
-            sb.Append('\n');
+            sb.Append("<b>ORDERED</b>\n  ").Append(OrderedName(entry)).Append('\n');
 
-            sb.Append("  <color=").Append(Muted).Append(">Served ").Append(FormatTime(entry.TimeTaken)).Append(" after they ordered.</color>\n");
-
-            // What was said
-            sb.Append("\n<b>WHAT WAS SAID</b>\n");
-            if(entry.Speech.Count == 0) sb.Append("  <color=").Append(Muted).Append(">Nothing.</color>\n");
-
-            foreach(VisitEvent line in entry.Speech)
+            sb.Append("\n<b>RECEIVED</b>\n");
+            if(entry.Served.Count == 0) sb.Append("  <color=").Append(Muted).Append(">Nothing.</color>\n");
+            foreach(IngredientPortion portion in entry.Served)
             {
-                bool clue = line.Tag == "Clue";
-                sb.Append("  <color=").Append(Muted).Append(">").Append(Stamp(line.Time)).Append(' ').Append(line.Tag).Append("</color>  ")
-                  .Append(clue ? "<color=#f28c33>\"" : "<i><color=#c8c3ba>\"").Append(line.Text).Append(clue ? "\"</color>" : "\"</color></i>");
-                if(clue) sb.Append("  ").Append(WarmthLabel(entry.Warmth));
-                sb.Append('\n');
+                sb.Append("  - ").Append(Describe(new IngredientPortion(portion.ingredient, portion.quantity, portion.prep))).Append('\n');
             }
 
-            // What was cooked
-            sb.Append("\n<b>WHAT WAS COOKED</b>\n");
-            if(entry.Cooking.Count == 0) sb.Append("  <color=").Append(Muted).Append(">Nothing logged.</color>\n");
+            float received = entry.Payment + entry.Tip;
+            float profit = received - entry.IngredientCost;
+            sb.Append("\n<b>RECEIPT</b>\n");
+            sb.Append("  Dish price          $").Append(entry.Price.ToString("0.00")).Append('\n');
+            sb.Append("  Cash received    $").Append(received.ToString("0.00")).Append('\n');
+            sb.Append("  Ingredients        $").Append(entry.IngredientCost.ToString("0.00")).Append('\n');
+            sb.Append("  <color=").Append(Muted).Append(">--------------------------------</color>\n");
+            sb.Append("  <b>Profit</b>               <color=#").Append(profit >= 0f ? "73cc73" : "e5594d").Append(">$").Append(profit.ToString("0.00")).Append("</color>\n");
 
-            foreach(VisitEvent step in entry.Cooking)
-            {
-                sb.Append("  <color=").Append(Muted).Append(">").Append(Stamp(step.Time)).Append("</color> <b>").Append(step.Tag).Append("</b>  ")
-                  .Append(step.Text).Append('\n');
-            }
-
-            // Served
-            sb.Append("\n<b>SERVED</b>\n");
-            foreach(IngredientPortion portion in entry.Served) sb.Append("  ").Append(Describe(portion, true)).Append('\n');
-
-            // How to make it again
-            if(entry.Dish != null)
-            {
-                sb.Append("\n<b>TO MAKE IT AGAIN</b>  <color=").Append(Muted).Append(">").Append(DishType(entry.Dish))
-                  .Append(IsOnMenu(entry.Dish) ? " · on the menu" : " · not on the menu").Append("</color>\n");
-                sb.Append(RecipeGuide.Steps(entry.Dish, Owned)).Append('\n');
-            }
-
-            // Flavour profile, next to the order's when you knew the order
-            sb.Append("\n<b>FLAVOUR PROFILE</b>  <color=").Append(Muted).Append(">").Append(entry.OrderKnown ? "served (ordered)" : "served").Append("</color>\n");
-            for(int i = 0; i < FlavourAxes.Count; i += 2)
-            {
-                sb.Append("  ").Append(AxisCell(entry, FlavourAxes.All[i]));
-                if(i + 1 < FlavourAxes.Count) sb.Append("     ").Append(AxisCell(entry, FlavourAxes.All[i + 1]));
-                sb.Append('\n');
-            }
-
-
-            // Result
-            sb.Append("\n<b>RESULT</b>\n  ").Append(VerdictLabel(entry.Verdict));
-            if(entry.Exact) sb.Append("  <color=").Append(Muted).Append(">exact recipe</color>");
-            else if(entry.Verdict != Verdict.Refused)
-            {
-                sb.Append("  <color=").Append(Muted).Append(">").Append((entry.Similarity.Combined * 100f).ToString("0"))
-                  .Append("% like the order (flavour ").Append((entry.Similarity.Flavour * 100f).ToString("0"))
-                  .Append("%, ingredients ").Append((entry.Similarity.Ingredients * 100f).ToString("0")).Append("%)</color>");
-            }
-
-            sb.Append("\n  Paid $").Append(entry.Payment.ToString("0.00"));
-            if(entry.Payment > 0f && entry.PayShare < 1f) sb.Append(" <color=").Append(Muted).Append(">(").Append((entry.PayShare * 100f).ToString("0")).Append("% of $").Append(entry.Price.ToString("0.00")).Append(")</color>");
-            if(entry.Tip > 0f) sb.Append(" + tip $").Append(entry.Tip.ToString("0.00"));
-            float profit = entry.Paid - entry.IngredientCost;
-            sb.Append("   Ingredients $").Append(entry.IngredientCost.ToString("0.00"))
-              .Append("   Profit <color=#").Append(profit >= 0f ? "73cc73" : "e5594d").Append(">$").Append(profit.ToString("0.00")).Append("</color>\n");
+            sb.Append("\n<b>TRANSCRIPT</b>\n");
+            if(entry.Speech.Count == 0) sb.Append("  <color=").Append(Muted).Append(">They didn't say anything.</color>\n");
+            foreach(VisitEvent line in entry.Speech) sb.Append("  <i><color=#c8c3ba>\"").Append(line.Text).Append("\"</color></i>\n");
 
             return sb.ToString();
         }

@@ -342,27 +342,18 @@ namespace Cooking.Prototype
             Image background = UIFactory.Panel(parent, "Timing Bar", new Color(0.08f, 0.08f, 0.09f, 1f));
             UIFactory.Size(background, height);
 
-            Band(background.transform, 0f, station.PerfectStart, new Color(0.35f, 0.35f, 0.4f, 1f));
-            Band(background.transform, station.PerfectStart, station.PerfectEnd, new Color(0.3f, 0.6f, 0.3f, 1f));
+            // Blue: undercooked. Orange: just right. Red: ruined.
+            Band(background.transform, 0f, station.PerfectStart, new Color(0.25f, 0.5f, 0.85f, 1f));
+            Band(background.transform, station.PerfectStart, station.PerfectEnd, new Color(0.95f, 0.6f, 0.2f, 1f));
+            Band(background.transform, station.PerfectEnd, 1f, new Color(0.8f, 0.2f, 0.18f, 1f));
 
-            if(station.Stirs)
-            {
-                // Wok: red overcooks a stir, black burns.
-                Band(background.transform, station.PerfectEnd, station.BlackStart, new Color(0.7f, 0.25f, 0.2f, 1f));
-                Band(background.transform, station.BlackStart, 1f, new Color(0.02f, 0.02f, 0.02f, 1f));
-            }
-            else
-            {
-                Band(background.transform, station.DangerStart, 1f, new Color(0.7f, 0.25f, 0.2f, 1f));
-            }
-
-            fill = UIFactory.Panel(background.transform, "Fill", new Color(1f, 1f, 1f, 0.18f)).rectTransform;
+            fill = UIFactory.Panel(background.transform, "Fill", new Color(1f, 1f, 1f, 0.22f)).rectTransform;
             UIFactory.Place(fill, 0f, 0f, 0f, 1f);
 
             marker = UIFactory.Panel(background.transform, "Marker", Color.white).rectTransform;
-            marker.anchorMin = new Vector2(0f, -0.15f);
-            marker.anchorMax = new Vector2(0f, 1.15f);
-            marker.sizeDelta = new Vector2(4f, 0f);
+            marker.anchorMin = new Vector2(0f, -0.2f);
+            marker.anchorMax = new Vector2(0f, 1.2f);
+            marker.sizeDelta = new Vector2(3f, 0f);
         }
 
         private static void Band(Transform parent, float from, float to, Color color)
@@ -375,8 +366,8 @@ namespace Cooking.Prototype
         {
             marker.gameObject.SetActive(visible);
             fill.anchorMax = new Vector2(visible ? progress : 0f, 1f);
-            marker.anchorMin = new Vector2(progress, -0.15f);
-            marker.anchorMax = new Vector2(progress, 1.15f);
+            marker.anchorMin = new Vector2(progress, -0.2f);
+            marker.anchorMax = new Vector2(progress, 1.2f);
             marker.anchoredPosition = Vector2.zero;
         }
     }

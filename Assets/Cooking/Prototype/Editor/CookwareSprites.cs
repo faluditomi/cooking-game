@@ -34,6 +34,7 @@ namespace Cooking.Prototype.EditorTools
         {
             new Item { Name = "knife", Model = "FBX/Knives/knife_chef_knife.fbx", ModelRotation = new Vector3(0f, 0f, 180f), View = new Vector3(8f, -20f, 0f) },
             new Item { Name = "peeler", Model = "FBX/All/cutensils_peeler.fbx", ModelRotation = new Vector3(0f, 0f, 180f), View = new Vector3(8f, -20f, 0f) },
+            new Item { Name = "spoon", Model = "FBX/All/misc_wooden_spoon.fbx", ModelRotation = new Vector3(-90f, 0f, 0f), View = new Vector3(8f, -20f, 0f) },
             new Item { Name = "grater", Model = "FBX/All/cutensils_box_grater.fbx", View = new Vector3(12f, -30f, 0f) },
             new Item { Name = "pan", Model = "FBX/Pans/pan_wok.fbx", View = new Vector3(50f, -20f, 0f), Hide = new[] { "pan wok lid" } },
             // Open, so the ingredients and the soup show inside.
@@ -147,7 +148,7 @@ namespace Cooking.Prototype.EditorTools
                 return;
             }
 
-            prototype.SetCookwareArt(Load("knife"), Load("peeler"), Load("grater"), Load("pan"), Load("pot"), Load("cutting_board"), Load("plate"));
+            prototype.SetCookwareArt(Load("knife"), Load("peeler"), Load("grater"), Load("pan"), Load("pot"), Load("cutting_board"), Load("plate"), Load("spoon"));
             EditorUtility.SetDirty(prototype);
             EditorSceneManager.MarkSceneDirty(prototype.gameObject.scene);
             EditorSceneManager.SaveScene(prototype.gameObject.scene);

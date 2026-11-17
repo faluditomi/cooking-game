@@ -19,7 +19,7 @@ MonoBehaviour:
   - ingredient: {fileID: 11400000, guid: fc4d9c7d893d459888f20847bba96260, type: 2}
     quantity: 1
     prep: 0
-    cooking: 2
+    cooking: 3
     doneness: 0
   - ingredient: {fileID: 11400000, guid: 67126739e4504962837fef42afe0d5c7, type: 2}
     quantity: 1
