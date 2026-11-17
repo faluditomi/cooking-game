@@ -211,6 +211,23 @@ namespace Cooking.Prototype
             return count;
         }
 
+        /// <summary>"in the pot" / "in the pan" when that station holds at least <paramref name="quantity"/> prepped like this, or null.</summary>
+        private string InStation(IngredientDefinition ingredient, PrepSteps prep, int quantity)
+        {
+            foreach(CookingStation station in new[] { pot, wok })
+            {
+                int count = 0;
+                foreach(IngredientPortion portion in station.Contents)
+                {
+                    if(portion.ingredient == ingredient && portion.prep == prep) count += portion.quantity;
+                }
+
+                if(count >= quantity) return station == pot ? "in the pot" : "in the pan";
+            }
+
+            return null;
+        }
+
         private bool DeskOpen()
         {
             if(phase == Phase.Service && !overlayOpen) return true;
@@ -1174,6 +1191,7 @@ namespace Cooking.Prototype
         private void RebuildPantry()
         {
             UIFactory.ClearChildren(pantryContent);
+            pantryPiles.Clear();
             List<Inventory.Entry> entries = inventory.Entries();
 
             if(entries.Count == 0)
@@ -1209,6 +1227,7 @@ namespace Cooking.Prototype
                 Inventory.Entry captured = entry;
                 Image cell = UIFactory.Panel(grid, entry.Ingredient.DisplayName, new Color(1f, 1f, 1f, 0.05f));
                 cell.gameObject.AddComponent<DragHandle>().Began = screen => GrabFromPantry(captured, screen);
+                if(entry.Prep == PrepSteps.None) pantryPiles[entry.Ingredient] = cell.rectTransform;
 
                 // Each piece shown, up to a small heap.
                 AddPile(cell.rectTransform, entry.Ingredient.Icon, Mathf.Min(entry.Quantity, 3), 34f, new Vector2(0.22f, 0.5f));

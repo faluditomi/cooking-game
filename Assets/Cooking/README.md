@@ -236,6 +236,28 @@ units per prep state ("3× Onion raw", "2× Onion peeled, sliced").
 - **Faces** in the history's lists (the regular's picture, or a placeholder), and **bundle tiles**
   that list what they add.
 
+### Tutorial (`CookingPrototype.Tutorial.cs`)
+
+**Play with tutorial** on the title screen starts with a **practice day** before cycle 1: one
+customer (the Man), one simple dish (*Soup on the rock*), no clock and no rent. A panel over the
+conversation says what to do, and a pulsing outline marks what to use. Each step waits for the
+player to actually do it:
+
+1. Welcome: buy in the morning, cook for the regulars, pay the rent; today is practice.
+2. Shop: click the Soup on the rock bundle, then Buy and start the day.
+3. The Man orders Soup on the rock; the Order page and the Recipes tab.
+4. Drag a potato from the pantry onto a cutting board, and peel it with the peeler from the roof.
+5. Drag the peeled potato, the soup cube and the salts into the pot, and click it to light it.
+6. Put a clean plate on the desk; when the bar is green, lift the pot onto it.
+7. Drag the plate to the food delivery spot; the Dish Served page; Continue.
+8. What real days add (every regular, a timer, rent), the pan, favourites and secret cravings.
+   **Start cycle 1** then begins the real game fresh (starting money, empty pantry, the morning
+   shop), so the player plans the shopping and prep for the real day themselves.
+
+A player who gets ahead of the instructions (say, the potato straight into the pot) is caught up to
+where they are. **Skip tutorial** goes straight to cycle 1 from any step; **Play** starts without the
+practice day. The order card also says when an ingredient is already in the pot or the pan.
+
 ### Sound (`CookingPrototype.Audio.cs`, `Audio/`)
 
 Sound effects and a market ambience; the music is coming separately. Every clip is synthesized from

@@ -175,6 +175,7 @@ namespace Cooking.Prototype
 
             bundleKey = key.ToString();
             UIFactory.ClearChildren(bundleGrid);
+            bundleTiles.Clear();
 
             foreach(RecipeDefinition recipe in visible)
             {
@@ -189,6 +190,7 @@ namespace Cooking.Prototype
                 text.alignment = TextAnchor.MiddleLeft;
                 UIFactory.FitText(text);
                 PinLeft(button, DishIcon(button.transform, recipe.Portions, 62f), 62f);
+                bundleTiles[recipe] = (RectTransform)button.transform;
                 button.interactable = phase == Phase.Morning;
             }
         }

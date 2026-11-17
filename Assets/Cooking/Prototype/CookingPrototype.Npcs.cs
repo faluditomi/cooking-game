@@ -319,10 +319,13 @@ namespace Cooking.Prototype
                 Stage = relationship.Stage,
             };
 
-            // Their order dialogue says what they want; without one, they just order.
-            if(!Speak(DialogueEventType.Order, null))
+            // Their order dialogue says what they want; without one, they just order. The tutorial's
+            // first customer always asks for the tutorial dish.
+            RecipeDefinition scripted = TutorialOrderFor(customer);
+
+            if(scripted != null || !Speak(DialogueEventType.Order, null))
             {
-                SetOrder(DefaultOrder());
+                SetOrder(scripted ?? DefaultOrder());
                 orderLine = customer.GetOrderLine(order, random);
                 currentEntry.OrderLine = orderLine;
                 AddSpeech(orderLine, "Order");
@@ -341,7 +344,7 @@ namespace Cooking.Prototype
                 Speak(DialogueEventType.Musing, null);
             }
 
-            if(Time.time >= nextHurryAt)
+            if(Time.time >= nextHurryAt && !TutorialActive)
             {
                 nextHurryAt = Time.time + Mathf.Max(5f, customer.hurryAfter);
                 Speak(DialogueEventType.Hurry, null);
