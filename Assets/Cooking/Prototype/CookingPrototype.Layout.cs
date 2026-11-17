@@ -44,6 +44,14 @@ namespace Cooking.Prototype
         [SerializeField] private Sprite boardSprite;
         [SerializeField] private Sprite plateSprite;
 
+        [Header("UI skin")]
+        [Tooltip("Kenney's UI Pack: Sci-fi (CC0), from Assets/Art Assets/UI Skin. Set by Custom Tools → Cooking Prototype → Assign UI Skin. Empty keeps the flat look.")]
+        [SerializeField] private Sprite skinPanel;
+        [SerializeField] private Sprite skinButton;
+        [SerializeField] private Sprite skinBar;
+        [SerializeField] private Sprite skinGlass;
+        [SerializeField] private Texture2D skinCursor;
+
         private RectTransform canvasRect;
         private RectTransform deskRect;
 
@@ -73,6 +81,26 @@ namespace Cooking.Prototype
         {
             billboardAds = new List<Sprite>(ads);
             billboardFrame = frame;
+        }
+
+        /// <summary>Sets the UI skin. Used by the editor's Assign UI Skin menu.</summary>
+        public void SetUiSkin(Sprite panel, Sprite button, Sprite bar, Sprite glass, Texture2D cursor)
+        {
+            skinPanel = panel;
+            skinButton = button;
+            skinBar = bar;
+            skinGlass = glass;
+            skinCursor = cursor;
+        }
+
+        /// <summary>Hands the skin to the UI factory (before the UI is built) and sets the pointer.</summary>
+        private void ApplySkin()
+        {
+            UIFactory.PanelSprite = skinPanel;
+            UIFactory.ButtonSprite = skinButton;
+            UIFactory.BarSprite = skinBar;
+            UIFactory.GlassSprite = skinGlass;
+            if(skinCursor != null) Cursor.SetCursor(skinCursor, new Vector2(3f, 3f), CursorMode.Auto);
         }
 
         /// <summary>Sets the cookware sprites. Used by the editor's Render Cookware Sprites menu.</summary>
@@ -362,6 +390,7 @@ namespace Cooking.Prototype
         private void BuildTablet(Transform root)
         {
             Image bezel = UIFactory.Panel(root, "Tablet", new Color(0.04f, 0.04f, 0.05f, 1f));
+            UIFactory.SkinGlass(bezel, new Color(0.16f, 0.17f, 0.21f, 1f));
             tablet = bezel.rectTransform;
 
             RectTransform screen = UIFactory.Panel(tablet, "Screen", UIFactory.Background).rectTransform;
@@ -425,9 +454,11 @@ namespace Cooking.Prototype
             ticket.Customer.gameObject.SetActive(false);
 
             Image timerBack = UIFactory.Panel(left, "Timer", new Color(0.08f, 0.08f, 0.09f, 1f));
-            UIFactory.Size(timerBack, 8f, 0f);
+            UIFactory.SkinBar(timerBack, new Color(0.2f, 0.2f, 0.23f, 1f));
+            UIFactory.Size(timerBack, 12f, 0f);
             ticket.TimerBar = timerBack.gameObject;
             ticket.TimerFillImage = UIFactory.Panel(timerBack.transform, "Fill", UIFactory.Good);
+            UIFactory.SkinBar(ticket.TimerFillImage, UIFactory.Good);
             ticket.TimerFill = ticket.TimerFillImage.rectTransform;
             UIFactory.Place(ticket.TimerFill, 0f, 0f, 1f, 1f);
             ticket.Timer = UIFactory.Label(left, "", 15, TextAnchor.MiddleLeft, FontStyle.Bold);

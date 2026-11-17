@@ -178,6 +178,7 @@ namespace Cooking.Prototype
 
             CreateKitchenState();
             EnsureEventSystem();
+            ApplySkin();
             BuildUI();
             InitNpcs();
             StartDay();

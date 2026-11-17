@@ -65,6 +65,7 @@ namespace Cooking.Prototype.EditorTools
             // The billboards and the rendered cookware.
             AssignMarketArt();
             CookwareSprites.AssignToScene();
+            UiSkinSetup.Assign();
 
             Selection.activeGameObject = root;
             Debug.Log("[Cooking] Built " + ScenePath + ". Press Play to cook.");

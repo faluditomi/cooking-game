@@ -1014,6 +1014,7 @@ namespace Cooking.Prototype
         {
             StationView view = new StationView { Station = station };
             Image tile = UIFactory.Panel(desk, station.Name, new Color(0.12f, 0.11f, 0.13f, 1f));
+            UIFactory.SkinPanel(tile, tile.color);
             view.Rect = tile.rectTransform;
             UIFactory.Place(view.Rect, xMin, 0.36f, xMax, 0.81f, 4f);
             DragHandle handle = tile.gameObject.AddComponent<DragHandle>();
@@ -1067,6 +1068,7 @@ namespace Cooking.Prototype
         private void BuildPantry(RectTransform desk)
         {
             Image pantry = UIFactory.Panel(desk, "Pantry", new Color(0.12f, 0.11f, 0.13f, 1f));
+            UIFactory.SkinPanel(pantry, pantry.color);
             pantryRect = pantry.rectTransform;
             UIFactory.Place(pantryRect, 0.8f, 0.03f, 0.988f, 0.97f);
             VerticalLayoutGroup layout = UIFactory.Vertical(pantry.gameObject, 4f, 8);

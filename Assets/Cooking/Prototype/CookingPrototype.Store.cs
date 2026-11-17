@@ -141,6 +141,7 @@ namespace Cooking.Prototype
                 name.rectTransform.offsetMax = new Vector2(-6f, -6f);
 
                 card.Info = UIFactory.Label(panel, "", 14, TextAnchor.MiddleLeft, FontStyle.Normal, UIFactory.MutedText);
+                UIFactory.FitText(card.Info);
                 UIFactory.Place(card.Info.rectTransform, 0f, 0.38f, 1f, 0.62f).offsetMin = new Vector2(62f, 0f);
 
                 RectTransform buttons = UIFactory.Rect(panel, "Buttons");
@@ -218,7 +219,7 @@ namespace Cooking.Prototype
             {
                 int stock = inventory.Total(card.Ingredient);
                 int inCart = cart.Count(card.Ingredient);
-                card.Info.text = "$" + card.Ingredient.Price.ToString("0.00") + "   Stock " + stock + (inCart > 0 ? "   <color=#f28c33>In cart " + inCart + "</color>" : "");
+                card.Info.text = "$" + card.Ingredient.Price.ToString("0.00") + "   Stock " + stock + (inCart > 0 ? "  <color=#f28c33>Cart " + inCart + "</color>" : "");
                 card.Less.interactable = open && inCart > 0;
                 card.More.interactable = open;
                 card.MoreFive.interactable = open;

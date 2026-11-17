@@ -107,7 +107,67 @@ namespace Cooking.Prototype
             RectTransform rt = Rect(parent, name);
             Image image = rt.gameObject.AddComponent<Image>();
             image.color = color;
+            // The two panel colours are the UI's panels: they get the skin's panel look.
+            if(color == PanelColor || color == PanelDark) SkinPanel(image, color);
             return image;
+        }
+
+        // ------------------------------------------------------------------ Skin (Kenney UI Pack: Sci-fi, CC0)
+
+        /// <summary>Nine-sliced panel, button, bar and glass sprites. Null keeps the flat look.</summary>
+        public static Sprite PanelSprite;
+        public static Sprite ButtonSprite;
+        public static Sprite BarSprite;
+        public static Sprite GlassSprite;
+
+        // The sprites are light grey; tints are lifted by these so colours come out about as chosen.
+        private const float PanelLift = 1.55f;
+        private const float ButtonLift = 1.15f;
+
+        private static Color Lift(Color color, float lift)
+        {
+            return new Color(Mathf.Min(1f, color.r * lift), Mathf.Min(1f, color.g * lift), Mathf.Min(1f, color.b * lift), color.a);
+        }
+
+        private static void Slice(Image image, Sprite sprite, float multiplier)
+        {
+            image.sprite = sprite;
+            image.type = UnityEngine.UI.Image.Type.Sliced;
+            image.fillCenter = true;
+            // The sprites are the pack's double-size ones; this keeps their corners small.
+            image.pixelsPerUnitMultiplier = multiplier;
+        }
+
+        /// <summary>A screwed-on panel tinted <paramref name="color"/>.</summary>
+        public static void SkinPanel(Image image, Color color)
+        {
+            if(PanelSprite == null) return;
+            Slice(image, PanelSprite, 2f);
+            image.color = Lift(color, PanelLift);
+        }
+
+        /// <summary>A raised button tinted <paramref name="color"/>.</summary>
+        public static void SkinButton(Image image, Color color)
+        {
+            if(ButtonSprite == null) return;
+            Slice(image, ButtonSprite, 2.5f);
+            image.color = Lift(color, ButtonLift);
+        }
+
+        /// <summary>A rounded bar (a progress track or its fill) tinted <paramref name="color"/>.</summary>
+        public static void SkinBar(Image image, Color color)
+        {
+            if(BarSprite == null) return;
+            Slice(image, BarSprite, 3f);
+            image.color = Lift(color, ButtonLift);
+        }
+
+        /// <summary>A glass panel tinted <paramref name="color"/> (the tablet).</summary>
+        public static void SkinGlass(Image image, Color color)
+        {
+            if(GlassSprite == null) return;
+            Slice(image, GlassSprite, 1.5f);
+            image.color = Lift(color, ButtonLift);
         }
 
         public static Text Label(Transform parent, string text, int size = 18, TextAnchor anchor = TextAnchor.UpperLeft,
@@ -131,6 +191,7 @@ namespace Cooking.Prototype
         public static Button Button(Transform parent, string text, UnityAction onClick, Color? color = null, int fontSize = 18)
         {
             Image image = Panel(parent, "Button " + text, color ?? ButtonColor);
+            SkinButton(image, color ?? ButtonColor);
             Button button = image.gameObject.AddComponent<Button>();
             ColorBlock colors = button.colors;
             colors.highlightedColor = new Color(1.25f, 1.25f, 1.25f, 1f);
@@ -141,6 +202,8 @@ namespace Cooking.Prototype
 
             Text label = Label(image.transform, text, fontSize, TextAnchor.MiddleCenter);
             Stretch(label.rectTransform, 4f);
+            // The raised button's lip is at the bottom: keep the text on the face.
+            if(ButtonSprite != null) label.rectTransform.offsetMin = new Vector2(4f, 6f);
             return button;
         }
 

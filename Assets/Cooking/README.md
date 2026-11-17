@@ -140,6 +140,13 @@ and needs the Input System UI module (the setup adds one). A held item follows t
 **Custom Tools → Cooking Prototype → Assign Market Art** puts the billboard sprites on the scene's
 prototype and sets them to point filtering.
 
+The panels, buttons, progress bars, tablet frame and mouse pointer use a few pieces of Kenney's CC0
+**UI Pack: Sci-fi**, copied into `Assets/Art Assets/UI Skin` (with its licence). They're light grey and
+tinted in code, so the colours stay as before. **Custom Tools → Cooking Prototype → Assign UI Skin**
+(`UiSkinSetup.cs`) sets them up as nine-sliced sprites (corners stay put when a panel stretches) and
+puts them on the prototype; **Build Scene** runs it too. `UIFactory` applies the skin: every panel in
+`PanelColor` or `PanelDark` and every button gets it automatically. Without the sprites the UI stays flat.
+
 The cookware (knife, peeler, box grater, wok, pot, cutting board, plate) is rendered from the CC0
 [3D Cooking Assets](https://milkandbanana.itch.io/) pack by MilkAndBanana:
 **Custom Tools → Cooking Prototype → Render Cookware Sprites** (`CookwareSprites.cs`) renders each
