@@ -796,12 +796,26 @@ namespace Cooking.Prototype
                     title = "Wrong order, bad food. They won't pay"; line = customer.dislikedLine; color = UIFactory.Bad; break;
             }
 
+            if(change.FirstTaste)
+            {
+                title = "They've never tasted anything like it. They liked it";
+                line = customer.likedLine;
+                color = UIFactory.Good;
+            }
+            else if(result.PaidAnyway)
+            {
+                title = "They can't tell good food from bad yet. They pay anyway";
+                color = UIFactory.Accent;
+            }
+
             resultTitle.text = title;
             resultTitle.color = color;
 
             // What they say comes from the dialogue catalog (it plays right after anything they were
             // saying), or the customer's fallback line when the catalog has nothing for this moment.
-            Speak(CustomerDialogue.EventFor(result, change.FoundDream || result.Verdict != Verdict.DreamMeal), line, priority: true);
+            DialogueSystem.DialogueEventType reaction = change.FirstTaste ? DialogueSystem.DialogueEventType.CorrectOrder
+                : CustomerDialogue.EventFor(result, change.FoundDream || result.Verdict != Verdict.DreamMeal);
+            Speak(reaction, line, priority: true);
 
             StringBuilder sb = new StringBuilder();
             sb.Append(DescribeChange(change));

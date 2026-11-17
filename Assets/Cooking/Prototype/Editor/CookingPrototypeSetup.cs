@@ -26,7 +26,9 @@ namespace Cooking.Prototype.EditorTools
         };
 
         /// <summary>Recipes regulars can order that the player doesn't get in the book (meeting decision).</summary>
-        private static readonly string[] OffMenu = { "Boiled synthetic chicken" };
+        private static readonly string[] OffMenu = { "Boiled synthetic chicken", "Potato", "Peeled potato", "MSG2 cube" };
+
+        private const string CharacterArt = "Assets/Art Assets/Characters";
 
         [MenuItem("Custom Tools/Cooking Prototype/Build Scene")]
         public static void BuildScene()
@@ -59,6 +61,10 @@ namespace Cooking.Prototype.EditorTools
 
             // Dialogue graphs, catalog, director and the regulars' dialogue ids.
             CookingDialogueSetup.BuildDialogue();
+
+            // The billboards and the rendered cookware.
+            AssignMarketArt();
+            CookwareSprites.AssignToScene();
 
             Selection.activeGameObject = root;
             Debug.Log("[Cooking] Built " + ScenePath + ". Press Play to cook.");
@@ -219,6 +225,12 @@ namespace Cooking.Prototype.EditorTools
             Add(recipes, "Boiled synthetic chicken", "Ordered by a confused sleeper", CookMethods.Boiled,
                 new Item("Synthetic Chicken", 1));
 
+            // The Sleeper's first "meals" (Miro board): things they don't know aren't food. Served raw.
+            const string Sleeper = "Ordered by a sleeper who doesn't know food yet";
+            Add(recipes, "Potato", Sleeper, CookMethods.None, new Item("Potato", 1));
+            Add(recipes, "Peeled potato", Sleeper, CookMethods.None, new Item("Potato", 1, Peeled));
+            Add(recipes, "MSG2 cube", Sleeper, CookMethods.None, new Item("MSG2 Cube", 1));
+
             AssetDatabase.SaveAssets();
             return recipes;
         }
@@ -248,6 +260,26 @@ namespace Cooking.Prototype.EditorTools
 
         // ------------------------------------------------------------------ Customers (from the design doc's NPC notes)
 
+        /// <summary>A regular's picture from the Miro board, trimmed and imported as a sprite. Null if it isn't there.</summary>
+        private static Sprite Portrait(string name)
+        {
+            string path = CharacterArt + "/" + name + ".png";
+            TextureImporter importer = AssetImporter.GetAtPath(path) as TextureImporter;
+            if(importer == null) return null;
+
+            if(importer.textureType != TextureImporterType.Sprite || importer.spriteImportMode != SpriteImportMode.Single || importer.maxTextureSize != 1024)
+            {
+                importer.textureType = TextureImporterType.Sprite;
+                importer.spriteImportMode = SpriteImportMode.Single;
+                importer.alphaIsTransparency = true;
+                importer.mipmapEnabled = false;
+                importer.maxTextureSize = 1024;
+                importer.SaveAndReimport();
+            }
+
+            return AssetDatabase.LoadAssetAtPath<Sprite>(path);
+        }
+
         private static List<Customer> CreateCustomers(Dictionary<string, RecipeDefinition> recipes)
         {
             // Each regular's secret desire: a flavour no menu recipe reaches, to be discovered.
@@ -271,6 +303,7 @@ namespace Cooking.Prototype.EditorTools
                     dislikedLine = "What even is this, Pot Boy?",
                     refusedLine = "None of that beef shit, you hear me?",
                     dreamLine = "This... This is...",
+                    portrait = Portrait("the_woman"),
                 },
                 new Customer
                 {
@@ -287,7 +320,17 @@ namespace Cooking.Prototype.EditorTools
                 new Customer
                 {
                     name = "The Sleeper",
-                    orders = new List<RecipeDefinition> { recipes["Boiled synthetic chicken"], recipes["Soup on the rock"] },
+                    // Miro board: their initial liked meals aren't on the menu and aren't really food.
+                    // The first thing that tastes good replaces them and makes them Familiar; as a
+                    // Stranger they don't know food, so they always pay.
+                    orders = new List<RecipeDefinition>
+                    {
+                        recipes["Potato"], recipes["Peeled potato"], recipes["MSG2 cube"], recipes["Boiled synthetic chicken"],
+                    },
+                    firstTasteReplacesLikes = true,
+                    alwaysPaysAsStranger = true,
+                    likedMealsToFamiliar = 1,
+                    portrait = Portrait("the_sleeper"),
                     secretDesire = desires["The Sleeper"],
                     orderLines = new List<string> { "Uum... I'd like a {0}?", "{0}. Is that a thing people eat?" },
                     likedLine = "Wow! That kinda tastes. So that's why people stuff their face?",

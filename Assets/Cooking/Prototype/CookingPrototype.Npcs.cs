@@ -441,7 +441,11 @@ namespace Cooking.Prototype
                   .Append("</b></color>\n");
             }
 
-            if(change.NewLikedMeal != null)
+            if(change.FirstTaste)
+            {
+                sb.Append("<color=#73cc73>Real food at last. They'll forget the raw stuff and order this instead.</color>\n");
+            }
+            else if(change.NewLikedMeal != null)
             {
                 sb.Append("<color=#73cc73>They liked it and will order it again.</color>\n");
             }

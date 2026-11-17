@@ -473,27 +473,42 @@ namespace Cooking.Prototype
             return a.ingredient == b.ingredient && a.prep == b.prep && a.cooking == b.cooking && a.IsRaw == b.IsRaw && (a.IsRaw || a.doneness == b.doneness);
         }
 
-        /// <summary>A seasoning on a cooked dish. Nothing else goes on a plate raw.</summary>
+        /// <summary>
+        /// Something raw onto a plate. A cooked dish only takes seasonings. A plate without one takes
+        /// anything raw, served as it is (some regulars ask for a plain potato), but then no cooked
+        /// dish goes on it.
+        /// </summary>
         private bool Season(Plate target, IngredientPortion portion)
         {
-            if(!portion.ingredient.IsSeasoning)
+            if(target.HasDish && !portion.ingredient.IsSeasoning)
             {
-                Say(portion.ingredient.DisplayName + " can't go on a plate raw. Everything for a dish is cooked in the pot or the pan; only seasonings go on after.", UIFactory.Bad);
-                return false;
-            }
-
-            if(!target.HasDish)
-            {
-                Say("Cook the dish first, then season it on the plate.", UIFactory.Bad);
+                Say(portion.ingredient.DisplayName + " can't go on a cooked dish. Everything for a dish is cooked in the pot or the pan; only seasonings go on after.", UIFactory.Bad);
                 return false;
             }
 
             AddToPlate(target, portion);
             target.Cost += portion.ingredient.Price * portion.quantity;
             focusPlate = target;
-            Say("Seasoned the dish with " + ListPortions(new[] { portion }) + ".");
-            LogCooking("Plate", "Seasoned with " + ListPortions(new[] { portion }) + ".");
+
+            if(target.HasDish)
+            {
+                Say("Seasoned the dish with " + ListPortions(new[] { portion }) + ".");
+                LogCooking("Plate", "Seasoned with " + ListPortions(new[] { portion }) + ".");
+            }
+            else
+            {
+                Say(ListPortions(new[] { portion }) + " on the plate, raw. Serve it as it is; a cooked dish needs a clean plate.");
+                LogCooking("Plate", "Put " + ListPortions(new[] { portion }) + " on the plate, raw.");
+            }
+
             return true;
+        }
+
+        /// <summary>Raw food other than seasonings on the plate: it's a raw plate, not one for a cooked dish.</summary>
+        private static bool HasRawFood(Plate target)
+        {
+            foreach(IngredientPortion portion in target.Items) if(portion.IsRaw && !portion.ingredient.IsSeasoning) return true;
+            return false;
         }
 
         private void DropPlate(Vector2 screen)
@@ -575,9 +590,10 @@ namespace Cooking.Prototype
         private void DishUp(StationView view, Plate target)
         {
             // One dish per plate: no more cooked food once there's a dish on it.
-            if(target.HasDish)
+            if(target.HasDish || HasRawFood(target))
             {
-                Say("There's already a dish on that plate. Use a clean one. The " + view.Station.Name.ToLowerInvariant() + " is back on the heat.", UIFactory.Bad);
+                Say((target.HasDish ? "There's already a dish on that plate." : "There's raw food on that plate.") + " Use a clean one. The "
+                    + view.Station.Name.ToLowerInvariant() + " is back on the heat.", UIFactory.Bad);
                 return;
             }
 
@@ -674,6 +690,7 @@ namespace Cooking.Prototype
             if(focusPlate == dropped) focusPlate = null;
 
             JudgeResult result = DishJudge.Judge(order, plate, customer, zones, rules, JudgeSettings());
+            if(customer.alwaysPaysAsStranger && Relationship(customer).Stage == NpcStage.Stranger) result = DishJudge.PayInFull(result);
             FinishOrder(result);
             return true;
         }
@@ -1092,7 +1109,7 @@ namespace Cooking.Prototype
                 shown++;
             }
 
-            string label = target.Items.Count == 0 ? "Empty plate" : target.HasDish ? DishLabel(target) : "Not cooked";
+            string label = target.Items.Count == 0 ? "Empty plate" : target.HasDish || HasRawFood(target) ? DishLabel(target) : "Seasoning";
             Text text = UIFactory.Label(parent, label, 12, TextAnchor.LowerCenter, FontStyle.Bold);
             UIFactory.Place(text.rectTransform, -0.1f, -0.06f, 1.1f, 0.2f);
             UIFactory.FitText(text);

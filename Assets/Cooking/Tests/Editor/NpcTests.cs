@@ -62,6 +62,67 @@ namespace Cooking.Tests
             Assert.AreEqual(NpcStage.Familiar, third.After);
         }
 
+        // ------------------------------------------------------------------ The Sleeper (Miro board)
+
+        private JudgeResult Tasty(Verdict verdict)
+        {
+            JudgeResult result = Result(verdict);
+            result.BestZone = new FlavourZoneMatch(Track(ScriptableObject.CreateInstance<FlavourZone>()), 1f);
+            return result;
+        }
+
+        [Test]
+        public void FirstTaste_ReplacesTheirFirstLikedMeals_AndMakesThemFamiliar()
+        {
+            IngredientDefinition potato = Ingredient("Potato");
+            IngredientDefinition rice = Ingredient("Rice");
+            RecipeDefinition rawPotato = Recipe("Potato", new IngredientPortion(potato, 1));
+            Customer sleeper = new Customer { name = "The Sleeper", orders = new List<RecipeDefinition> { rawPotato }, firstTasteReplacesLikes = true };
+            CustomerRelationship relationship = new CustomerRelationship(sleeper);
+
+            List<IngredientPortion> friedRice = new List<IngredientPortion> { new IngredientPortion(rice, 2, PrepSteps.None, CookMethods.Fried, Doneness.Perfect) };
+            // Not what they ordered, so they don't like it the usual way; but it tastes good.
+            RelationshipChange change = relationship.Record(Tasty(Verdict.Disliked), friedRice);
+
+            Assert.IsTrue(change.FirstTaste);
+            Assert.AreEqual(NpcStage.Familiar, change.After);
+            Assert.IsTrue(relationship.HasTasted);
+            Assert.AreEqual(1, relationship.LikedMeals.Count);
+            Assert.AreNotEqual(rawPotato, relationship.LikedMeals[0]);
+            Track(relationship.LikedMeals[0]);
+        }
+
+        [Test]
+        public void TheirFirstLikedMeals_DontCountTowardsFamiliar()
+        {
+            IngredientDefinition potato = Ingredient("Potato");
+            RecipeDefinition rawPotato = Recipe("Potato", new IngredientPortion(potato, 1));
+            Customer sleeper = new Customer { orders = new List<RecipeDefinition> { rawPotato }, firstTasteReplacesLikes = true, likedMealsToFamiliar = 1 };
+            CustomerRelationship relationship = new CustomerRelationship(sleeper);
+
+            // Exactly what they asked for, even if it happens to land in a zone: still just a potato.
+            RelationshipChange change = relationship.Record(Tasty(Verdict.Ordered), new List<IngredientPortion> { new IngredientPortion(potato, 1) });
+
+            Assert.IsFalse(change.FirstTaste);
+            Assert.AreEqual(NpcStage.Stranger, relationship.Stage);
+            Assert.AreEqual(0, relationship.LikedCount);
+            Assert.AreEqual(rawPotato, relationship.LikedMeals[0]);
+        }
+
+        [Test]
+        public void PayInFull_PaysForAnythingTheyEat_ButNotARefusal()
+        {
+            JudgeResult bad = new JudgeResult { Verdict = Verdict.Disliked, Price = 4f };
+            JudgeResult paid = DishJudge.PayInFull(bad);
+            Assert.AreEqual(4f, paid.Payment);
+            Assert.IsTrue(paid.PaidAnyway);
+            Assert.IsFalse(paid.IsLiked);
+
+            JudgeResult refused = DishJudge.PayInFull(new JudgeResult { Verdict = Verdict.Refused, Price = 4f });
+            Assert.AreEqual(0f, refused.Payment);
+            Assert.IsFalse(refused.PaidAnyway);
+        }
+
         [Test]
         public void OnlyExactAndVeryClose_CountAsLiked()
         {
