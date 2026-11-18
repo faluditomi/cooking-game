@@ -149,6 +149,8 @@ namespace Cooking.Prototype
             // Lifted off the stove, a pot or pan pauses and carries on where it left off when it's put back.
             if(heldStation != wokView) wok.Tick(deltaTime);
             if(heldStation != potView) pot.Tick(deltaTime);
+            // The practice dish can't burn: it waits in the orange, as if stirred.
+            if(practiceDay && pot.CurrentStage == CookingStation.Stage.Done && pot.Progress > Mathf.Lerp(pot.PerfectStart, pot.PerfectEnd, 0.85f)) pot.Settle();
             UpdateStationView(wokView);
             UpdateStationView(potView);
         }
@@ -378,6 +380,16 @@ namespace Cooking.Prototype
 
         private void DropHeld(Vector2 screen)
         {
+            // The tutorial only takes the step it's on: anything else goes back where it came from.
+            if(!TutorialAllowsDrop(screen))
+            {
+                Say(TutorialDropHint(screen), UIFactory.Bad);
+                if(held == Held.Station) shakeGesture.End();
+                DropWithoutEffect();
+                RefreshAll();
+                return;
+            }
+
             Held what = held;
             held = Held.None;
             DestroyGhost();
@@ -1205,13 +1217,6 @@ namespace Cooking.Prototype
             else if(item.Loose != null)
             {
                 AddPile(item.Rect, PrepSprites.For(item.Loose.ingredient, item.Loose.prep), Mathf.Min(item.Loose.quantity, 3), item.Size * 0.62f, new Vector2(0.5f, 0.55f));
-
-                if(ingredientLabels)
-                {
-                    Text label = UIFactory.Label(item.Rect, IngredientLabel(item.Loose.ingredient, item.Loose.quantity, item.Loose.prep), 12, TextAnchor.UpperCenter,
-                        FontStyle.Bold);
-                    UIFactory.Place(label.rectTransform, -0.3f, -0.25f, 1.3f, 0.05f);
-                }
             }
         }
 
@@ -1249,7 +1254,7 @@ namespace Cooking.Prototype
             const int columns = 4;
             RectTransform grid = UIFactory.Rect(pantryContent, "Piles");
             GridLayoutGroup layout = grid.gameObject.AddComponent<GridLayoutGroup>();
-            layout.cellSize = new Vector2(104f, ingredientLabels ? 64f : 50f);
+            layout.cellSize = new Vector2(104f, 50f);
             layout.spacing = new Vector2(4f, 2f);
             layout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
             layout.constraintCount = columns;
@@ -1265,14 +1270,7 @@ namespace Cooking.Prototype
                 if(entry.Prep == PrepSteps.None) pantryPiles[entry.Ingredient] = cell.rectTransform;
 
                 // Each piece shown, up to a small heap.
-                AddPile(cell.rectTransform, PrepSprites.For(entry.Ingredient, entry.Prep), Mathf.Min(entry.Quantity, 4), 34f, new Vector2(0.5f, ingredientLabels ? 0.62f : 0.5f));
-
-                if(ingredientLabels)
-                {
-                    Text label = UIFactory.Label(cell.rectTransform, IngredientLabel(entry.Ingredient, entry.Quantity, entry.Prep), 11, TextAnchor.LowerCenter);
-                    UIFactory.Place(label.rectTransform, 0f, 0f, 1f, 0.32f);
-                    UIFactory.FitText(label);
-                }
+                AddPile(cell.rectTransform, PrepSprites.For(entry.Ingredient, entry.Prep), Mathf.Min(entry.Quantity, 4), 34f, new Vector2(0.5f, 0.5f));
             }
         }
 
