@@ -13,39 +13,39 @@ MonoBehaviour:
   m_Name: Sleeper - CorrectOrder - Stranger - O3
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: 28d914f8-0e0b-42f7-8bae-06dbdeb2bed2
+  - guid: 89e40ab4-a8f3-44ba-99a1-5d43ad81a782
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: d916f89b-09c4-423d-bb79-5d186b8b81f1
+  - guid: 62679937-2995-45c6-8b69-f40b417d2f07
     kind: 0
     line:
       text: Food. In my mouth.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: 7979de4b-3197-4d6b-b470-0fda9f7e535a
+  - guid: a8e3d9f1-06cd-411e-9d5e-7f0d2e39d7c9
     kind: 0
     line:
       text: It was meant to be.
       delaySeconds: 1.6
     editorPosition: {x: 520, y: 0}
-  - guid: 19493a12-13c6-4346-8c45-de5c2fdf56e7
+  - guid: 5c440cf1-af80-4fe6-b224-0d853fcab27a
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 780, y: 0}
   edges:
-  - fromNodeGuid: 28d914f8-0e0b-42f7-8bae-06dbdeb2bed2
+  - fromNodeGuid: 89e40ab4-a8f3-44ba-99a1-5d43ad81a782
     fromOptionGuid: 
-    toNodeGuid: d916f89b-09c4-423d-bb79-5d186b8b81f1
-  - fromNodeGuid: d916f89b-09c4-423d-bb79-5d186b8b81f1
+    toNodeGuid: 62679937-2995-45c6-8b69-f40b417d2f07
+  - fromNodeGuid: 62679937-2995-45c6-8b69-f40b417d2f07
     fromOptionGuid: 
-    toNodeGuid: 7979de4b-3197-4d6b-b470-0fda9f7e535a
-  - fromNodeGuid: 7979de4b-3197-4d6b-b470-0fda9f7e535a
+    toNodeGuid: a8e3d9f1-06cd-411e-9d5e-7f0d2e39d7c9
+  - fromNodeGuid: a8e3d9f1-06cd-411e-9d5e-7f0d2e39d7c9
     fromOptionGuid: 
-    toNodeGuid: 19493a12-13c6-4346-8c45-de5c2fdf56e7
+    toNodeGuid: 5c440cf1-af80-4fe6-b224-0d853fcab27a
   isOneShot: 0
   payload: 

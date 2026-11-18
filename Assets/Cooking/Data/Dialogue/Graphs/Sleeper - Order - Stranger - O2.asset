@@ -13,39 +13,39 @@ MonoBehaviour:
   m_Name: Sleeper - Order - Stranger - O2
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: 07943866-9dfc-4c6c-84ab-ef7073e205a3
+  - guid: a47a5061-5be1-4273-9c13-6314dd1b97ec
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 66b2d79c-19e1-40d9-af7e-f13ebf3d1ab1
+  - guid: fca29f6c-bbaf-495f-acfc-36a682ff9ee6
     kind: 0
     line:
       text: Hi.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: 9dd797de-e3ef-48be-b2cd-49a82d0efe97
+  - guid: ab209fc0-21d5-4f76-8401-1a5bbcd6beb0
     kind: 0
     line:
       text: One peeled potato, please.
       delaySeconds: 1.1
     editorPosition: {x: 520, y: 0}
-  - guid: 4b5bbc51-1dfc-4d7f-bdef-3921d8256374
+  - guid: d3a1ece0-ca53-47cd-a296-3ad97ed801fd
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 780, y: 0}
   edges:
-  - fromNodeGuid: 07943866-9dfc-4c6c-84ab-ef7073e205a3
+  - fromNodeGuid: a47a5061-5be1-4273-9c13-6314dd1b97ec
     fromOptionGuid: 
-    toNodeGuid: 66b2d79c-19e1-40d9-af7e-f13ebf3d1ab1
-  - fromNodeGuid: 66b2d79c-19e1-40d9-af7e-f13ebf3d1ab1
+    toNodeGuid: fca29f6c-bbaf-495f-acfc-36a682ff9ee6
+  - fromNodeGuid: fca29f6c-bbaf-495f-acfc-36a682ff9ee6
     fromOptionGuid: 
-    toNodeGuid: 9dd797de-e3ef-48be-b2cd-49a82d0efe97
-  - fromNodeGuid: 9dd797de-e3ef-48be-b2cd-49a82d0efe97
+    toNodeGuid: ab209fc0-21d5-4f76-8401-1a5bbcd6beb0
+  - fromNodeGuid: ab209fc0-21d5-4f76-8401-1a5bbcd6beb0
     fromOptionGuid: 
-    toNodeGuid: 4b5bbc51-1dfc-4d7f-bdef-3921d8256374
+    toNodeGuid: d3a1ece0-ca53-47cd-a296-3ad97ed801fd
   isOneShot: 1
   payload: Peeled potato

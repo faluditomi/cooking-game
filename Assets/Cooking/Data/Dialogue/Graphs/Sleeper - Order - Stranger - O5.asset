@@ -13,57 +13,57 @@ MonoBehaviour:
   m_Name: Sleeper - Order - Stranger - O5
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: 07b565cb-677b-4b38-9507-885b44fa4094
+  - guid: cff2738c-6375-466d-884c-867d2c698f76
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: bbd3f499-d22c-4b44-a5a8-df2379a81b8b
+  - guid: 9cbc41e6-66fc-4bb9-8edf-40ace99b6eca
     kind: 0
     line:
       text: Hey, man.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: f98f620b-6532-42e5-b524-b2148f772cee
+  - guid: e626b341-5603-496a-816b-1b36781e5266
     kind: 0
     line:
       text: Hmm... I'll go for the...
       delaySeconds: 1.3
     editorPosition: {x: 520, y: 0}
-  - guid: 33d44352-6faa-4666-bf52-360e3d02da11
+  - guid: c42cba4f-b297-43d4-b47d-f1ab3c292e3a
     kind: 0
     line:
       text: Maybe... Nah.
       delaySeconds: 1.9
     editorPosition: {x: 780, y: 0}
-  - guid: fb009ff1-929a-4a6d-88b7-90fc2a0f673e
+  - guid: f91270f9-8704-4c3a-be02-057ac69ad1ff
     kind: 0
     line:
       text: Soup on the rock, please.
       delaySeconds: 1.5
     editorPosition: {x: 1040, y: 0}
-  - guid: 57a231ad-90a2-46c5-b228-52e330743a84
+  - guid: c1958878-074d-44df-bce8-b955fff1e4e6
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 1300, y: 0}
   edges:
-  - fromNodeGuid: 07b565cb-677b-4b38-9507-885b44fa4094
+  - fromNodeGuid: cff2738c-6375-466d-884c-867d2c698f76
     fromOptionGuid: 
-    toNodeGuid: bbd3f499-d22c-4b44-a5a8-df2379a81b8b
-  - fromNodeGuid: bbd3f499-d22c-4b44-a5a8-df2379a81b8b
+    toNodeGuid: 9cbc41e6-66fc-4bb9-8edf-40ace99b6eca
+  - fromNodeGuid: 9cbc41e6-66fc-4bb9-8edf-40ace99b6eca
     fromOptionGuid: 
-    toNodeGuid: f98f620b-6532-42e5-b524-b2148f772cee
-  - fromNodeGuid: f98f620b-6532-42e5-b524-b2148f772cee
+    toNodeGuid: e626b341-5603-496a-816b-1b36781e5266
+  - fromNodeGuid: e626b341-5603-496a-816b-1b36781e5266
     fromOptionGuid: 
-    toNodeGuid: 33d44352-6faa-4666-bf52-360e3d02da11
-  - fromNodeGuid: 33d44352-6faa-4666-bf52-360e3d02da11
+    toNodeGuid: c42cba4f-b297-43d4-b47d-f1ab3c292e3a
+  - fromNodeGuid: c42cba4f-b297-43d4-b47d-f1ab3c292e3a
     fromOptionGuid: 
-    toNodeGuid: fb009ff1-929a-4a6d-88b7-90fc2a0f673e
-  - fromNodeGuid: fb009ff1-929a-4a6d-88b7-90fc2a0f673e
+    toNodeGuid: f91270f9-8704-4c3a-be02-057ac69ad1ff
+  - fromNodeGuid: f91270f9-8704-4c3a-be02-057ac69ad1ff
     fromOptionGuid: 
-    toNodeGuid: 57a231ad-90a2-46c5-b228-52e330743a84
+    toNodeGuid: c1958878-074d-44df-bce8-b955fff1e4e6
   isOneShot: 0
   payload: Soup on the rock

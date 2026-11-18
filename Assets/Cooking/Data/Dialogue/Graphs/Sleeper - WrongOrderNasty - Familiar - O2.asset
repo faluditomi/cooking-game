@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Sleeper - WrongOrderNasty - Familiar - O2
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: 231e6fbd-c5ac-4d1a-9d3c-b720ff9f1706
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: 871174ff-ca15-42bc-ae20-6b68f22ee668
+    kind: 0
+    line:
+      text: Did I come on a wrong cycle?
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: 1b1bbe23-8800-4e21-80f7-9251f4e02c56
+    kind: 0
+    line:
+      text: I didn't know you have those too.
+      delaySeconds: 2
+    editorPosition: {x: 520, y: 0}
+  - guid: 8bbfa88c-2c60-4c41-a86a-e52a6f55fee9
+    kind: 0
+    line:
+      text: Don't worry, I'll be back.
+      delaySeconds: 2.2
+    editorPosition: {x: 780, y: 0}
+  - guid: 50a64aee-1511-43d1-881c-6c7447c15dce
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 1040, y: 0}
+  edges:
+  - fromNodeGuid: 231e6fbd-c5ac-4d1a-9d3c-b720ff9f1706
+    fromOptionGuid: 
+    toNodeGuid: 871174ff-ca15-42bc-ae20-6b68f22ee668
+  - fromNodeGuid: 871174ff-ca15-42bc-ae20-6b68f22ee668
+    fromOptionGuid: 
+    toNodeGuid: 1b1bbe23-8800-4e21-80f7-9251f4e02c56
+  - fromNodeGuid: 1b1bbe23-8800-4e21-80f7-9251f4e02c56
+    fromOptionGuid: 
+    toNodeGuid: 8bbfa88c-2c60-4c41-a86a-e52a6f55fee9
+  - fromNodeGuid: 8bbfa88c-2c60-4c41-a86a-e52a6f55fee9
+    fromOptionGuid: 
+    toNodeGuid: 50a64aee-1511-43d1-881c-6c7447c15dce
+  isOneShot: 0
+  payload: 

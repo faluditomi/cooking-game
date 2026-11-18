@@ -13,66 +13,66 @@ MonoBehaviour:
   m_Name: Sleeper - Musing - Familiar - O3
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: d36a0822-e396-4565-8af4-354390962829
+  - guid: d0205375-04e4-463b-88f5-8b874c920a2e
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 18811d9d-1afe-4f89-a3c0-cb5a881d2554
+  - guid: f654fe83-2788-4002-8f52-43af0ddb67bf
     kind: 0
     line:
-      text: Have you ever though about making a Sleeper Menu?
+      text: Have you ever thought about making a Sleeper Menu?
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: d0f6bccd-c021-4b0d-92ae-2846ee566e0a
+  - guid: 4b6754e9-1ca2-4d6a-9b35-2113a393c85d
     kind: 0
     line:
       text: You know... Food meant for Sleepers?
       delaySeconds: 2.8
     editorPosition: {x: 520, y: 0}
-  - guid: 8fee432e-f8fd-4eaa-a0d3-65dbed36a01a
+  - guid: fe9fca52-abdb-4dd8-bf3b-ce898ed9e19a
     kind: 0
     line:
       text: These tongues don't taste much, but a lot of your dishes... Ohh, they taste plenty!
       delaySeconds: 2.3
     editorPosition: {x: 780, y: 0}
-  - guid: a969f547-c9de-46b8-9cfc-b8fb9c2a9ede
+  - guid: 52a3dd2c-6135-424c-933c-716d14d95f25
     kind: 0
     line:
       text: And, of course, the MSG cubes.
       delaySeconds: 4
     editorPosition: {x: 1040, y: 0}
-  - guid: d4770e41-7d73-438d-8391-ede22cbba028
+  - guid: a0777aa1-33b9-4aa2-9c6c-8db24c47c8c3
     kind: 0
     line:
       text: Ahhh, the MSG cubes!
       delaySeconds: 2.1
     editorPosition: {x: 1300, y: 0}
-  - guid: 2cf9e419-9377-4d72-bdc1-21ddb91b9302
+  - guid: 78303bfa-8388-40d5-a325-189d8cfee69d
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 1560, y: 0}
   edges:
-  - fromNodeGuid: d36a0822-e396-4565-8af4-354390962829
+  - fromNodeGuid: d0205375-04e4-463b-88f5-8b874c920a2e
     fromOptionGuid: 
-    toNodeGuid: 18811d9d-1afe-4f89-a3c0-cb5a881d2554
-  - fromNodeGuid: 18811d9d-1afe-4f89-a3c0-cb5a881d2554
+    toNodeGuid: f654fe83-2788-4002-8f52-43af0ddb67bf
+  - fromNodeGuid: f654fe83-2788-4002-8f52-43af0ddb67bf
     fromOptionGuid: 
-    toNodeGuid: d0f6bccd-c021-4b0d-92ae-2846ee566e0a
-  - fromNodeGuid: d0f6bccd-c021-4b0d-92ae-2846ee566e0a
+    toNodeGuid: 4b6754e9-1ca2-4d6a-9b35-2113a393c85d
+  - fromNodeGuid: 4b6754e9-1ca2-4d6a-9b35-2113a393c85d
     fromOptionGuid: 
-    toNodeGuid: 8fee432e-f8fd-4eaa-a0d3-65dbed36a01a
-  - fromNodeGuid: 8fee432e-f8fd-4eaa-a0d3-65dbed36a01a
+    toNodeGuid: fe9fca52-abdb-4dd8-bf3b-ce898ed9e19a
+  - fromNodeGuid: fe9fca52-abdb-4dd8-bf3b-ce898ed9e19a
     fromOptionGuid: 
-    toNodeGuid: a969f547-c9de-46b8-9cfc-b8fb9c2a9ede
-  - fromNodeGuid: a969f547-c9de-46b8-9cfc-b8fb9c2a9ede
+    toNodeGuid: 52a3dd2c-6135-424c-933c-716d14d95f25
+  - fromNodeGuid: 52a3dd2c-6135-424c-933c-716d14d95f25
     fromOptionGuid: 
-    toNodeGuid: d4770e41-7d73-438d-8391-ede22cbba028
-  - fromNodeGuid: d4770e41-7d73-438d-8391-ede22cbba028
+    toNodeGuid: a0777aa1-33b9-4aa2-9c6c-8db24c47c8c3
+  - fromNodeGuid: a0777aa1-33b9-4aa2-9c6c-8db24c47c8c3
     fromOptionGuid: 
-    toNodeGuid: 2cf9e419-9377-4d72-bdc1-21ddb91b9302
+    toNodeGuid: 78303bfa-8388-40d5-a325-189d8cfee69d
   isOneShot: 0
   payload: 

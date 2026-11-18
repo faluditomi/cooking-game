@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Sleeper - CorrectOrder - Familiar - O1
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: 8b653681-8716-481f-b823-3da10b77ab01
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: f52bd2f7-176c-4e26-ad4b-0e184dba9109
+    kind: 0
+    line:
+      text: My mouth is pleased, as always.
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: 4d2c6bbc-1945-48be-b841-b66ed98233bd
+    kind: 0
+    line:
+      text: Thank you, man. I'll be back tomorrow.
+      delaySeconds: 2.1
+    editorPosition: {x: 520, y: 0}
+  - guid: 257a56ab-a1d7-4d63-b1ad-37556211ae02
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 780, y: 0}
+  edges:
+  - fromNodeGuid: 8b653681-8716-481f-b823-3da10b77ab01
+    fromOptionGuid: 
+    toNodeGuid: f52bd2f7-176c-4e26-ad4b-0e184dba9109
+  - fromNodeGuid: f52bd2f7-176c-4e26-ad4b-0e184dba9109
+    fromOptionGuid: 
+    toNodeGuid: 4d2c6bbc-1945-48be-b841-b66ed98233bd
+  - fromNodeGuid: 4d2c6bbc-1945-48be-b841-b66ed98233bd
+    fromOptionGuid: 
+    toNodeGuid: 257a56ab-a1d7-4d63-b1ad-37556211ae02
+  isOneShot: 0
+  payload: 

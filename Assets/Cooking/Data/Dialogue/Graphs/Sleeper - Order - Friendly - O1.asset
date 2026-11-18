@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Sleeper - Order - Friendly - O1
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: e19e99b8-7f5e-42bb-93dd-4da903858040
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: 98680f15-fff3-4623-843a-5769419a6d14
+    kind: 0
+    line:
+      text: Hey friend.
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: 87a56e21-bb62-4420-82df-8601c13dcc5f
+    kind: 0
+    line:
+      text: I would like one glorious [liked meal], please.
+      delaySeconds: 1.4
+    editorPosition: {x: 520, y: 0}
+  - guid: d64883c2-97a5-4c87-a35e-20ad88bb5d13
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 780, y: 0}
+  edges:
+  - fromNodeGuid: e19e99b8-7f5e-42bb-93dd-4da903858040
+    fromOptionGuid: 
+    toNodeGuid: 98680f15-fff3-4623-843a-5769419a6d14
+  - fromNodeGuid: 98680f15-fff3-4623-843a-5769419a6d14
+    fromOptionGuid: 
+    toNodeGuid: 87a56e21-bb62-4420-82df-8601c13dcc5f
+  - fromNodeGuid: 87a56e21-bb62-4420-82df-8601c13dcc5f
+    fromOptionGuid: 
+    toNodeGuid: d64883c2-97a5-4c87-a35e-20ad88bb5d13
+  isOneShot: 0
+  payload: '[liked meal]'

@@ -13,39 +13,39 @@ MonoBehaviour:
   m_Name: Sleeper - CorrectOrder - Stranger - O2
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: 2fb29ef2-e731-48e0-87ff-03182a24656a
+  - guid: b4a27851-74fe-4301-bfb0-ed1a282a7eae
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 3a9ce9d8-ffe6-4a36-87b6-ed633953f2ea
+  - guid: 0b008632-8cff-47c9-8b3c-673c5264eb09
     kind: 0
     line:
       text: Mmm... Good.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: f7ca4dbe-9655-4160-9a43-b29ca4b53043
+  - guid: 1cfded99-df66-422a-a94f-200be3d1f851
     kind: 0
     line:
       text: Yeah...
       delaySeconds: 1.4
     editorPosition: {x: 520, y: 0}
-  - guid: 1bafc366-38af-49e3-8109-71788fa23a5b
+  - guid: 4a3bd936-f9f6-4984-a799-8690c67e630a
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 780, y: 0}
   edges:
-  - fromNodeGuid: 2fb29ef2-e731-48e0-87ff-03182a24656a
+  - fromNodeGuid: b4a27851-74fe-4301-bfb0-ed1a282a7eae
     fromOptionGuid: 
-    toNodeGuid: 3a9ce9d8-ffe6-4a36-87b6-ed633953f2ea
-  - fromNodeGuid: 3a9ce9d8-ffe6-4a36-87b6-ed633953f2ea
+    toNodeGuid: 0b008632-8cff-47c9-8b3c-673c5264eb09
+  - fromNodeGuid: 0b008632-8cff-47c9-8b3c-673c5264eb09
     fromOptionGuid: 
-    toNodeGuid: f7ca4dbe-9655-4160-9a43-b29ca4b53043
-  - fromNodeGuid: f7ca4dbe-9655-4160-9a43-b29ca4b53043
+    toNodeGuid: 1cfded99-df66-422a-a94f-200be3d1f851
+  - fromNodeGuid: 1cfded99-df66-422a-a94f-200be3d1f851
     fromOptionGuid: 
-    toNodeGuid: 1bafc366-38af-49e3-8109-71788fa23a5b
+    toNodeGuid: 4a3bd936-f9f6-4984-a799-8690c67e630a
   isOneShot: 0
   payload: 

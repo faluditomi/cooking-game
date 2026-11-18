@@ -1,0 +1,69 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Sleeper - Musing - Friendly - O2
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: dfb014bf-8f3a-434f-87ad-bf7fcfbd1c66
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: 767adf04-5a00-4165-b68f-acd09e3b149b
+    kind: 0
+    line:
+      text: My mom made me my favourite noodles again. She still works at the forge.
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: d99c0a46-67af-4c73-8774-ecd7f88c6d71
+    kind: 0
+    line:
+      text: It's strange, I arrived to the Eye for the first time not long ago. Still, suddenly it feels like I spent a lifetime here.
+      delaySeconds: 3.6
+    editorPosition: {x: 520, y: 0}
+  - guid: 0bb327cd-4855-41ce-9e36-5b5ea779dbf6
+    kind: 0
+    line:
+      text: She's handling it well, too. Flux knows how hard it must be for her.
+      delaySeconds: 5.4
+    editorPosition: {x: 780, y: 0}
+  - guid: c8152011-172d-4f9f-8bcc-cee39baa40b1
+    kind: 0
+    line:
+      text: Her son sure is uglier now, than when he left.
+      delaySeconds: 3.4
+    editorPosition: {x: 1040, y: 0}
+  - guid: d7d6eb45-b425-407b-a1cb-acb8f55296c7
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 1300, y: 0}
+  edges:
+  - fromNodeGuid: dfb014bf-8f3a-434f-87ad-bf7fcfbd1c66
+    fromOptionGuid: 
+    toNodeGuid: 767adf04-5a00-4165-b68f-acd09e3b149b
+  - fromNodeGuid: 767adf04-5a00-4165-b68f-acd09e3b149b
+    fromOptionGuid: 
+    toNodeGuid: d99c0a46-67af-4c73-8774-ecd7f88c6d71
+  - fromNodeGuid: d99c0a46-67af-4c73-8774-ecd7f88c6d71
+    fromOptionGuid: 
+    toNodeGuid: 0bb327cd-4855-41ce-9e36-5b5ea779dbf6
+  - fromNodeGuid: 0bb327cd-4855-41ce-9e36-5b5ea779dbf6
+    fromOptionGuid: 
+    toNodeGuid: c8152011-172d-4f9f-8bcc-cee39baa40b1
+  - fromNodeGuid: c8152011-172d-4f9f-8bcc-cee39baa40b1
+    fromOptionGuid: 
+    toNodeGuid: d7d6eb45-b425-407b-a1cb-acb8f55296c7
+  isOneShot: 1
+  payload: 

@@ -13,39 +13,39 @@ MonoBehaviour:
   m_Name: Sleeper - Musing - Stranger - O1
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: 39108877-abe8-4864-b0aa-f7e051ca5096
+  - guid: cd152e97-e312-4683-be07-04481871fc87
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 85802e80-c413-4e7b-82b9-709c1864d45f
+  - guid: 3ca7b0fe-8f44-484f-812e-80536fecb16f
     kind: 0
     line:
       text: You're not selling Stabilizer, right?
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: 67af8a40-41d4-42f0-b1aa-2132ae3dd295
+  - guid: dc617922-c0a7-4cde-931d-c8de7ac4a2df
     kind: 0
     line:
       text: Right.
       delaySeconds: 2.3
     editorPosition: {x: 520, y: 0}
-  - guid: 2ba45f1f-44c8-401c-9ca8-2e6f71f709c0
+  - guid: 2f6c872c-9446-4a46-a0be-1e5a60cb17a7
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 780, y: 0}
   edges:
-  - fromNodeGuid: 39108877-abe8-4864-b0aa-f7e051ca5096
+  - fromNodeGuid: cd152e97-e312-4683-be07-04481871fc87
     fromOptionGuid: 
-    toNodeGuid: 85802e80-c413-4e7b-82b9-709c1864d45f
-  - fromNodeGuid: 85802e80-c413-4e7b-82b9-709c1864d45f
+    toNodeGuid: 3ca7b0fe-8f44-484f-812e-80536fecb16f
+  - fromNodeGuid: 3ca7b0fe-8f44-484f-812e-80536fecb16f
     fromOptionGuid: 
-    toNodeGuid: 67af8a40-41d4-42f0-b1aa-2132ae3dd295
-  - fromNodeGuid: 67af8a40-41d4-42f0-b1aa-2132ae3dd295
+    toNodeGuid: dc617922-c0a7-4cde-931d-c8de7ac4a2df
+  - fromNodeGuid: dc617922-c0a7-4cde-931d-c8de7ac4a2df
     fromOptionGuid: 
-    toNodeGuid: 2ba45f1f-44c8-401c-9ca8-2e6f71f709c0
+    toNodeGuid: 2f6c872c-9446-4a46-a0be-1e5a60cb17a7
   isOneShot: 1
   payload: 

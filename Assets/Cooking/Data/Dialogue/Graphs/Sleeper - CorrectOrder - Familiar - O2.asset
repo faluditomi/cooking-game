@@ -1,0 +1,69 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Sleeper - CorrectOrder - Familiar - O2
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: e7064c94-ff2c-4410-823d-659aa603adf0
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: d7ad6801-8fab-4131-a9f2-ec802eca7de8
+    kind: 0
+    line:
+      text: That is good.
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: cc6a32c3-fa2a-42d9-808f-2ced0177634e
+    kind: 0
+    line:
+      text: One day you gotta teach me.
+      delaySeconds: 1.5
+    editorPosition: {x: 520, y: 0}
+  - guid: 75edb2c8-2680-4b69-9c15-2af833283d1a
+    kind: 0
+    line:
+      text: Actually, don't. Wouldn't want your stand going out of business.
+      delaySeconds: 2
+    editorPosition: {x: 780, y: 0}
+  - guid: b629f11d-0c68-436e-9c26-6eb7882cb99e
+    kind: 0
+    line:
+      text: I need you here.
+      delaySeconds: 3.3
+    editorPosition: {x: 1040, y: 0}
+  - guid: e7e83356-8477-4f1a-a42c-90cc1a39a491
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 1300, y: 0}
+  edges:
+  - fromNodeGuid: e7064c94-ff2c-4410-823d-659aa603adf0
+    fromOptionGuid: 
+    toNodeGuid: d7ad6801-8fab-4131-a9f2-ec802eca7de8
+  - fromNodeGuid: d7ad6801-8fab-4131-a9f2-ec802eca7de8
+    fromOptionGuid: 
+    toNodeGuid: cc6a32c3-fa2a-42d9-808f-2ced0177634e
+  - fromNodeGuid: cc6a32c3-fa2a-42d9-808f-2ced0177634e
+    fromOptionGuid: 
+    toNodeGuid: 75edb2c8-2680-4b69-9c15-2af833283d1a
+  - fromNodeGuid: 75edb2c8-2680-4b69-9c15-2af833283d1a
+    fromOptionGuid: 
+    toNodeGuid: b629f11d-0c68-436e-9c26-6eb7882cb99e
+  - fromNodeGuid: b629f11d-0c68-436e-9c26-6eb7882cb99e
+    fromOptionGuid: 
+    toNodeGuid: e7e83356-8477-4f1a-a42c-90cc1a39a491
+  isOneShot: 0
+  payload: 

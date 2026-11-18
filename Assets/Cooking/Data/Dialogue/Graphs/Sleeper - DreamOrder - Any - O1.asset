@@ -13,48 +13,93 @@ MonoBehaviour:
   m_Name: Sleeper - DreamOrder - Any - O1
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: c977743f-229e-4781-b7a2-9a1d7ddbae00
+  - guid: 127e5a03-d968-499b-87f7-e99187886839
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 0aaddaf6-3e30-4cb6-9635-b3a50dfedcfd
+  - guid: e3670d64-2b9c-4fa2-96c8-e3d3338211e4
     kind: 0
     line:
-      text: That burn...
+      text: Mmmm... Man!
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: 3fb9ef2b-8728-4443-af62-823d6a4ad17d
+  - guid: c5685f91-98a4-4665-9ee1-ec52936482ce
     kind: 0
     line:
-      text: I remember a kitchen. Someone's hands.
+      text: That is it!
       delaySeconds: 1.4
     editorPosition: {x: 520, y: 0}
-  - guid: cd42c4f5-4539-40d7-9c60-c5433575068d
+  - guid: c74cecd3-1e47-4a98-90ee-4d07720e92aa
     kind: 0
     line:
-      text: I have to go. I know where she is.
-      delaySeconds: 2.4
+      text: Just like my mom used to make. Every night, when she got home from the noodle forge, I'd beg her to make this.
+      delaySeconds: 1.4
     editorPosition: {x: 780, y: 0}
-  - guid: 7be4e81b-b2b8-4cfe-b427-3d6db3feed54
+  - guid: 66c39338-7366-42a6-82c9-8df26b0cb7d4
+    kind: 0
+    line:
+      text: She always brought the fresh stuff from work. The chili came from my uncle. He had an ancient plant he smuggled back in the day.
+      delaySeconds: 4.9
+    editorPosition: {x: 1040, y: 0}
+  - guid: fd588189-2718-4a8a-b208-f11d3eb2c1f4
+    kind: 0
+    line:
+      text: Those were the days, man!
+      delaySeconds: 5.6
+    editorPosition: {x: 1300, y: 0}
+  - guid: 0a0b8e0c-7caa-47b8-973a-60ec3086eb6d
+    kind: 0
+    line:
+      text: Wait...
+      delaySeconds: 1.9
+    editorPosition: {x: 1560, y: 0}
+  - guid: 56f9d237-af7d-4a42-9d4e-6bb5fedfa7e2
+    kind: 0
+    line:
+      text: My mom!
+      delaySeconds: 1.2
+    editorPosition: {x: 1820, y: 0}
+  - guid: 25f0cb39-d3ee-4d97-858b-e69d11adc5f6
+    kind: 0
+    line:
+      text: Man, it's my mom!
+      delaySeconds: 1.2
+    editorPosition: {x: 2080, y: 0}
+  - guid: 6ce4387c-e009-4c3c-92bd-e8ced75f243d
     kind: 4
     line:
       text: 
       delaySeconds: 1
-    editorPosition: {x: 1040, y: 0}
+    editorPosition: {x: 2340, y: 0}
   edges:
-  - fromNodeGuid: c977743f-229e-4781-b7a2-9a1d7ddbae00
+  - fromNodeGuid: 127e5a03-d968-499b-87f7-e99187886839
     fromOptionGuid: 
-    toNodeGuid: 0aaddaf6-3e30-4cb6-9635-b3a50dfedcfd
-  - fromNodeGuid: 0aaddaf6-3e30-4cb6-9635-b3a50dfedcfd
+    toNodeGuid: e3670d64-2b9c-4fa2-96c8-e3d3338211e4
+  - fromNodeGuid: e3670d64-2b9c-4fa2-96c8-e3d3338211e4
     fromOptionGuid: 
-    toNodeGuid: 3fb9ef2b-8728-4443-af62-823d6a4ad17d
-  - fromNodeGuid: 3fb9ef2b-8728-4443-af62-823d6a4ad17d
+    toNodeGuid: c5685f91-98a4-4665-9ee1-ec52936482ce
+  - fromNodeGuid: c5685f91-98a4-4665-9ee1-ec52936482ce
     fromOptionGuid: 
-    toNodeGuid: cd42c4f5-4539-40d7-9c60-c5433575068d
-  - fromNodeGuid: cd42c4f5-4539-40d7-9c60-c5433575068d
+    toNodeGuid: c74cecd3-1e47-4a98-90ee-4d07720e92aa
+  - fromNodeGuid: c74cecd3-1e47-4a98-90ee-4d07720e92aa
     fromOptionGuid: 
-    toNodeGuid: 7be4e81b-b2b8-4cfe-b427-3d6db3feed54
+    toNodeGuid: 66c39338-7366-42a6-82c9-8df26b0cb7d4
+  - fromNodeGuid: 66c39338-7366-42a6-82c9-8df26b0cb7d4
+    fromOptionGuid: 
+    toNodeGuid: fd588189-2718-4a8a-b208-f11d3eb2c1f4
+  - fromNodeGuid: fd588189-2718-4a8a-b208-f11d3eb2c1f4
+    fromOptionGuid: 
+    toNodeGuid: 0a0b8e0c-7caa-47b8-973a-60ec3086eb6d
+  - fromNodeGuid: 0a0b8e0c-7caa-47b8-973a-60ec3086eb6d
+    fromOptionGuid: 
+    toNodeGuid: 56f9d237-af7d-4a42-9d4e-6bb5fedfa7e2
+  - fromNodeGuid: 56f9d237-af7d-4a42-9d4e-6bb5fedfa7e2
+    fromOptionGuid: 
+    toNodeGuid: 25f0cb39-d3ee-4d97-858b-e69d11adc5f6
+  - fromNodeGuid: 25f0cb39-d3ee-4d97-858b-e69d11adc5f6
+    fromOptionGuid: 
+    toNodeGuid: 6ce4387c-e009-4c3c-92bd-e8ced75f243d
   isOneShot: 1
   payload: 

@@ -245,20 +245,22 @@ namespace Cooking.Prototype.EditorTools
             // Familiar
             b.Add(sleeper, Order, Familiar, Liked, false,
                 "Hey, man.", "Can I please get the [liked meal]?", "Or whatever else you may cook up.", "I want your tastiest tastes, all in my mouth.");
+            b.Add(sleeper, Order, Familiar, Liked, false,
+                "Hmm... What will it be today?", "Let's go with the [liked meal], please.");
             b.Add(sleeper, Musing, Familiar,
                 "And when did you get here, man?",
                 "To Erlin's Eye, that is.",
                 "Does it get any easier?",
                 "I've been here a few days now, and still just as clueless as when I got here.",
                 "It's strange, this place feels like home, yet I recognise nothing at all.",
-                "But, at least I know you now, man, and this stall gives me refuge.");
+                "But, at least I know you now. And, this stall gives me refuge.");
             b.Add(sleeper, Musing, Familiar,
                 "Man, I've been here a while now, and still, I don't know why.",
-                "I've had these faint memories, dreams tugging at me, drawing me here.",
+                "I've had these faint memories, dreams tugging at me, drawing me to the Eye.",
                 "I hoped once I got here, I'd understand why but... Nothing.",
                 "I got nothing.");
             b.Add(sleeper, Musing, Familiar,
-                "Have you ever though about making a Sleeper Menu?",
+                "Have you ever thought about making a Sleeper Menu?",
                 "You know... Food meant for Sleepers?",
                 "These tongues don't taste much, but a lot of your dishes... Ohh, they taste plenty!",
                 "And, of course, the MSG cubes.",
@@ -271,12 +273,49 @@ namespace Cooking.Prototype.EditorTools
                 "The smell of seaweed... It was familiar. Like it was always there, enveloping me.");
             b.Add(sleeper, Musing, Familiar,
                 "A woman passed me by on the street recently.",
-                "She was holding steaming hot plate of noodles, reeking of chili, and I could have sworn I knew her.",
-                "I got the urge to run up and give her a hug, but as I was going to say hi, I forgot her name, then her face.",
-                "She never was who I thought she was. I also don't even know who I thought she was in the first place.",
+                "She was holding a steaming hot plate of noodles, reeking of chili. I could have sworn I knew her.",
+                "I got the urge to run up and give her a hug but, as I was going to say hi, I forgot her name, then her face.",
+                "She wasn't who I thought she was, and I don't even know who I thought she was in the first place.",
                 "This synthetic mind will be the death of me...");
+            b.Add(sleeper, Hurry, Familiar, "Having trouble, man?", "Don't worry, I don't got much going on anyway.");
+            b.Add(sleeper, Hurry, Familiar, "Should I come back later?");
+            b.Add(sleeper, Correct, Familiar, "My mouth is pleased, as always.", "Thank you, man. I'll be back tomorrow.");
+            b.Add(sleeper, Correct, Familiar,
+                "That is good.", "One day you gotta teach me.", "Actually, don't. Wouldn't want your stand going out of business.", "I need you here.");
+            b.Add(sleeper, Tasty, Familiar, "Another cycle, another surprise for my taste receptors.", "Thank you, man.");
+            b.Add(sleeper, Tasty, Familiar, "Mmm... Yeah!", "I only wish more people got to share in this magic.");
+            b.Add(sleeper, Nasty, Familiar, "Something is off today, but I can't tell what.", "Don't worry, I'm sure it's just my taste receptors.");
+            b.Add(sleeper, Nasty, Familiar, "Did I come on a wrong cycle?", "I didn't know you have those too.", "Don't worry, I'll be back.");
+
+            // The dream dish: his mother's chili noodles. It brings her back to him.
+            b.Add(sleeper, Dream, Any, null, true,
+                "Mmmm... Man!",
+                "That is it!",
+                "Just like my mom used to make. Every night, when she got home from the noodle forge, I'd beg her to make this.",
+                "She always brought the fresh stuff from work. The chili came from my uncle. He had an ancient plant he smuggled back in the day.",
+                "Those were the days, man!",
+                "Wait...",
+                "My mom!",
+                "Man, it's my mom!");
 
             // Friendly
+            b.Add(sleeper, Order, Friendly, Liked, false, "Hey friend.", "I would like one glorious [liked meal], please.");
+            b.Add(sleeper, Musing, Friendly, null, true,
+                "Sorry for running away on you yesterday.",
+                "All the sudden, the memories, the dreams I've been having... They all fell into place.",
+                "I remembered what drew me here.",
+                "Your cooking did that!",
+                "I'm sure everyone who signs their self away to a corporation has a reason to do so. I'm sure my previous self had one too, I don't quite know.",
+                "What I do know is that in doing so, my previous self left their mom behind.",
+                "Left my mom behind. And that's been gnawing at me ever since I opened these synthetic eyes. I just never managed to match the memory to the feeling.",
+                "I wonder what that person I was is feeling right now. Wonder where they are.",
+                "Regardless... Thanks to you I was able to reunite with my mother. Start to try and right wrongs I feel like I'd never do.",
+                "And I owe you for that opportunity, friend.");
+            b.Add(sleeper, Musing, Friendly, null, true,
+                "My mom made me my favourite noodles again. She still works at the forge.",
+                "It's strange, I arrived to the Eye for the first time not long ago. Still, suddenly it feels like I spent a lifetime here.",
+                "She's handling it well, too. Flux knows how hard it must be for her.",
+                "Her son sure is uglier now, than when he left.");
             b.Add(sleeper, Musing, Friendly, null, true,
                 "Don't think I ever told you the reason I came to your stall the day I got here.",
                 "You were basically my first stop, and only because I saw someone walking away from here with a weird, steaming plate of stuff -- and a big smile.",
@@ -284,14 +323,15 @@ namespace Cooking.Prototype.EditorTools
                 "Like something you read about, but never see in real life. You know, like books.",
                 "And sometimes I think about what would have happened if I don't find your stall that day...",
                 "Anyways, I did, and I got my fair share of smiles too.",
-                "Your stall has a charm, like no other.");
-
-            // The board has nothing yet for these: placeholders, at any stage.
-            b.Add(sleeper, Hurry, Any, "Is it supposed to take this long? I don't know how food works.");
-            b.Add(sleeper, Correct, Any, "Wow! That kinda tastes.", "So that's why people stuff their face?");
-            b.Add(sleeper, Tasty, Any, "Is it supposed to be like this? I honestly can't tell.");
-            b.Add(sleeper, Nasty, Any, "Uhh... thanks?");
-            b.Add(sleeper, Dream, Any, null, true, "That burn...", "I remember a kitchen. Someone's hands.", "I have to go. I know where she is.");
+                "Your stall has a charm, like no other, friend.");
+            b.Add(sleeper, Hurry, Friendly, "This sure is a ritual for you, friend.");
+            b.Add(sleeper, Hurry, Friendly, "You know, I've watched you make many dishes by now.", "Let me know if you need some advice.");
+            b.Add(sleeper, Correct, Friendly, "My mouth is pleased, as always.", "I have to bring my mom along sometime.");
+            b.Add(sleeper, Correct, Friendly, "Wouldn't want to start my cycle any other way.", "Thank you, friend.");
+            b.Add(sleeper, Tasty, Friendly, "Stop it, friend. My receptors can't handle such a delectable palate.", "I'll be back tomorrow!");
+            b.Add(sleeper, Tasty, Friendly, "Thank you for these tastes, friend.", "I'll see you tomorrow.");
+            b.Add(sleeper, Nasty, Friendly, "Ohh...", "Thank Flux I didn't bring my mom today.", "Sorry, friend. I'll be back tomorrow.");
+            b.Add(sleeper, Nasty, Friendly, "Don't worry, friend.", "If you were able to whip up magic every day, it might make it boring.");
 
             return b.Specs;
         }

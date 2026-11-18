@@ -13,57 +13,57 @@ MonoBehaviour:
   m_Name: Sleeper - WrongOrderTasty - Stranger - O1
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: b8b696c4-ef83-43a1-8d0e-f21f7aca3422
+  - guid: 972e76be-b84d-4914-9f5c-8c0e747e75f2
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 05c78293-a82c-4217-8388-561d6f30ad7f
+  - guid: 29a0bd2e-6595-4744-ac96-ad42aa938cc4
     kind: 0
     line:
       text: Wow...
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: b2a13d29-495b-4c42-a914-3f0759248547
+  - guid: e8deff5b-14a6-4e15-ab06-16ac833256f2
     kind: 0
     line:
       text: That kinda tastes, man.
       delaySeconds: 1.2
     editorPosition: {x: 520, y: 0}
-  - guid: 7d3f72dc-bff0-498f-be3d-85320b2ba135
+  - guid: 57eba7c4-604f-405c-9584-2e47156f3b16
     kind: 0
     line:
       text: Is this why people come here?
       delaySeconds: 1.8
     editorPosition: {x: 780, y: 0}
-  - guid: 6f6fe168-1a97-4edb-97f1-05dffd68145f
+  - guid: 3a8d8e97-302a-4591-ac1d-92d311ae1472
     kind: 0
     line:
       text: Ohh... I'll be back!
       delaySeconds: 2
     editorPosition: {x: 1040, y: 0}
-  - guid: 80764d85-ac25-4825-ba4b-2a113fcfdd9e
+  - guid: 1ac3509e-afb6-4e22-a92e-369c6cecfb7d
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 1300, y: 0}
   edges:
-  - fromNodeGuid: b8b696c4-ef83-43a1-8d0e-f21f7aca3422
+  - fromNodeGuid: 972e76be-b84d-4914-9f5c-8c0e747e75f2
     fromOptionGuid: 
-    toNodeGuid: 05c78293-a82c-4217-8388-561d6f30ad7f
-  - fromNodeGuid: 05c78293-a82c-4217-8388-561d6f30ad7f
+    toNodeGuid: 29a0bd2e-6595-4744-ac96-ad42aa938cc4
+  - fromNodeGuid: 29a0bd2e-6595-4744-ac96-ad42aa938cc4
     fromOptionGuid: 
-    toNodeGuid: b2a13d29-495b-4c42-a914-3f0759248547
-  - fromNodeGuid: b2a13d29-495b-4c42-a914-3f0759248547
+    toNodeGuid: e8deff5b-14a6-4e15-ab06-16ac833256f2
+  - fromNodeGuid: e8deff5b-14a6-4e15-ab06-16ac833256f2
     fromOptionGuid: 
-    toNodeGuid: 7d3f72dc-bff0-498f-be3d-85320b2ba135
-  - fromNodeGuid: 7d3f72dc-bff0-498f-be3d-85320b2ba135
+    toNodeGuid: 57eba7c4-604f-405c-9584-2e47156f3b16
+  - fromNodeGuid: 57eba7c4-604f-405c-9584-2e47156f3b16
     fromOptionGuid: 
-    toNodeGuid: 6f6fe168-1a97-4edb-97f1-05dffd68145f
-  - fromNodeGuid: 6f6fe168-1a97-4edb-97f1-05dffd68145f
+    toNodeGuid: 3a8d8e97-302a-4591-ac1d-92d311ae1472
+  - fromNodeGuid: 3a8d8e97-302a-4591-ac1d-92d311ae1472
     fromOptionGuid: 
-    toNodeGuid: 80764d85-ac25-4825-ba4b-2a113fcfdd9e
+    toNodeGuid: 1ac3509e-afb6-4e22-a92e-369c6cecfb7d
   isOneShot: 0
   payload: 

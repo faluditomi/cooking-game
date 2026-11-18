@@ -13,39 +13,39 @@ MonoBehaviour:
   m_Name: Sleeper - Order - Stranger - O3
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: cc856a20-78ae-4536-95e9-7299977cd5ef
+  - guid: fc5d65c1-4a0c-446a-b938-8a5282886822
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: e81fbd7d-a1e5-4c58-9da1-ba8dd08979af
+  - guid: 43873711-2194-4d56-b44b-343a7dc83843
     kind: 0
     line:
       text: Hi, again.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: 2d6ca13a-6ebe-4860-9b02-c31e20b2639a
+  - guid: 65b5bca0-8f68-4f90-86cb-778f69e7de66
     kind: 0
     line:
       text: I'll take an MSG2 cube, please.
       delaySeconds: 1.4
     editorPosition: {x: 520, y: 0}
-  - guid: 247b99b9-c130-4053-9f3b-8e7212c1108b
+  - guid: aad8e4d5-6ecd-4f91-bf38-30a1240bb874
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 780, y: 0}
   edges:
-  - fromNodeGuid: cc856a20-78ae-4536-95e9-7299977cd5ef
+  - fromNodeGuid: fc5d65c1-4a0c-446a-b938-8a5282886822
     fromOptionGuid: 
-    toNodeGuid: e81fbd7d-a1e5-4c58-9da1-ba8dd08979af
-  - fromNodeGuid: e81fbd7d-a1e5-4c58-9da1-ba8dd08979af
+    toNodeGuid: 43873711-2194-4d56-b44b-343a7dc83843
+  - fromNodeGuid: 43873711-2194-4d56-b44b-343a7dc83843
     fromOptionGuid: 
-    toNodeGuid: 2d6ca13a-6ebe-4860-9b02-c31e20b2639a
-  - fromNodeGuid: 2d6ca13a-6ebe-4860-9b02-c31e20b2639a
+    toNodeGuid: 65b5bca0-8f68-4f90-86cb-778f69e7de66
+  - fromNodeGuid: 65b5bca0-8f68-4f90-86cb-778f69e7de66
     fromOptionGuid: 
-    toNodeGuid: 247b99b9-c130-4053-9f3b-8e7212c1108b
+    toNodeGuid: aad8e4d5-6ecd-4f91-bf38-30a1240bb874
   isOneShot: 1
   payload: MSG2 cube

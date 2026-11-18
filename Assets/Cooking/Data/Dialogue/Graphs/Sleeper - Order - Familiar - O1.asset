@@ -13,57 +13,57 @@ MonoBehaviour:
   m_Name: Sleeper - Order - Familiar - O1
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: f34154ee-ad2c-4edc-9e67-dec95971f312
+  - guid: 4a8ef257-e8ef-4542-8a8b-aa5e8bbd9f2a
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 520404ba-56cd-4650-9eca-e23784b77b82
+  - guid: 8922d5fc-95ba-4152-a705-8eeb53850175
     kind: 0
     line:
       text: Hey, man.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: 4be59e60-95b7-4ecf-b9c5-30b6c4b73a95
+  - guid: c73e7b12-ca0e-4044-ac86-d84eb59f6a8f
     kind: 0
     line:
       text: Can I please get the [liked meal]?
       delaySeconds: 1.3
     editorPosition: {x: 520, y: 0}
-  - guid: dbf99d5e-5c76-4e3e-b707-603ea4f234e7
+  - guid: 6821ac7c-ec92-47cb-a046-4e7003c0203c
     kind: 0
     line:
       text: Or whatever else you may cook up.
       delaySeconds: 2.2
     editorPosition: {x: 780, y: 0}
-  - guid: 5928cd15-f02b-4e7d-985f-b7e01a545944
+  - guid: 06666382-18b4-4c74-9754-46f9712cf75f
     kind: 0
     line:
       text: I want your tastiest tastes, all in my mouth.
       delaySeconds: 2.2
     editorPosition: {x: 1040, y: 0}
-  - guid: bbd4155f-ebff-4197-b1f0-b63689242187
+  - guid: ae5a2afa-bd09-4d61-bdad-d7a783b01412
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 1300, y: 0}
   edges:
-  - fromNodeGuid: f34154ee-ad2c-4edc-9e67-dec95971f312
+  - fromNodeGuid: 4a8ef257-e8ef-4542-8a8b-aa5e8bbd9f2a
     fromOptionGuid: 
-    toNodeGuid: 520404ba-56cd-4650-9eca-e23784b77b82
-  - fromNodeGuid: 520404ba-56cd-4650-9eca-e23784b77b82
+    toNodeGuid: 8922d5fc-95ba-4152-a705-8eeb53850175
+  - fromNodeGuid: 8922d5fc-95ba-4152-a705-8eeb53850175
     fromOptionGuid: 
-    toNodeGuid: 4be59e60-95b7-4ecf-b9c5-30b6c4b73a95
-  - fromNodeGuid: 4be59e60-95b7-4ecf-b9c5-30b6c4b73a95
+    toNodeGuid: c73e7b12-ca0e-4044-ac86-d84eb59f6a8f
+  - fromNodeGuid: c73e7b12-ca0e-4044-ac86-d84eb59f6a8f
     fromOptionGuid: 
-    toNodeGuid: dbf99d5e-5c76-4e3e-b707-603ea4f234e7
-  - fromNodeGuid: dbf99d5e-5c76-4e3e-b707-603ea4f234e7
+    toNodeGuid: 6821ac7c-ec92-47cb-a046-4e7003c0203c
+  - fromNodeGuid: 6821ac7c-ec92-47cb-a046-4e7003c0203c
     fromOptionGuid: 
-    toNodeGuid: 5928cd15-f02b-4e7d-985f-b7e01a545944
-  - fromNodeGuid: 5928cd15-f02b-4e7d-985f-b7e01a545944
+    toNodeGuid: 06666382-18b4-4c74-9754-46f9712cf75f
+  - fromNodeGuid: 06666382-18b4-4c74-9754-46f9712cf75f
     fromOptionGuid: 
-    toNodeGuid: bbd4155f-ebff-4197-b1f0-b63689242187
+    toNodeGuid: ae5a2afa-bd09-4d61-bdad-d7a783b01412
   isOneShot: 0
   payload: '[liked meal]'

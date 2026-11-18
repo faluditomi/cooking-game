@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Sleeper - WrongOrderNasty - Friendly - O2
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: f90e58b9-2388-4b25-894a-5273f41fe7f4
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: ab1ed166-b9a2-4f7d-bec4-9952e3064153
+    kind: 0
+    line:
+      text: Don't worry, friend.
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: 902d83d2-63de-4bb3-b218-9c69041cf4af
+    kind: 0
+    line:
+      text: If you were able to whip up magic every day, it might make it boring.
+      delaySeconds: 1.7
+    editorPosition: {x: 520, y: 0}
+  - guid: 5fa587f8-f46b-4e2b-a384-13a889a00672
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 780, y: 0}
+  edges:
+  - fromNodeGuid: f90e58b9-2388-4b25-894a-5273f41fe7f4
+    fromOptionGuid: 
+    toNodeGuid: ab1ed166-b9a2-4f7d-bec4-9952e3064153
+  - fromNodeGuid: ab1ed166-b9a2-4f7d-bec4-9952e3064153
+    fromOptionGuid: 
+    toNodeGuid: 902d83d2-63de-4bb3-b218-9c69041cf4af
+  - fromNodeGuid: 902d83d2-63de-4bb3-b218-9c69041cf4af
+    fromOptionGuid: 
+    toNodeGuid: 5fa587f8-f46b-4e2b-a384-13a889a00672
+  isOneShot: 0
+  payload: 
