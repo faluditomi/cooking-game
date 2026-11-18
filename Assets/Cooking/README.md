@@ -136,8 +136,7 @@ The layout follows the "Screen layout mock-up" on the Miro board:
   - **Pantry** (right): your stock (`Inventory`) in four columns, grouped into **Raw**,
     **Prepped** and **Seasoning** under taped paper labels like the stoves' (always there, even
     when a group is empty), with no panel behind it. Each pile shows its pieces (one unit shows one
-    piece). Labels like "x2 Pak Choi" show **only when held** by default; the title screen switches
-    them to **always** (`ingredientLabels`).
+    piece). Labels like "x2 Pak Choi" show **only when held**.
     Holding a pile takes **one** unit. Drop it on a cutting board, the pot, the pan, a plate
     (seasonings only, on a cooked dish) or free desk space. Dropped anywhere else, it goes back.
   - **Desk space**: no grid. Plates and loose ingredients go where you drop them, anywhere in the
@@ -299,18 +298,24 @@ conversation says what to do, and a pulsing outline marks what to use. Each step
 player to actually do it:
 
 1. Welcome: buy in the morning, cook for the regulars, pay the rent; today is practice.
-2. The grocer: click the Soup on the rock bundle, then Buy and start the day.
+2. The grocer: click (or drag) the Soup on the rock bundle, then Buy and start the day.
 3. Petor orders Soup on the rock; the Current Order page and the Menu tab.
-4. Drag a potato from the pantry onto a cutting board, and peel it with the peeler from the roof.
-5. Drag the peeled potato, the soup cube and the salts into the pot (it starts with the first).
-6. Put a clean plate on the desk; when the bar is orange, lift the pot onto it (the spoon holds it there).
-7. Drag the plate to the food delivery spot; the Dish Served page; Continue.
-8. What real days add (every regular, a timer, rent), the pan, favourites and secret cravings.
+4. The order chart: dishes are dots; the order's grey dot, its blue tasty zone, your orange dot,
+   and the ring that previews an ingredient held over the pot.
+5. Drag a potato from the pantry onto a cutting board, and peel it with the peeler from the roof.
+6. Drag the peeled potato, the soup cube and the salts into the pot (it starts with the first).
+7. Put a clean plate on the desk; when the bar is orange, lift the pot onto it (the spoon holds it there).
+8. Drag the plate to the food delivery spot; the Dish Served page; Continue.
+9. What real days add (every regular, a timer, rent), the pan, and the pay rules for a dish that
+   isn't the order: a proper dish (3 ingredients, something cooked) in a tasty zone is paid, in
+   their favourite zone it's tipped; the Flavour Profiles tab and its ticks.
    **Start cycle 1** then begins the real game fresh (starting money, empty pantry, the morning
    shop), so the player plans the shopping and prep for the real day themselves.
 
-A player who gets ahead of the instructions (say, the potato straight into the pot) is caught up to
-where they are. **Skip tutorial** goes straight to cycle 1 from any step; **Play** starts without the
+The tutorial can't be done wrong: a see-through `TutorialBlocker` over the screen lets clicks through
+only on what the step uses (anything else says what to do), anything let go in the wrong place goes
+back where it came from with a hint, the soup cube has to go in first, the pot can only be dished up
+in the orange, and the practice pot never burns (it waits in the orange). **Skip tutorial** goes straight to cycle 1 from any step; **Play** starts without the
 practice day. The order card also says when an ingredient is already in the pot or the pan.
 
 ### Sound (`CookingPrototype.Audio.cs`, `Audio/`)

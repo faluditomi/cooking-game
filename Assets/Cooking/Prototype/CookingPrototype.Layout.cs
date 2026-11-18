@@ -45,9 +45,6 @@ namespace Cooking.Prototype
         [SerializeField] private Sprite plateSprite;
         [SerializeField] private Sprite spoonSprite;
 
-        [Header("Labels")]
-        [Tooltip("Pantry and desk ingredients show \"x2 Pak Choi\" under them. Off: the name shows only above what's held. Also switchable on the title screen.")]
-        [SerializeField] private bool ingredientLabels;
 
         /// <summary>When a warning toast over the desk hides again (unscaled time).</summary>
         private float toastUntil;

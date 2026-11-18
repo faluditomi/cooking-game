@@ -74,13 +74,6 @@ namespace Cooking.Prototype
             UIFactory.Button(startRow, "Play with tutorial", () => StartGame(true), new Color(0.75f, 0.42f, 0.15f, 1f), 30);
             RectTransform playRow = UIFactory.Row(panel, 52f);
             UIFactory.Button(playRow, "Play", () => StartGame(false), null, 24);
-            RectTransform labelsRow = UIFactory.Row(panel, 40f);
-            Button labelsButton = null;
-            labelsButton = UIFactory.Button(labelsRow, LabelsCaption(), () =>
-            {
-                ingredientLabels = !ingredientLabels;
-                UIFactory.SetButtonText(labelsButton, LabelsCaption());
-            }, null, 18);
             RectTransform settingsRow = UIFactory.Row(panel, 44f);
             UIFactory.Button(settingsRow, "Settings", () => OpenSettings(true), null, 20);
 #if !UNITY_WEBGL
@@ -90,12 +83,6 @@ namespace Cooking.Prototype
 #endif
 
             titleOverlay.SetActive(false);
-        }
-
-        /// <summary>The title screen's switch for the ingredient labels in the pantry and on the desk.</summary>
-        private string LabelsCaption()
-        {
-            return "Ingredient labels: " + (ingredientLabels ? "always" : "only when held");
         }
     }
 }
