@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce3b2af0cee65f04b8b8553a214d35ac, type: 3}
+  m_Name: Umami Bomb
+  m_EditorClassIdentifier: Cooking.Runtime::Cooking.FlavourZone
+  displayName: Umami Bomb
+  color: {r: 0.75, g: 0.35, b: 0.55, a: 1}
+  description: Savoury turned all the way up. MSG2's natural habitat.
+  min:
+    savoury: 0
+    salty: 0
+    sweet: 0
+    bitter: 0
+    sour: 0
+    pain: 0
+    nutrition: 0
+    texture: 0
+  max:
+    savoury: 10
+    salty: 10
+    sweet: 10
+    bitter: 10
+    sour: 10
+    pain: 10
+    nutrition: 10
+    texture: 10
+  chartAxis: 0.1
+  chartSpread: 0.5
+  chartInner: 0.82
+  chartOuter: 0.97

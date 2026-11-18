@@ -51,11 +51,21 @@ namespace Cooking.Prototype
         {
             if(plateRadar == null) return;
 
+            plateRadar.ClearProfiles();
+
+            // Only while someone is waiting on an order: once it's served (or the day is over) the
+            // radar is clear again.
+            if(phase != Phase.Service || customer == null || !orderIn)
+            {
+                hoverDish = null;
+                hoverTarget = null;
+                return;
+            }
+
             List<IngredientPortion> dish = DishSoFar();
-            bool target = orderIn && orderKnown && order != null;
+            bool target = orderKnown && order != null;
 
             // Dots: the order is where to aim, the dish is where you are, the ring is where you'd go.
-            plateRadar.ClearProfiles();
             if(target) plateRadar.AddDot(orderProfile, OrderGrey);
             // Grey until it's a proper dish (enough ingredients, something cooked): only then can it count.
             int needed = DishJudge.Settings.Default.MinIngredients;

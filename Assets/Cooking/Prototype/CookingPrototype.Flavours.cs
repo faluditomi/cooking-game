@@ -50,7 +50,7 @@ namespace Cooking.Prototype
             foreach(FlavourZone zone in zones)
             {
                 if(zone == null) continue;
-                tasteProfiles.Add(new TasteProfile { Zone = zone, Name = zone.DisplayName, Color = TastePalette[tasteProfiles.Count % TastePalette.Length] });
+                tasteProfiles.Add(new TasteProfile { Zone = zone, Name = zone.DisplayName, Color = zone.Color });
             }
         }
 
