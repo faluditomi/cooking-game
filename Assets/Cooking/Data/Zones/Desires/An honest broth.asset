@@ -33,3 +33,7 @@ MonoBehaviour:
     pain: 0.8
     nutrition: 7.5
     texture: 3.5
+  chartAxis: 6.7
+  chartSpread: 0.25
+  chartInner: 0.22
+  chartOuter: 0.42

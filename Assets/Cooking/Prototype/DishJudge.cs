@@ -42,6 +42,11 @@ namespace Cooking.Prototype
         public bool SameZone;
         /// <summary>It lands in the customer's own favourite flavour (their secret desire zone): they tip.</summary>
         public bool Favourite;
+        /// <summary>
+        /// A proper dish: enough different ingredients and something cooked. Only a proper dish can be
+        /// tasty, their favourite or their dream (so a single raw mushroom can't land in a zone and pass).
+        /// </summary>
+        public bool Proper;
         /// <summary>Paid in full only because they don't know good food from bad yet (see <see cref="DishJudge.PayInFull"/>).</summary>
         public bool PaidAnyway;
 
@@ -55,9 +60,9 @@ namespace Cooking.Prototype
     /// <item>Their dream meal (deep in their favourite flavour, with what it needs): paid and tipped generously.</item>
     /// <item>The exact order: full price, plus a tip if it's also in their favourite flavour.</item>
     /// <item>Not the order, but in their favourite flavour: full price and a tip.</item>
-    /// <item>Not the order, but in a basic tasty zone or tasting close to the order: full price, no tip.</item>
-    /// <item>Otherwise, how close it is to the order (<see cref="DishSimilarity"/>): very close and close
-    /// enough pay part of the price, anything further isn't paid for.</item>
+    /// <item>Not the order, but in a basic tasty zone: full price, no tip.</item>
+    /// <item>Anything else: not paid. (How similar it is to the order, <see cref="DishSimilarity"/>, is
+    /// still worked out for the report, but it doesn't pay.)</item>
     /// </list>
     /// </summary>
     public static class DishJudge
@@ -83,8 +88,8 @@ namespace Cooking.Prototype
             public float ZoneAt;
             /// <summary>Score against their favourite that, with what it needs, makes it their dream meal.</summary>
             public float DreamAt;
-            /// <summary>Flavour similarity to the order (0..1) at which a different dish still tastes like what they wanted: liked and paid in full.</summary>
-            public float LikeFlavourAt;
+            /// <summary>Different ingredients a dish needs before it can count as tasty (and something cooked).</summary>
+            public int MinIngredients;
 
             public static Settings Default => new Settings
             {
@@ -97,9 +102,9 @@ namespace Cooking.Prototype
                 CloseEnoughPay = 0.6f,
                 DreamTip = 1f,
                 FavouriteTip = 0.3f,
-                ZoneAt = 0.75f,
-                DreamAt = 0.85f,
-                LikeFlavourAt = 0.5f,
+                ZoneAt = 1f,
+                DreamAt = 1f,
+                MinIngredients = 3,
             };
         }
 
@@ -133,10 +138,11 @@ namespace Cooking.Prototype
 
             if(!HasFood(dish)) return result;
 
-            result.Favourite = result.DesireScore >= settings.ZoneAt && WellCooked(dish);
+            result.Proper = IsProperDish(dish, settings.MinIngredients);
+            result.Favourite = result.Proper && result.DesireScore >= settings.ZoneAt && WellCooked(dish);
 
             // Their dream meal wins over anything they'd otherwise refuse.
-            if(result.DesireScore >= settings.DreamAt && HasAll(dish, customer.dreamNeeds))
+            if(result.Proper && result.DesireScore >= settings.DreamAt && HasAll(dish, customer.dreamNeeds))
             {
                 result.Favourite = true;
                 result.Verdict = Verdict.DreamMeal;
@@ -165,23 +171,14 @@ namespace Cooking.Prototype
                 result.PayShare = 1f;
                 result.Tip = result.Price * settings.FavouriteTip;
             }
-            else if((InTastyZone(result, settings) || (order != null && result.Similarity.Flavour >= settings.LikeFlavourAt)) && WellCooked(dish))
+            else if(result.Proper && InTastyZone(result, settings) && WellCooked(dish))
             {
-                // Not the order, but tasty (any basic desirable zone, or close to how the order tastes): paid in full, no tip.
+                // Not the order, but tasty (its dot is in a tasty zone): paid in full, no tip.
                 result.Verdict = Verdict.VeryClose;
                 result.SameZone = true;
                 result.PayShare = 1f;
             }
-            else if(result.Similarity.Combined >= settings.VeryCloseAt)
-            {
-                result.Verdict = Verdict.VeryClose;
-                result.PayShare = settings.VeryClosePay;
-            }
-            else if(result.Similarity.Combined >= settings.CloseEnoughAt)
-            {
-                result.Verdict = Verdict.CloseEnough;
-                result.PayShare = settings.CloseEnoughPay;
-            }
+            // Anything else isn't paid for: no part-payment for a near miss.
 
             result.Payment = result.Price * result.PayShare;
             return result;
@@ -220,7 +217,28 @@ namespace Cooking.Prototype
         /// <summary>A flavour inside one of the basic tasty zones (forgivingly: near the edge counts).</summary>
         public static bool IsTasty(JudgeResult result)
         {
-            return result.BestZone.Zone != null && result.BestZone.Score >= Settings.Default.ZoneAt;
+            return result.Proper && result.BestZone.Zone != null && result.BestZone.Score >= Settings.Default.ZoneAt;
+        }
+
+        /// <summary>
+        /// At least <paramref name="minIngredients"/> different ingredients, and at least one of them
+        /// cooked: something that can be called a dish, rather than a lone ingredient.
+        /// </summary>
+        public static bool IsProperDish(IReadOnlyList<IngredientPortion> dish, int minIngredients)
+        {
+            if(dish == null) return false;
+
+            List<IngredientDefinition> kinds = new List<IngredientDefinition>();
+            bool cooked = false;
+
+            foreach(IngredientPortion portion in dish)
+            {
+                if(portion == null || !portion.IsValid) continue;
+                if(!kinds.Contains(portion.ingredient)) kinds.Add(portion.ingredient);
+                cooked |= !portion.IsRaw;
+            }
+
+            return cooked && kinds.Count >= minIngredients;
         }
 
         private static bool HasFood(IReadOnlyList<IngredientPortion> dish)

@@ -54,8 +54,10 @@ namespace Cooking.Prototype
                 bookSteps.text = Report(entry);
 
                 bookRadarHeader.text = "FLAVOUR PROFILE";
-                if(entry.OrderKnown) bookRadar.AddProfile(entry.OrderedFlavour, new Color(0.6f, 0.6f, 0.6f, 0.8f), false);
-                bookRadar.AddProfile(entry.Flavour, new Color(0.95f, 0.55f, 0.2f, 1f), true);
+                FlavourZone landed = zones.Find(z => z != null && z.DisplayName == entry.BestZone);
+                if(landed != null && FlavourEvaluator.Score(entry.Flavour, landed, Falloff) >= DishJudge.Settings.Default.ZoneAt) bookRadar.AddZone(landed, TastyZoneBlue);
+                if(entry.OrderKnown) bookRadar.AddDot(entry.OrderedFlavour, OrderGrey);
+                bookRadar.AddDot(entry.Flavour, UIFactory.Accent);
             }
 
             RefreshHistorySave(selectedEntry);

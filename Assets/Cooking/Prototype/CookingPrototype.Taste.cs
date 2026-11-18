@@ -4,16 +4,18 @@ using UnityEngine;
 namespace Cooking.Prototype
 {
     /// <summary>
-    /// The Current Order radar as a cooking tool. It shows the order's taste (grey) and the tasty zone
-    /// it belongs to (blue) as the target, and the dish as it builds up (orange): what's on the plate
-    /// plus what's in the pot and pan, as they'll taste once cooked. While an ingredient is held over
-    /// the pot, the pan or a plate, a dotted shape shows where the dish would go if it were dropped
-    /// there.
+    /// The Current Order radar as a cooking tool. Dishes are dots (the centre of their shape on the
+    /// chart). It shows the order (a grey dot) and the tasty zone it belongs to (blue) as the target,
+    /// and the dish as it builds up (an orange dot): what's on the plate plus what's in the pot and
+    /// pan, as they'll taste once cooked. While an ingredient is held over the pot, the pan or a
+    /// plate, a dashed ring shows where the dot would move if it were dropped there.
     /// </summary>
     public partial class CookingPrototype
     {
         private static readonly Color OrderGrey = new Color(0.85f, 0.85f, 0.85f, 0.75f);
         private static readonly Color PreviewColor = new Color(1f, 0.85f, 0.6f, 0.95f);
+        /// <summary>A dish too simple to count yet.</summary>
+        private static readonly Color SimpleGrey = new Color(0.55f, 0.55f, 0.58f, 1f);
 
         /// <summary>The held ingredient's would-be dish, while it's over the pot, the pan or a plate; null otherwise.</summary>
         private List<IngredientPortion> hoverDish;
@@ -52,10 +54,13 @@ namespace Cooking.Prototype
             List<IngredientPortion> dish = DishSoFar();
             bool target = orderIn && orderKnown && order != null;
 
+            // Dots: the order is where to aim, the dish is where you are, the ring is where you'd go.
             plateRadar.ClearProfiles();
-            if(target) plateRadar.AddProfile(orderProfile, OrderGrey, false);
-            if(dish.Count > 0) plateRadar.AddProfile(FlavourCalculator.Calculate(dish, rules), UIFactory.Accent, true);
-            if(hoverDish != null) plateRadar.AddProfile(FlavourCalculator.Calculate(hoverDish, rules), PreviewColor, false, true);
+            if(target) plateRadar.AddDot(orderProfile, OrderGrey);
+            // Grey until it's a proper dish (enough ingredients, something cooked): only then can it count.
+            int needed = DishJudge.Settings.Default.MinIngredients;
+            if(dish.Count > 0) plateRadar.AddDot(FlavourCalculator.Calculate(dish, rules), DishJudge.IsProperDish(dish, needed) ? UIFactory.Accent : SimpleGrey);
+            if(hoverDish != null) plateRadar.AddDot(FlavourCalculator.Calculate(hoverDish, rules), DishJudge.IsProperDish(hoverDish, needed) ? PreviewColor : SimpleGrey, true);
         }
 
         /// <summary>

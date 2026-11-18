@@ -75,16 +75,18 @@ customer/judging system, not here.
 
 All values are **placeholders** tuned so the Notion recipes behave sensibly:
 
-| Recipe | Lands in |
-|---|---|
-| MSBeef fried rice | Greasy Comfort |
-| Calorice | between Greasy Comfort and Hearty Broth (bland, on purpose) |
-| Hellchick noodles | Fire Bowl |
-| Mushroom soup | Hearty Broth |
-| Synthetic soup | near Hearty Broth |
-| Soup on the rock | **no zone**: salty 8.2. Lower its salt or accept it as a rough dish. |
-| Sweet & sour tofu soup | Sweet & Sour only (Hera's dream is now a beef version, see below) |
-| Burnt or raw dishes | no zone |
+Zones are shapes on the radar, and a dish is judged by where its **dot** lands (see "Dishes as
+dots" below). The four tasty zones are fitted around the menu, one dish family each:
+
+| Zone | Where on the chart | Menu dishes in it |
+|---|---|---|
+| Greasy Comfort | outer band on the nutrition-crunch side | Calorice, MSBeef noodles |
+| Hearty Broth | inner band on the same side | Mushroom soup, Synthetic soup |
+| Fire Bowl | towards pain | Hellspawn fried rice |
+| Briny Broth | towards salty | Soup on the rock |
+
+A raw potato or a lone MSG2 cube lands in none of them; each regular's dream dish lands in their
+own favourite (Hera's in the middle, Petor's near Hearty Broth, the Sleeper's inside Fire Bowl).
 
 ## Cooking prototype (`Prototype/`)
 
@@ -245,18 +247,32 @@ units per prep state ("3× Onion raw", "2× Onion peeled, sliced").
 - **Tastes and tips** (demo changes): see the verdict table below. In short, a correct order pays
   50% more than before (`margin` 2.4); a dish that isn't the order but lands in a basic tasty zone
   is paid in full without a tip; one in the customer's own favourite flavour is paid in full and
-  tipped. The tasty zones were narrowed (about half as wide, so they're harder to hit and overlap
-  less), with `ZoneAt` 0.75 of the zone score and `zoneFalloff` 2.
+  tipped. Anything else isn't paid: no part-payment for a near miss.
+- **Dishes as dots** (`FlavourDot`): on every radar a dish (and an order) is one dot, the centre
+  of what stands out in its shape: each flavour minus the dish's own average (nearly every
+  ingredient adds nutrition and crunch, so a plain centre puts every dish in one corner), averaged
+  over the chart's corners and magnified (`Gain`) to use the chart. Zones are wedges on the chart
+  (`FlavourZone` "On the chart": direction, width, inner and outer edge). **A dish is tasty when
+  its dot is inside a tasty zone's wedge, and in their favourite when it's inside the customer's
+  wedge**: exactly what the radar shows. A zone without a chart shape falls back to its per-axis
+  min/max (the tests use those).
+- **Only a proper dish counts** (`DishJudge.IsProperDish`, `MinIngredients` 3): to be tasty, their
+  favourite or their dream, a dish needs at least 3 different ingredients and something cooked, so
+  a lone ingredient can't land in a zone and get paid. The exact order is always paid (the
+  Sleeper's raw potato). Until a dish is proper its dot is grey on the radar, and the Dish Served
+  page says why it didn't count.
 - **Cooking by taste** (`CookingPrototype.Taste.cs`): the Current Order radar is the guide while
-  you cook. It shows the order's taste (grey) and the tasty zone it belongs to (blue) as the
-  target, and the dish as it builds up (orange): the plate you're working on plus the pot and pan,
+  you cook. It shows the order (a grey dot) and the tasty zone it belongs to (blue) as the target,
+  and the dish as it builds up (an orange dot): the plate you're working on plus the pot and pan,
   as they'll taste once cooked (burnt once they're in the red). Holding an ingredient over the pot,
-  the pan or a plate shows a dotted shape: where the dish would go if you dropped it.
+  the pan or a plate shows a dashed ring: where the dot would move if you dropped it.
 - **Prepped ingredients look prepped** (`PrepSprites`): made from the ingredient's own picture the
   first time it's needed. Peeled is paler, sliced is three outlined slices with pale cut faces,
   grated is a heap of shreds; peeled and sliced (or grated) combine. Used in the pantry, on the
   boards, the desk, in hand, in the pot and pan, and in dish pictures.
-- **Dish Served radar**: the dish and the order's outline (grey) when it's a dish you know. No zone.
+- **Dish Served and History radars**: the dish's dot, the order's grey dot when it's a dish you
+  know, and the tasty zone only when the dot actually landed in it. The Menu shows each dish's dot
+  in its zone.
 - **Dish Served headline**: one of three, "Correct order", "Wrong order, but they liked it" or
   "Wrong order and they didn't like it". The tablet doesn't talk about how well a regular knows you.
 - **Orders show when they're said**: the order dialogue is read from its first line, but the
@@ -338,20 +354,17 @@ The code is split by part: `CookingPrototype.cs` (cycle loop, ticket, result and
 |---|---|---|---|---|
 | Dream meal | deep in their favourite flavour (`DreamAt`, 0.85), with everything in `dreamNeeds`. Beats a refusal | price + 100% tip | yes | `DreamOrder` the first time, then `CorrectOrder` |
 | Ordered | `RecipeDefinition.Matches`: same portions, prep and cooking, nothing badly cooked | 100%, + 30% tip in their favourite flavour | yes | `CorrectOrder` |
-| Their taste | not the order, but in their favourite flavour (`ZoneAt`), well cooked | 100% + 30% tip (`FavouriteTip`) | yes | `WrongOrderTasty` |
-| Tasty | not the order, but in a basic tasty zone (`ZoneAt`), or tasting close to the order (flavour similarity ≥ `LikeFlavourAt`, 50%), well cooked | 100%, no tip | yes | `WrongOrderTasty` |
-| Very close | similarity ≥ `veryCloseAt` (70%) | `veryClosePay` (80%) | yes | `WrongOrderTasty` |
-| Close enough | similarity ≥ `closeEnoughAt` (45%) | `closeEnoughPay` (60%) | no | `WrongOrderTasty` |
+| Their taste | not the order, but a proper dish whose dot is in their favourite zone, well cooked | 100% + 30% tip (`FavouriteTip`) | yes | `WrongOrderTasty` |
+| Tasty | not the order, but a proper dish whose dot is in a basic tasty zone, well cooked | 100%, no tip | yes | `WrongOrderTasty` |
 | Refused | contains something they won't eat | nothing | no | `WrongOrderNasty` |
 | Too different | anything else | nothing | no | `WrongOrderNasty` |
 
 **Similarity** (`DishSimilarity`) blends flavour and ingredients, weighted by `flavourWeight` (50/50):
 flavour is 1 at the same point on the radar and 0 at `flavourRange` (6) apart; ingredients counts
 units that went in as written (right ingredient with the wrong prep, cooking or doneness counts
-half), over the larger of ordered and served units, so missing and extra units both cost. As a
-guide with the placeholder data: forgetting the pepper or not grating the MSG2 is very close;
-1 mushroom instead of 3, overcooking or leaving out the tofu is close enough; a burnt fried rice,
-Hellspawn fried rice without chilli, or a different dish isn't paid for. A dish in or close to
+half), over the larger of ordered and served units, so missing and extra units both cost. It's
+still worked out for the history, but no longer pays: a near miss of the order is paid only if its
+dot lands in a tasty zone. A dish in or close to
 their favourite flavour (`CustomerRelationship.CloseToFavourite`) is added to what they like.
 
 Price is the **ordered** dish's ingredient cost × `margin`. The menu follows the Notion menu:

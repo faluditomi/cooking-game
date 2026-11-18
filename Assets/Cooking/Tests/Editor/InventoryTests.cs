@@ -120,9 +120,12 @@ namespace Cooking.Tests
             order.Configure("Sweet thing", "Test", new[] { new IngredientPortion(sweet, 1) });
             DishJudge.Settings settings = DishJudge.Settings.Default;
             settings.Margin = 2f;
+            // Two-ingredient dishes, cooked, are enough to count here.
+            settings.MinIngredients = 2;
 
             JudgeResult withoutBeef = DishJudge.Judge(order, new[] { new IngredientPortion(sweet, 1) }, customer, new[] { zone }, null, settings);
-            JudgeResult withBeef = DishJudge.Judge(order, new[] { new IngredientPortion(sweet, 1), new IngredientPortion(beef, 1) }, customer, new[] { zone }, null, settings);
+            JudgeResult withBeef = DishJudge.Judge(order, new[] { new IngredientPortion(sweet, 1, cooking: CookMethods.Boiled), new IngredientPortion(beef, 1, cooking: CookMethods.Boiled) },
+                customer, new[] { zone }, null, settings);
             JudgeResult beefOnly = DishJudge.Judge(order, new[] { new IngredientPortion(beef, 1) }, customer, new[] { zone }, null, settings);
 
             Assert.AreEqual(Verdict.Ordered, withoutBeef.Verdict, "in the zone but without beef it's just their order");

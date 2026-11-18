@@ -109,10 +109,13 @@ namespace Cooking.Prototype
             // The recipe exactly as the Current Order card writes it.
             bookSteps.text = RecipeLines(recipe);
 
-            // Only the selected dish: no zone bands, so its shape reads at a glance.
+            // The dish's dot, inside the tasty zone it belongs to.
+            FlavourProfile profile = recipe.CalculateProfile(rules);
+            FlavourZoneMatch home = FlavourEvaluator.FindBestZone(profile, zones, Falloff);
             bookRadar.ClearProfiles();
             bookRadar.SetZones(null);
-            bookRadar.AddProfile(recipe.CalculateProfile(rules), new Color(0.95f, 0.55f, 0.2f, 1f), true);
+            if(home.Zone != null && home.Score >= DishJudge.Settings.Default.ZoneAt) bookRadar.AddZone(home.Zone, TastyZoneBlue);
+            bookRadar.AddDot(profile, UIFactory.Accent);
 
             bookDeleteButton.transform.parent.gameObject.SetActive(CanDelete(recipe));
         }
