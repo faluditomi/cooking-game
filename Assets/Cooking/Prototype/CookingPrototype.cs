@@ -423,12 +423,12 @@ namespace Cooking.Prototype
         }
 
         /// <summary>
-        /// After bad food (not paid for, or refused) a regular may stay away for a cycle or two
+        /// After bad food (not paid for) a regular may stay away for a cycle or two
         /// (design doc). They always come back. Someone who doesn't know food yet doesn't mind.
         /// </summary>
         private void MaybeStayAway(JudgeResult result)
         {
-            bool bad = !result.IsPaid || result.Verdict == Verdict.Refused;
+            bool bad = !result.IsPaid;
             if(!bad || result.PaidAnyway || customer == null || random.NextDouble() >= stayAwayChance) return;
 
             int cycles = random.Next(1, 3);
@@ -887,7 +887,7 @@ namespace Cooking.Prototype
             Color color;
             bool liked = change.FirstTaste || (result.IsPaid && !result.PaidAnyway && result.Verdict != Verdict.CloseEnough) || result.Verdict == Verdict.DreamMeal;
 
-            if(result.ExactMatch && result.Verdict != Verdict.Refused)
+            if(result.ExactMatch)
             {
                 title = "Correct order";
                 color = UIFactory.Good;
@@ -903,7 +903,7 @@ namespace Cooking.Prototype
             {
                 title = "Wrong order and they didn't like it";
                 color = UIFactory.Bad;
-                line = result.Verdict == Verdict.Refused ? customer.refusedLine : customer.dislikedLine;
+                line = customer.dislikedLine;
             }
 
             resultTitle.text = title;
@@ -922,7 +922,6 @@ namespace Cooking.Prototype
             if(sb.Length > 0) sb.Append('\n');
             AppendOrderAndReceipt(sb, DishName(order), plate, result.Price, result.Payment + result.Tip, dishCost);
             if(result.Tip > 0f) sb.Append("  <color=#a6a199>(with a $").Append(result.Tip.ToString("0.00")).Append(" tip)</color>\n");
-            if(result.RefusedIngredient != null) sb.Append("\nWon't eat: <color=#e5594d>").Append(result.RefusedIngredient.DisplayName).Append("</color>\n");
             if(!result.ExactMatch && !result.Proper)
             {
                 sb.Append("\n<color=#a6a199>Too simple to count as a dish: it needs at least ").Append(DishJudge.Settings.Default.MinIngredients)

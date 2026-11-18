@@ -248,7 +248,7 @@ units per prep state ("3× Onion raw", "2× Onion peeled, sliced").
 - **Time's up**: when the timer runs out, the customer at the counter still gets their order
   ("Last customer"); nobody else comes. Those who never got there are listed as not making it
   before closing.
-- **Staying away**: after food they didn't pay for (or refused), a regular may skip the next cycle
+- **Staying away**: after food they didn't pay for, a regular may skip the next cycle
   or two (`stayAwayChance`, 50%). They always come back, and someone always turns up. The morning
   list says who's staying away. The Sleeper, paying anyway as a Stranger, doesn't mind.
 - **Dream meal**: once found, it's what they always order.
@@ -375,7 +375,6 @@ The code is split by part: `CookingPrototype.cs` (cycle loop, ticket, result and
 | Ordered | `RecipeDefinition.Matches`: same portions, prep and cooking, nothing badly cooked | 100%, + 30% tip in their favourite flavour | yes | `CorrectOrder` |
 | Their taste | not the order, but a proper dish whose dot is in their favourite zone, well cooked | 100% + 30% tip (`FavouriteTip`) | yes | `WrongOrderTasty` |
 | Tasty | not the order, but a proper dish whose dot is in a basic tasty zone, well cooked | 100%, no tip | yes | `WrongOrderTasty` |
-| Refused | contains something they won't eat | nothing | no | `WrongOrderNasty` |
 | Too different | anything else | nothing | no | `WrongOrderNasty` |
 
 **Similarity** (`DishSimilarity`) blends flavour and ingredients, weighted by `flavourWeight` (50/50):
@@ -392,9 +391,9 @@ and poured into the pan), and Mushroom soup, Synthetic soup and Soup on the rock
 
 Only three regulars come, left to right on the Miro board (Notion demo changes):
 
-- **Hera**: starts out liking MSBeef noodles (Real Beef™ only) and Calorice, and refuses Beef. Her favourite flavour is *Their lost love's soup*, Jessa's sweet and sour beef soup: her dream needs Beef, and wins over the refusal.
+- **Hera**: starts out liking MSBeef noodles (Real Beef™ only) and Calorice. Her favourite flavour is *Their lost love's soup*, Jessa's sweet and sour beef soup: her dream needs Beef.
 - **Sleeper** (Miro board): their initial liked list is empty; every Stranger order is scripted in their dialogue (a potato, a peeled potato, an MSG2 cube, then soup on the rock). The raw "meals" aren't on the menu or in the book (any raw ingredient can go on a clean plate). They don't know food yet, so as a Stranger they pay full price for anything they'll eat (`alwaysPaysAsStranger`). The first dish that actually tastes good makes them Familiar on its own (`firstTasteReplacesLikes`). A secret spice fiend: *Mother's fire*, and the dream dish needs chilli, seaweed noodles and MSG2.
-- **Petor**: refuses synthetic chicken. His favourite is *An honest broth* (filling, a little to chew, a touch sweet). His dialogue column on Miro is still empty, so he has placeholder lines.
+- **Petor**: his favourite is *An honest broth* (filling, a little to chew, a touch sweet). His dialogue column on Miro is still empty, so he has placeholder lines.
 - **Pictures**: all three stand at the counter with their art from the Miro board (`Customer.portrait`, in `Assets/Art Assets/Characters`, trimmed).
 - After their dream dish, their starting liked dishes that don't taste like their favourite are dropped, and their favourite joins the **Flavour Profiles** tab ("Hera's Taste").
 

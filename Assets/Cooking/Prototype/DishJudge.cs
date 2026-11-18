@@ -6,15 +6,13 @@ namespace Cooking.Prototype
     {
         /// <summary>Nothing on the plate, or too different from what they ordered. No pay.</summary>
         Disliked,
-        /// <summary>Contains something they will not eat. No pay.</summary>
-        Refused,
         /// <summary>Exactly what they ordered, cooked right. Full price.</summary>
         Ordered,
         /// <summary>Not exact, but very close to the order. Most of the price, and they're happy.</summary>
         VeryClose,
         /// <summary>Close enough to pay for, but they're lukewarm about it.</summary>
         CloseEnough,
-        /// <summary>Hits their secret desire (with what it needs). Paid and tipped generously, even over a refusal.</summary>
+        /// <summary>Hits their secret desire (with what it needs). Paid and tipped generously.</summary>
         DreamMeal,
     }
 
@@ -29,7 +27,6 @@ namespace Cooking.Prototype
         public FlavourZoneMatch BestZone;
         /// <summary>Score against the customer's secret desire, or -1 when they have none.</summary>
         public float DesireScore;
-        public IngredientDefinition RefusedIngredient;
         /// <summary>Menu price of the ordered dish.</summary>
         public float Price;
         /// <summary>Share of <see cref="Price"/> they pay for this tier (0..1).</summary>
@@ -147,7 +144,7 @@ namespace Cooking.Prototype
             result.Proper = IsProperDish(dish, settings.MinIngredients, PreppedNeeded(customer, settings));
             result.Favourite = result.Proper && result.DesireScore >= settings.ZoneAt && WellCooked(dish);
 
-            // Their dream meal wins over anything they'd otherwise refuse.
+            // Their dream meal wins over everything else.
             if(result.Proper && result.DesireScore >= settings.DreamAt && HasAll(dish, customer.dreamNeeds))
             {
                 result.Favourite = true;
@@ -158,13 +155,7 @@ namespace Cooking.Prototype
                 return result;
             }
 
-            result.RefusedIngredient = FindRefused(dish, customer);
-
-            if(result.RefusedIngredient != null)
-            {
-                result.Verdict = Verdict.Refused;
-            }
-            else if(result.ExactMatch)
+            if(result.ExactMatch)
             {
                 result.Verdict = Verdict.Ordered;
                 result.PayShare = 1f;
@@ -191,12 +182,12 @@ namespace Cooking.Prototype
         }
 
         /// <summary>
-        /// Full price for anything they'll eat (not a refusal), for a customer who can't tell good
+        /// Full price for anything they're served, for a customer who can't tell good
         /// food from bad yet. What they thought of it (the verdict) stays as it was.
         /// </summary>
         public static JudgeResult PayInFull(JudgeResult result)
         {
-            if(result.Verdict == Verdict.Refused || result.PayShare >= 1f) return result;
+            if(result.PayShare >= 1f) return result;
 
             result.PayShare = 1f;
             result.Payment = result.Price;
@@ -287,19 +278,6 @@ namespace Cooking.Prototype
             }
 
             return true;
-        }
-
-        private static IngredientDefinition FindRefused(IReadOnlyList<IngredientPortion> dish, Customer customer)
-        {
-            if(customer == null || customer.refuses == null || customer.refuses.Count == 0) return null;
-
-            for(int i = 0; i < dish.Count; i++)
-            {
-                IngredientPortion portion = dish[i];
-                if(portion != null && portion.IsValid && customer.refuses.Contains(portion.ingredient)) return portion.ingredient;
-            }
-
-            return null;
         }
     }
 }
