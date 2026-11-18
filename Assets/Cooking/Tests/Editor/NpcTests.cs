@@ -128,9 +128,6 @@ namespace Cooking.Tests
             Assert.IsTrue(paid.PaidAnyway);
             Assert.IsFalse(paid.IsLiked);
 
-            JudgeResult refused = DishJudge.PayInFull(new JudgeResult { Verdict = Verdict.Refused, Price = 4f });
-            Assert.AreEqual(0f, refused.Payment);
-            Assert.IsFalse(refused.PaidAnyway);
         }
 
         [Test]
@@ -154,7 +151,6 @@ namespace Cooking.Tests
 
             relationship.Record(Result(Verdict.Disliked), new List<IngredientPortion>());
             relationship.Record(Result(Verdict.CloseEnough), new List<IngredientPortion>());
-            relationship.Record(Result(Verdict.Refused), new List<IngredientPortion>());
 
             Assert.AreEqual(0, relationship.LikedCount);
             Assert.AreEqual(NpcStage.Stranger, relationship.Stage);
@@ -270,7 +266,6 @@ namespace Cooking.Tests
             Assert.AreEqual(DialogueEventType.WrongOrderTasty, CustomerDialogue.EventFor(Result(Verdict.VeryClose)));
             Assert.AreEqual(DialogueEventType.WrongOrderTasty, CustomerDialogue.EventFor(Result(Verdict.CloseEnough)));
             Assert.AreEqual(DialogueEventType.WrongOrderNasty, CustomerDialogue.EventFor(Result(Verdict.Disliked)));
-            Assert.AreEqual(DialogueEventType.WrongOrderNasty, CustomerDialogue.EventFor(Result(Verdict.Refused)));
             Assert.AreEqual(DialogueEventType.DreamOrder, CustomerDialogue.EventFor(Result(Verdict.DreamMeal)));
             Assert.AreEqual(DialogueEventType.CorrectOrder, CustomerDialogue.EventFor(Result(Verdict.DreamMeal), firstDream: false));
         }

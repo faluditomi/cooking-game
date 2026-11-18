@@ -484,19 +484,6 @@ namespace Cooking.Tests
         }
 
         [Test]
-        public void Judge_RefusedIngredient_IsNeverPaid()
-        {
-            JudgeFixture f = Fixture();
-            Customer customer = new Customer { refuses = new List<IngredientDefinition> { f.Salty } };
-
-            JudgeResult result = DishJudge.Judge(f.Order, f.Order.CreatePerfectPortions(), customer, f.Zones, null, Settings);
-
-            Assert.AreEqual(Verdict.Refused, result.Verdict);
-            Assert.AreSame(f.Salty, result.RefusedIngredient);
-            Assert.IsFalse(result.IsPaid);
-        }
-
-        [Test]
         public void Judge_EmptyPlate_IsDisliked()
         {
             JudgeFixture f = Fixture();

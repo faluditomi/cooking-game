@@ -145,7 +145,7 @@ namespace Cooking.Prototype
                 // dish makes them Familiar.
                 bool firstLike = FindMatch(Customer.orders, served) != null;
 
-                if(!firstLike && result.Verdict != Verdict.Refused && TastesGood(result))
+                if(!firstLike && TastesGood(result))
                 {
                     HasTasted = true;
                     LikedCount++;

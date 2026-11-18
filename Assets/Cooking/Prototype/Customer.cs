@@ -5,7 +5,7 @@ using UnityEngine.Serialization;
 
 namespace Cooking.Prototype
 {
-    /// <summary>An Eyesider who comes to the stall: what they order, what they refuse, and what they secretly crave.</summary>
+    /// <summary>An Eyesider who comes to the stall: what they order and what they secretly crave.</summary>
     [Serializable]
     public class Customer
     {
@@ -27,10 +27,8 @@ namespace Cooking.Prototype
         public Sprite portrait;
         [Tooltip("Hitting this zone is their dream meal. Optional.")]
         public FlavourZone secretDesire;
-        [Tooltip("The dream meal also needs all of these on the plate. They win over refusals: a dream meal is eaten even with something they'd otherwise refuse.")]
+        [Tooltip("The dream meal also needs all of these on the plate.")]
         public List<IngredientDefinition> dreamNeeds = new List<IngredientDefinition>();
-        [Tooltip("They refuse any dish containing these (unless it's their dream meal).")]
-        public List<IngredientDefinition> refuses = new List<IngredientDefinition>();
 
         [Header("Timing (seconds)")]
         [Tooltip("They hurry you this long after arriving, and again each time this long passes.")]
@@ -42,7 +40,6 @@ namespace Cooking.Prototype
         public List<string> orderLines = new List<string>();
         public string likedLine = "...";
         public string dislikedLine = "...";
-        public string refusedLine = "I'm not eating that.";
         public string dreamLine = "...oh.";
 
         public string GetOrderLine(RecipeDefinition order, System.Random random)

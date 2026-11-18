@@ -137,7 +137,6 @@ namespace Cooking.Prototype
                 case Verdict.Ordered: return "<color=#73cc73>Correct order</color>";
                 case Verdict.VeryClose: return "<color=#73cc73>Wrong order, good food (liked)</color>";
                 case Verdict.CloseEnough: return "<color=#f28c33>Wrong order, good food</color>";
-                case Verdict.Refused: return "<color=#e5594d>Wrong order, bad food (refused)</color>";
                 default: return "<color=#e5594d>Wrong order, bad food</color>";
             }
         }

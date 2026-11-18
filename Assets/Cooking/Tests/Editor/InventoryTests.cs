@@ -101,7 +101,7 @@ namespace Cooking.Tests
         }
 
         [Test]
-        public void DreamMeal_NeedsItsIngredient_AndBeatsARefusal()
+        public void DreamMeal_NeedsItsIngredient()
         {
             IngredientDefinition sweet = Ingredient("Sweet", new FlavourProfile { sweet = 8f }, price: 2f);
             IngredientDefinition beef = Ingredient("Beef", FlavourProfile.Zero, price: 1f);
@@ -112,7 +112,6 @@ namespace Cooking.Tests
             {
                 secretDesire = zone,
                 dreamNeeds = new List<IngredientDefinition> { beef },
-                refuses = new List<IngredientDefinition> { beef },
             };
 
             RecipeDefinition order = ScriptableObject.CreateInstance<RecipeDefinition>();
@@ -127,13 +126,11 @@ namespace Cooking.Tests
             JudgeResult withoutBeef = DishJudge.Judge(order, new[] { new IngredientPortion(sweet, 1) }, customer, new[] { zone }, null, settings);
             JudgeResult withBeef = DishJudge.Judge(order, new[] { new IngredientPortion(sweet, 1, cooking: CookMethods.Boiled), new IngredientPortion(beef, 1, cooking: CookMethods.Boiled) },
                 customer, new[] { zone }, null, settings);
-            JudgeResult beefOnly = DishJudge.Judge(order, new[] { new IngredientPortion(beef, 1) }, customer, new[] { zone }, null, settings);
 
             Assert.AreEqual(Verdict.Ordered, withoutBeef.Verdict, "in the zone but without beef it's just their order");
-            Assert.AreEqual(Verdict.DreamMeal, withBeef.Verdict, "the dream meal wins over refusing beef");
+            Assert.AreEqual(Verdict.DreamMeal, withBeef.Verdict, "with beef it's their dream meal");
             Assert.Greater(withBeef.Tip, 0f);
             Assert.IsTrue(withBeef.IsLiked);
-            Assert.AreEqual(Verdict.Refused, beefOnly.Verdict, "outside the dream they still refuse beef");
         }
     }
 }
