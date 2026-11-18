@@ -4,9 +4,9 @@ using UnityEngine;
 namespace Cooking.Prototype
 {
     /// <summary>
-    /// Sound effects and the market ambience (the music is coming separately). The clips are made by
-    /// Assets/Cooking/Audio/Source/synth_sounds.py and assigned by Custom Tools → Cooking Prototype →
-    /// Assign Sounds. One-shots play from a small pool of sources with a little pitch variation; the
+    /// Sound effects, the market ambience and the music ("Hunger", Audio/Music). The effects are made by
+    /// Assets/Cooking/Audio/Source/synth_sounds.py; Custom Tools → Cooking Prototype → Assign Sounds
+    /// puts them and the music on the prototype. One-shots play from a small pool of sources with a little pitch variation; the
     /// sizzle and boil loops follow the pan and pot, and the ambience runs all the time.
     /// </summary>
     public partial class CookingPrototype
@@ -45,7 +45,7 @@ namespace Cooking.Prototype
         [SerializeField, Range(0f, 1f)] private float ambienceVolume = 0.35f;
         [Tooltip("The pan's sizzle and the pot's bubbling, at full.")]
         [SerializeField, Range(0f, 1f)] private float cookingVolume = 0.45f;
-        [Tooltip("The game's music, looping. Empty until the track is in.")]
+        [Tooltip("The game's music, looping (Audio/Music/hunger.wav).")]
         [SerializeField] private AudioClip music;
         [SerializeField, Range(0f, 1f)] private float musicVolume = 0.6f;
 
@@ -64,6 +64,11 @@ namespace Cooking.Prototype
         public void SetSounds(SoundSet set)
         {
             sounds = set;
+        }
+
+        public void SetMusic(AudioClip clip)
+        {
+            music = clip;
         }
 
         private void InitAudio()

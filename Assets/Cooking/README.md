@@ -324,7 +324,8 @@ practice day. The order card also says when an ingredient is already in the pot 
 
 ### Sound (`CookingPrototype.Audio.cs`, `Audio/`)
 
-Sound effects and a market ambience; the music is coming separately. Every clip is synthesized from
+Sound effects, a market ambience and the music: **"Hunger"** (`Audio/Music/hunger.wav`, streamed
+and Vorbis-compressed on import), looping from the moment the game starts. Every sound effect is synthesized from
 sine waves and filtered noise by `Audio/Source/synth_sounds.py` (plain Python 3, no packages), so
 there are no samples or licences involved: edit a sound's function there and re-run it to change it.
 **Custom Tools → Cooking Prototype → Assign Sounds** (`SoundSetup.cs`) imports them and puts them on
@@ -427,7 +428,7 @@ Elsewhere (the Dish Served page) the tasty zone is drawn in blue.
 Esc or the **II** button: **Resume**, **Main Menu**, **Settings** and **Quit Game**. Pausing stops
 the game's time (`Time.timeScale`): timers, cooking, customers and dialogue. Settings has the
 **sound effects** and **music** volumes, saved between sessions (`PlayerPrefs`); the title screen
-opens it too. The music clip goes in `music` on the `Cooking Prototype` object when it's ready.
+opens it too. The music is `music` on the `Cooking Prototype` object (Assign Sounds sets it).
 
 ### Regulars and dialogue (`Prototype/Npc/`, `CookingPrototype.Npcs.cs`)
 
