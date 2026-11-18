@@ -16,13 +16,18 @@ namespace Cooking.Prototype
             public FlavourProfile Profile;
             public Color Color;
             public bool Filled;
+            public bool Dashed;
         }
 
         [SerializeField] private float labelMargin = 44f;
         [SerializeField] private int rings = 4;
         [SerializeField] private Color gridColor = new Color(1f, 1f, 1f, 0.14f);
 
+        /// <summary>The desirable zones are drawn in blue unless a colour is given.</summary>
+        public static readonly Color DefaultZoneColor = new Color(0.3f, 0.55f, 0.95f, 1f);
+
         private readonly List<FlavourZone> zones = new List<FlavourZone>();
+        private readonly List<Color> zoneColors = new List<Color>();
         private readonly List<Series> series = new List<Series>();
         private FlavourZone highlighted;
         private Text[] labels;
@@ -33,8 +38,26 @@ namespace Cooking.Prototype
         public void SetZones(IEnumerable<FlavourZone> newZones, FlavourZone highlight = null)
         {
             zones.Clear();
-            if(newZones != null) zones.AddRange(newZones);
+            zoneColors.Clear();
+            if(newZones != null) foreach(FlavourZone zone in newZones) AddZone(zone, DefaultZoneColor);
             highlighted = highlight;
+            SetVerticesDirty();
+        }
+
+        /// <summary>Adds one zone, drawn in <paramref name="zoneColor"/>.</summary>
+        public void AddZone(FlavourZone zone, Color zoneColor)
+        {
+            if(zone == null) return;
+            zones.Add(zone);
+            zoneColors.Add(zoneColor);
+            SetVerticesDirty();
+        }
+
+        /// <summary>Room left around the chart for the axis labels (smaller for a small radar).</summary>
+        public void SetLabelMargin(float margin)
+        {
+            labelMargin = margin;
+            LayoutLabels();
             SetVerticesDirty();
         }
 
@@ -50,9 +73,9 @@ namespace Cooking.Prototype
             SetVerticesDirty();
         }
 
-        public void AddProfile(FlavourProfile profile, Color profileColor, bool filled)
+        public void AddProfile(FlavourProfile profile, Color profileColor, bool filled, bool dashed = false)
         {
-            series.Add(new Series { Profile = profile, Color = profileColor, Filled = filled });
+            series.Add(new Series { Profile = profile, Color = profileColor, Filled = filled, Dashed = dashed });
             SetVerticesDirty();
         }
 
@@ -130,25 +153,25 @@ namespace Cooking.Prototype
 
             for(int i = 0; i < count; i++) AddLine(vh, Center, Point(i, FlavourProfile.MaxValue), 1.5f, gridColor);
 
-            foreach(FlavourZone zone in zones)
+            for(int z = 0; z < zones.Count; z++)
             {
-                if(zone != null) DrawZone(vh, zone, zone == highlighted);
+                if(zones[z] != null) DrawZone(vh, zones[z], zoneColors[z], zones[z] == highlighted);
             }
 
             foreach(Series entry in series) DrawProfile(vh, entry);
         }
 
-        private void DrawZone(VertexHelper vh, FlavourZone zone, bool isHighlighted)
+        private void DrawZone(VertexHelper vh, FlavourZone zone, Color zoneColor, bool isHighlighted)
         {
             int count = FlavourAxes.Count;
-            Color fill = zone.Color;
-            fill.a = highlighted == null ? 0.16f : isHighlighted ? 0.32f : 0.03f;
-            Color line = zone.Color;
+            Color fill = zoneColor;
+            fill.a = highlighted == null ? 0.22f : isHighlighted ? 0.32f : 0.03f;
+            Color line = zoneColor;
             line.a = highlighted == null || isHighlighted ? 0.85f : 0.2f;
 
             // The area inside the zone's minimums is "not enough of this": shaded faintly and
             // edged with a dashed line, so it reads as a boundary instead of a hole.
-            Color shortfall = zone.Color;
+            Color shortfall = zoneColor;
             shortfall.a = fill.a * 0.45f;
             Color innerLine = line;
             innerLine.a *= 0.75f;
@@ -201,7 +224,10 @@ namespace Cooking.Prototype
 
             for(int i = 0; i < count; i++)
             {
-                AddLine(vh, Point(i, Value(entry.Profile, i)), Point(i + 1, Value(entry.Profile, i + 1)), entry.Filled ? 3f : 2f, entry.Color);
+                Vector2 a = Point(i, Value(entry.Profile, i));
+                Vector2 b = Point(i + 1, Value(entry.Profile, i + 1));
+                if(entry.Dashed) AddDashedLine(vh, a, b, 2.5f, entry.Color, 5f, 4f);
+                else AddLine(vh, a, b, entry.Filled ? 3f : 2f, entry.Color);
             }
         }
 

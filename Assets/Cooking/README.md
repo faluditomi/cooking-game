@@ -83,7 +83,7 @@ All values are **placeholders** tuned so the Notion recipes behave sensibly:
 | Mushroom soup | Hearty Broth |
 | Synthetic soup | near Hearty Broth |
 | Soup on the rock | **no zone**: salty 8.2. Lower its salt or accept it as a rough dish. |
-| Sweet & sour tofu soup | Sweet & Sour only (the Woman's dream is now a beef version, see below) |
+| Sweet & sour tofu soup | Sweet & Sour only (Hera's dream is now a beef version, see below) |
 | Burnt or raw dishes | no zone |
 
 ## Cooking prototype (`Prototype/`)
@@ -111,17 +111,22 @@ Cooking Prototype**, into `Builds/` (git-ignored):
 
 The layout follows the "Screen layout mock-up" on the Miro board:
 
-- **Conversation** (left, full height): just the customer's name and what they say, typed out with
-  the newest line at the top. It clears when the customer leaves. Warnings (can't afford the cart,
-  the pot's full) show for a few seconds as a toast over the desk.
-- **Market** (top right): the night market with billboard ads (CraftPix pack, new ads each cycle),
-  the customer at the bottom left (no name or state under them), and the **tools** (knife, peeler,
-  grater, spoon) hanging from the stall roof, unlabelled.
+- **Conversation** (left, full height): just the customer's name and what they say, typed out,
+  each new line below the last (once the box is full, older lines scroll off the top). It clears
+  when the customer leaves. Warnings (can't afford the basket, the pot's full) show for a few seconds
+  as a toast over the desk.
+- **Market** (top right): the Bright Market in the distance, painted at startup and blurred
+  (`MarketBackdrop`: towers with lit windows, neon, a row of stalls with lamps, strings of
+  lanterns), with no ads, the
+  customer close to the counter and seen from the hips up as in the Miro mock-up (no name or state
+  under them), and the **tools** (knife, peeler, grater, spoon) hanging from the stall roof,
+  unlabelled. The **II** button in the corner (or Esc) pauses.
 - **Workbench** (bottom right), all press-and-hold drags:
-  - **Pantry** (right): your stock (`Inventory`) in three columns, grouped into **raw**,
-    **prepped** and **seasoning**, with no panel behind it. Each pile shows its pieces (one unit
-    shows one piece) and a label like "x2 Pak Choi". The title screen switches the labels between
-    **always** and **only when held** (`ingredientLabels`); a held ingredient always shows its name.
+  - **Pantry** (right): your stock (`Inventory`) in four columns, grouped into **Raw**,
+    **Prepped** and **Seasoning** under taped paper labels like the stoves' (always there, even
+    when a group is empty), with no panel behind it. Each pile shows its pieces (one unit shows one
+    piece). Labels like "x2 Pak Choi" show **only when held** by default; the title screen switches
+    them to **always** (`ingredientLabels`).
     Holding a pile takes **one** unit. Drop it on a cutting board, the pot, the pan, a plate
     (seasonings only, on a cooked dish) or free desk space. Dropped anywhere else, it goes back.
   - **Desk space**: no grid. Plates and loose ingredients go where you drop them, anywhere in the
@@ -133,11 +138,12 @@ The layout follows the "Screen layout mock-up" on the Miro board:
     with food. Drop the plate on it to serve.
   - **Stoves**: the pot (**Boil**) and the pan (**Fry**) sit on two drawn stoves, labelled on taped
     paper. A small bar rides on each pot. They start cooking with the first thing in.
-  - **Prep section**: two cutting boards.
-  - **Tablet**, built into the table (bottom left). Small, it shows the **Current Order** page (the
-    timer, cycle and money at the top). **Menu**,
-    **History** and, in the morning, **Shop** open it big over the right side, as do the Dish
-    Served and End of Cycle pages. **Shrink** puts it back.
+  - **Prep section**: two cutting boards, with no text on them.
+  - **Tablet**, built into the table (bottom left), and everything fits in it (it never goes full
+    screen). Tabs: **Current Order** (the timer, cycle and money at the top, the order card, and a
+    radar with your plate, the order, and any flavour profiles ticked to show there), **Menu**,
+    **History** and **Flavour Profiles**. The Dish Served and End of Cycle pages take the whole
+    tablet and hide the tabs until they're dismissed.
 
 The UI is built in code at startup (`CookingPrototype.Layout.cs`), with uGUI and the built-in font,
 and needs the Input System UI module (the setup adds one). A held item follows the pointer from
@@ -168,13 +174,15 @@ goes with them. The knife and peeler hang upright but are held flat by the handl
 The game runs in cycles (days). Everything you buy goes into your stock (`Inventory`), which tracks
 units per prep state ("3× Onion raw", "2× Onion peeled, sliced").
 
-1. **Morning** (untimed). The tablet opens big on the **Shop**. Fill a cart (`ShoppingCart`):
-   ingredients one at a time from the shelf (−, +1, +5), a whole dish from the **Bundles** tiles
-   (one serving of a menu dish). Nothing is bought until you pay. The cart column also has the day-timer switch and
-   who's coming today. The workbench is locked: prepping is part of the timed day (meeting
-   decision).
-2. **Buy and start the day** (Shop tab) pays for the cart, starts the timer and opens the stall.
-   The tablet goes back into the table, on the Order page. The Shop closes until the next morning.
+1. **Morning** (untimed), at the market's **grocer** (`CookingPrototype.Store.cs`), a scene of its
+   own over the stall: ingredients stand on shelves with price tags and how many you have at home.
+   Click one, or drag it into the **basket**, where everything picked is heaped; click a piece in
+   the basket, or drag it out, to put it back. The price tags name what's on the shelf. **Recipe bundles** under the shelves add everything one menu dish needs.
+   Nothing is bought until you pay (`ShoppingCart`). The till also has **Empty basket**, the
+   day-timer switch and who's coming today. The workbench waits: prepping is part of the timed day
+   (meeting decision).
+2. **Buy and start the day** pays for the basket, starts the timer and goes back to the stall,
+   with the tablet on the Current Order. The grocer closes until the next morning.
 3. **Service.** The day timer runs (`daySeconds`, 6 minutes). Every regular comes **once**, in a
    shuffled order, 1–6 s (`arrivalDelay`) after the last one leaves. They order as they arrive:
    their order dialogue names the dish, and the Order page fills in. It shows the recipe with each
@@ -212,7 +220,7 @@ units per prep state ("3× Onion raw", "2× Onion peeled, sliced").
      (20 letters): **Save dish** adds it to the menu (origin Emphis); **Continue** leaves it
      "Nameless". Continue sends the customer off (anything they were still saying stops).
    - **Day timer off**: to compare the "time trial gauntlet" and "zen social kitchen" vibes
-     (design doc TODO), switch it off in the Shop in the morning, or untick `dayTimer` on the
+     (design doc TODO), switch it off at the grocer in the morning, or untick `dayTimer` on the
      `Cooking Prototype` object. The day then ends when everyone has been.
 4. **End of the cycle**, when everyone has been or the timer runs out (whoever is still waiting
    leaves without eating): the End of Cycle page lists each dish and who it was for, income,
@@ -234,9 +242,26 @@ units per prep state ("3× Onion raw", "2× Onion peeled, sliced").
   or two (`stayAwayChance`, 50%). They always come back, and someone always turns up. The morning
   list says who's staying away. The Sleeper, paying anyway as a Stranger, doesn't mind.
 - **Dream meal**: once found, it's what they always order.
-- **Just as tasty**: a dish that isn't the order but lands in the same desirable flavour zone as the
-  order (and nothing on it is badly cooked) is liked. A genuinely different dish is paid in full and
-  tipped (`SameZoneTip`, 20%); a near miss of the order is paid as very close.
+- **Tastes and tips** (demo changes): see the verdict table below. In short, a correct order pays
+  50% more than before (`margin` 2.4); a dish that isn't the order but lands in a basic tasty zone
+  is paid in full without a tip; one in the customer's own favourite flavour is paid in full and
+  tipped. The tasty zones were narrowed (about half as wide, so they're harder to hit and overlap
+  less), with `ZoneAt` 0.75 of the zone score and `zoneFalloff` 2.
+- **Cooking by taste** (`CookingPrototype.Taste.cs`): the Current Order radar is the guide while
+  you cook. It shows the order's taste (grey) and the tasty zone it belongs to (blue) as the
+  target, and the dish as it builds up (orange): the plate you're working on plus the pot and pan,
+  as they'll taste once cooked (burnt once they're in the red). Holding an ingredient over the pot,
+  the pan or a plate shows a dotted shape: where the dish would go if you dropped it.
+- **Prepped ingredients look prepped** (`PrepSprites`): made from the ingredient's own picture the
+  first time it's needed. Peeled is paler, sliced is three outlined slices with pale cut faces,
+  grated is a heap of shreds; peeled and sliced (or grated) combine. Used in the pantry, on the
+  boards, the desk, in hand, in the pot and pan, and in dish pictures.
+- **Dish Served radar**: the dish and the order's outline (grey) when it's a dish you know. No zone.
+- **Dish Served headline**: one of three, "Correct order", "Wrong order, but they liked it" or
+  "Wrong order and they didn't like it". The tablet doesn't talk about how well a regular knows you.
+- **Orders show when they're said**: the order dialogue is read from its first line, but the
+  Current Order card only fills in on the line that names the dish (or when the dialogue ends).
+  Dishes only NPCs know (the Sleeper's potato) are found through `offMenu` on the `Cooking Prototype`.
 - **Faces** in the history's lists (the regular's picture, or a placeholder), and **bundle tiles**
   that list what they add.
 
@@ -248,8 +273,8 @@ conversation says what to do, and a pulsing outline marks what to use. Each step
 player to actually do it:
 
 1. Welcome: buy in the morning, cook for the regulars, pay the rent; today is practice.
-2. Shop: click the Soup on the rock bundle, then Buy and start the day.
-3. The Man orders Soup on the rock; the Current Order page and the Menu tab.
+2. The grocer: click the Soup on the rock bundle, then Buy and start the day.
+3. Petor orders Soup on the rock; the Current Order page and the Menu tab.
 4. Drag a potato from the pantry onto a cutting board, and peel it with the peeler from the roof.
 5. Drag the peeled potato, the soup cube and the salts into the pot (it starts with the first).
 6. Put a clean plate on the desk; when the bar is orange, lift the pot onto it (the spoon holds it there).
@@ -305,15 +330,18 @@ on Soup Cube).
 
 The code is split by part: `CookingPrototype.cs` (cycle loop, ticket, result and summary pages),
 `.Layout.cs` (the screen, market and tablet), `.Kitchen.cs` (workbench, plates, stations, drags),
-`.Prep.cs` (cutting boards and tools), `.Store.cs` (Shop tab), `.RecipeBook.cs`, `.History.cs`,
+`.Prep.cs` (cutting boards and tools), `.Store.cs` (the morning grocer), `.RecipeBook.cs` (Menu tab),
+`.History.cs`, `.Flavours.cs` (Flavour Profiles tab), `.Pause.cs` (pause menu and settings),
 `.Npcs.cs` (customers and dialogue) and `.Discovery.cs` (naming dishes).
 
 | Verdict | When | Pay | Liked? | Their reaction |
 |---|---|---|---|---|
-| Dream meal | inside their secret desire zone, with everything in `dreamNeeds`. Beats a refusal | price + 100% tip | yes | `DreamOrder` the first time, then `CorrectOrder` |
-| Ordered | `RecipeDefinition.Matches`: same portions, prep and cooking, nothing badly cooked | 100% | yes | `CorrectOrder` |
-| Very close | similarity ≥ `veryCloseAt` (80%) | `veryClosePay` (80%) | yes | `WrongOrderTasty` |
-| Close enough | similarity ≥ `closeEnoughAt` (55%) | `closeEnoughPay` (60%) | no | `WrongOrderTasty` |
+| Dream meal | deep in their favourite flavour (`DreamAt`, 0.85), with everything in `dreamNeeds`. Beats a refusal | price + 100% tip | yes | `DreamOrder` the first time, then `CorrectOrder` |
+| Ordered | `RecipeDefinition.Matches`: same portions, prep and cooking, nothing badly cooked | 100%, + 30% tip in their favourite flavour | yes | `CorrectOrder` |
+| Their taste | not the order, but in their favourite flavour (`ZoneAt`), well cooked | 100% + 30% tip (`FavouriteTip`) | yes | `WrongOrderTasty` |
+| Tasty | not the order, but in a basic tasty zone (`ZoneAt`), or tasting close to the order (flavour similarity ≥ `LikeFlavourAt`, 50%), well cooked | 100%, no tip | yes | `WrongOrderTasty` |
+| Very close | similarity ≥ `veryCloseAt` (70%) | `veryClosePay` (80%) | yes | `WrongOrderTasty` |
+| Close enough | similarity ≥ `closeEnoughAt` (45%) | `closeEnoughPay` (60%) | no | `WrongOrderTasty` |
 | Refused | contains something they won't eat | nothing | no | `WrongOrderNasty` |
 | Too different | anything else | nothing | no | `WrongOrderNasty` |
 
@@ -323,16 +351,20 @@ units that went in as written (right ingredient with the wrong prep, cooking or 
 half), over the larger of ordered and served units, so missing and extra units both cost. As a
 guide with the placeholder data: forgetting the pepper or not grating the MSG2 is very close;
 1 mushroom instead of 3, overcooking or leaving out the tofu is close enough; a burnt fried rice,
-Hellchick without chilli, or a different dish isn't paid for. A very close dish they didn't order
-is added to what they like.
+Hellspawn fried rice without chilli, or a different dish isn't paid for. A dish in or close to
+their favourite flavour (`CustomerRelationship.CloseToFavourite`) is added to what they like.
 
-Price is the **ordered** dish's ingredient cost × `margin`. Customers come from the design doc's NPC notes:
+Price is the **ordered** dish's ingredient cost × `margin`. The menu follows the Notion menu:
+MSBeef noodles, Calorice and Hellspawn fried rice (fried; their rice and noodles are boiled first
+and poured into the pan), and Mushroom soup, Synthetic soup and Soup on the rock (boiled).
 
-- **The Woman**: starts out liking MSBeef fried rice (Real Beef™ only), Synthetic soup and Calorice, and refuses Beef. Secretly craves *Their lost love's soup*, a sweet and sour beef soup: her dream needs Beef, and wins over the refusal.
-- **The Man**: refuses synthetic chicken. Craves *An honest broth* (filling, a little to chew, a touch sweet).
-- **The Sleeper** (Miro board): their first liked meals aren't really food: a potato, a peeled potato, an MSG2 cube and boiled synthetic chicken. None of them are on the menu or in the book, and the first three are served raw (any raw ingredient can go on a clean plate; a raw plate takes no cooked dish). They don't know food yet, so as a Stranger they pay full price for anything they'll eat (`alwaysPaysAsStranger`). The first dish that actually tastes good (inside a desirable flavour zone) and isn't one of those replaces the whole list and makes them Familiar on its own (`firstTasteReplacesLikes`). Craves *Mother's fire* (very hot, savoury, not sweet).
-- **Pictures**: the Woman and the Sleeper stand at the counter with their art from the Miro board (`Customer.portrait`, in `Assets/Art Assets/Characters`, trimmed). The others are placeholder figures for now.
-- **A generic Eyesider**: orders anything on the menu, craves nothing.
+Only three regulars come, left to right on the Miro board (Notion demo changes):
+
+- **Hera**: starts out liking MSBeef noodles (Real Beef™ only) and Calorice, and refuses Beef. Her favourite flavour is *Their lost love's soup*, Jessa's sweet and sour beef soup: her dream needs Beef, and wins over the refusal.
+- **Sleeper** (Miro board): their initial liked list is empty; every Stranger order is scripted in their dialogue (a potato, a peeled potato, an MSG2 cube, then soup on the rock). The raw "meals" aren't on the menu or in the book (any raw ingredient can go on a clean plate). They don't know food yet, so as a Stranger they pay full price for anything they'll eat (`alwaysPaysAsStranger`). The first dish that actually tastes good makes them Familiar on its own (`firstTasteReplacesLikes`). A secret spice fiend: *Mother's fire*, and the dream dish needs chilli, seaweed noodles and MSG2.
+- **Petor**: refuses synthetic chicken. His favourite is *An honest broth* (filling, a little to chew, a touch sweet). His dialogue column on Miro is still empty, so he has placeholder lines.
+- **Pictures**: all three stand at the counter with their art from the Miro board (`Customer.portrait`, in `Assets/Art Assets/Characters`, trimmed).
+- After their dream dish, their starting liked dishes that don't taste like their favourite are dropped, and their favourite joins the **Flavour Profiles** tab ("Hera's Taste").
 
 Customer lines and other settings (margin, station speed, live preview) are on the
 `Cooking Prototype` object in the scene. The live flavour preview is a tuning aid. The design
@@ -346,17 +378,25 @@ The tablet's **Menu** tab opens it any time. It lists the menu only (no backgrou
 list); dishes you didn't save (or took off) are in the cooking history. The selected dish and its
 flavour profile share one page:
 
-- **Steps** (`RecipeGuide`): what to buy (with how many you have), what to prep with which tool
-  ("peel (peeler), then slice (knife)"), which station cooks what and how (pot: the soup cube
-  makes it a soup; take it off in the orange, stir or shake to hold it there; boiled-then-fried:
-  pour the pot into the pan; raw straight to the plate), and serving.
-- **Flavour Profile**: the dish alone on the radar. No zones, and no "tastes like", which could give away
-  what customers want.
-- **Shopping**: have/need per ingredient (stock + cart), with **+ One serving** and **+ What's
-  missing** to fill the store cart. These only work in the morning.
+- **The recipe**, written exactly like the Current Order card: each ingredient with its prep and
+  whether it's ready, and the menu price. (`RecipeGuide` still writes the full steps; the tests use it.)
+- **Flavour Profile** at the bottom of the page (scroll down): the dish alone on the radar.
 
-While there's an order, opening it shows that dish. The kitchen keeps running while it's open (the
-big tablet covers the workbench), so looking something up costs time.
+While there's an order, opening it shows that dish. The kitchen keeps running while it's open.
+
+### Flavour Profiles tab (`CookingPrototype.Flavours.cs`)
+
+The basic tasty zones, one at a time with their names and each in its own colour; the arrows cycle
+through them. **Display on Current Order tab** shows that zone on the Current Order's radar too.
+When a regular gets their dream dish, their favourite flavour joins the list ("Hera's Taste").
+Elsewhere (the Dish Served page) the tasty zone is drawn in blue.
+
+### Pause menu and settings (`CookingPrototype.Pause.cs`)
+
+Esc or the **II** button: **Resume**, **Main Menu**, **Settings** and **Quit Game**. Pausing stops
+the game's time (`Time.timeScale`): timers, cooking, customers and dialogue. Settings has the
+**sound effects** and **music** volumes, saved between sessions (`PlayerPrefs`); the title screen
+opens it too. The music clip goes in `music` on the `Cooking Prototype` object when it's ready.
 
 ### Regulars and dialogue (`Prototype/Npc/`, `CookingPrototype.Npcs.cs`)
 
@@ -373,10 +413,10 @@ the session:
   they didn't order is added (as the menu dish it makes, or as a new "Nameless" dish), so they can
   ask for it back and it's judged as an exact order when you recreate it.
 - **A visit**, as DialogueSystem triggers `(NPC, event, stage)`:
-  - `Order` when they arrive. The order graph's `payload` names the dish ("MSBeef fried rice"), or
+  - `Order` when they arrive. The order graph's `payload` names the dish ("MSBeef noodles"), or
     is a token: `[liked meal]` / `[liked dish]` (one of their liked meals) or `[dream dish]`. In the
     text, tokens become the dish's name, or "the thing you made me the other day" / "the regular"
-    when it isn't on the menu (never saved, or deleted). `[name of her lover]` stays as written.
+    when it isn't on the menu (never saved, or deleted).
   - `Musing` once per order, `musingAfter` (8–20 s) after they order.
   - `Hurry` every `hurryAfter` seconds (per regular) while they wait.
   - On serving, with priority: `CorrectOrder`, `WrongOrderTasty`, `WrongOrderNasty`, or
@@ -386,14 +426,17 @@ the session:
 - **Director policy:** `FinishThenQueue`. Whatever is being said finishes; the next dialogue
   waits a beat; a dish reaction jumps the queue. Options of a set play in order (O1, O2, O3) the
   first time, then at random; one-shots (like her Friendly O1 musing) play once.
-- **Content:** **Custom Tools → Cooking Prototype → Build Dialogue** generates one graph per option
+- **Content:** **Custom Tools → Cooking Prototype → Rebuild Dialogue From Scratch** (Build Scene
+  runs it) deletes the graphs and builds them again from `CookingDialogueSetup`; **Build Dialogue**
+  only adds what's missing. One graph per option
   in `Data/Dialogue/Graphs/` ("Woman - Order - Stranger - O1") and the catalog
   `Data/Dialogue/CookingDialogueCatalog.asset` through the DialogueSystem's editor API, then wires
-  the open prototype scene (catalog, each regular's `dialogueId`, a `DialogueDirector`). The Woman's
-  lines are the board's, as written (her Stranger "correct order" O1 is "[Nothing]" on the board,
-  so that graph has no lines and she says nothing); the Man has the board's MSG line and otherwise placeholders, as
-  do the Sleeper and Eyesiders. Existing graphs are kept, so rewrite the text in
-  **Custom Tools → Dialogue Graph Editor**; rerunning only adds what's missing. Build Scene runs it too.
+  the open prototype scene (catalog, each regular's `dialogueId`, a `DialogueDirector`). Hera's
+  and the Sleeper's lines are the board's, as written (Hera's Stranger "correct order" O1 is
+  "[Nothing]" on the board, so that graph has no lines; her MSBeef orders name the MSBeef noodles
+  from the Notion menu). Petor has the board's MSG line and otherwise placeholders, as does the
+  Sleeper where the board is still empty (dream, and reactions once familiar). Hera, Petor and the
+  Sleeper use the DialogueSystem ids Woman, Man and Sleeper.
 - The cycle summary lists who became familiar or had their dream meal; the morning ticket shows
   each regular's stage and what they order now.
 
@@ -408,9 +451,9 @@ built around dishes from the design doc that aren't on the menu; one way to hit 
 
 | Regular | Desire | One dish that hits it |
 |---|---|---|
-| The Woman | Their lost love's soup (needs Beef) | Soup Cube, Beef sliced, 2× Sugar, 2× Citric Acid, boiled. With Real Beef it tastes right but isn't it |
-| The Man | An honest broth | Soup Cube, 2× Potato peeled+sliced, Pak Choi sliced, Mushroom sliced, Salt, boiled |
-| The Sleeper | Mother's fire | Seaweed Noodles, Synthetic Chicken sliced, 4× Chilli grated, 2× MSG2 grated, fried |
+| Hera | Their lost love's soup (needs Beef) | Soup Cube, Beef sliced, 2× Sugar, 2× Citric Acid, boiled. With Real Beef it tastes right but isn't it |
+| Petor | An honest broth | Soup Cube, 2× Potato peeled+sliced, Pak Choi sliced, Mushroom sliced, Salt, boiled |
+| Sleeper | Mother's fire | Seaweed Noodles, Synthetic Chicken sliced, 4× Chilli grated, 2× MSG2 grated, fried |
 
 - **Clues.** From Familiar, after each dish (until they've had their dream meal) the regular adds a
   clue after their reaction: warmer / colder / about the same than their closest dish so far, plus

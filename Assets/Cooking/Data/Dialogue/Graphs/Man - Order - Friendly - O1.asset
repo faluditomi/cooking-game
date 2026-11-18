@@ -13,30 +13,30 @@ MonoBehaviour:
   m_Name: Man - Order - Friendly - O1
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: 2d17a29b-6719-4c82-9c71-68c3531bc83e
+  - guid: 1ec3bcf8-fe05-4c5f-adc1-b61e117d0372
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 2b344966-1070-4761-9f81-198662cd3b6f
+  - guid: b111c9e5-440b-4ed1-9960-71326d1ec0a1
     kind: 0
     line:
       text: I made it for the kids three times this week. They asked for it again.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: 01fa8c54-917a-4942-8873-0821e91f3697
+  - guid: eb07d89a-57c0-42d7-aace-d41609fd3a8d
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 520, y: 0}
   edges:
-  - fromNodeGuid: 2d17a29b-6719-4c82-9c71-68c3531bc83e
+  - fromNodeGuid: 1ec3bcf8-fe05-4c5f-adc1-b61e117d0372
     fromOptionGuid: 
-    toNodeGuid: 2b344966-1070-4761-9f81-198662cd3b6f
-  - fromNodeGuid: 2b344966-1070-4761-9f81-198662cd3b6f
+    toNodeGuid: b111c9e5-440b-4ed1-9960-71326d1ec0a1
+  - fromNodeGuid: b111c9e5-440b-4ed1-9960-71326d1ec0a1
     fromOptionGuid: 
-    toNodeGuid: 01fa8c54-917a-4942-8873-0821e91f3697
+    toNodeGuid: eb07d89a-57c0-42d7-aace-d41609fd3a8d
   isOneShot: 0
   payload: 

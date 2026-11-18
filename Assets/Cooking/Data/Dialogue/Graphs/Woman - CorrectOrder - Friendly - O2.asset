@@ -13,48 +13,48 @@ MonoBehaviour:
   m_Name: Woman - CorrectOrder - Friendly - O2
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: 7217c552-aea6-4c5d-b5e3-c7af2e0791a6
+  - guid: f9583253-6b17-4018-8564-2f80958c12bb
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 495b6ddb-0355-49b4-ac53-828f2fdbf180
+  - guid: cc48b52d-7826-4612-b631-b7377fbfc688
     kind: 0
     line:
       text: Mmm...
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: 51fdf304-d62c-4545-9343-c2dbcfb93280
+  - guid: 433280d8-9bbd-459e-9c09-ceaccd6b7294
     kind: 0
     line:
       text: Maybe I should take you with me, ey?
       delaySeconds: 1.2
     editorPosition: {x: 520, y: 0}
-  - guid: 53408357-3c29-4130-a6f8-c9b23989b7eb
+  - guid: 8ca03334-0a01-4a3e-97d2-bb60c695ea36
     kind: 0
     line:
       text: Yeah, I'll miss this.
       delaySeconds: 2.3
     editorPosition: {x: 780, y: 0}
-  - guid: b3f6b14b-2d35-4322-8a18-b95d4c34e3bb
+  - guid: 27eda351-df14-4881-889d-4ca99f551672
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 1040, y: 0}
   edges:
-  - fromNodeGuid: 7217c552-aea6-4c5d-b5e3-c7af2e0791a6
+  - fromNodeGuid: f9583253-6b17-4018-8564-2f80958c12bb
     fromOptionGuid: 
-    toNodeGuid: 495b6ddb-0355-49b4-ac53-828f2fdbf180
-  - fromNodeGuid: 495b6ddb-0355-49b4-ac53-828f2fdbf180
+    toNodeGuid: cc48b52d-7826-4612-b631-b7377fbfc688
+  - fromNodeGuid: cc48b52d-7826-4612-b631-b7377fbfc688
     fromOptionGuid: 
-    toNodeGuid: 51fdf304-d62c-4545-9343-c2dbcfb93280
-  - fromNodeGuid: 51fdf304-d62c-4545-9343-c2dbcfb93280
+    toNodeGuid: 433280d8-9bbd-459e-9c09-ceaccd6b7294
+  - fromNodeGuid: 433280d8-9bbd-459e-9c09-ceaccd6b7294
     fromOptionGuid: 
-    toNodeGuid: 53408357-3c29-4130-a6f8-c9b23989b7eb
-  - fromNodeGuid: 53408357-3c29-4130-a6f8-c9b23989b7eb
+    toNodeGuid: 8ca03334-0a01-4a3e-97d2-bb60c695ea36
+  - fromNodeGuid: 8ca03334-0a01-4a3e-97d2-bb60c695ea36
     fromOptionGuid: 
-    toNodeGuid: b3f6b14b-2d35-4322-8a18-b95d4c34e3bb
+    toNodeGuid: 27eda351-df14-4881-889d-4ca99f551672
   isOneShot: 0
   payload: 

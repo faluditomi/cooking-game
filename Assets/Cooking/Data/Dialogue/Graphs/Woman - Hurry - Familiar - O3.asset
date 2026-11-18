@@ -13,39 +13,39 @@ MonoBehaviour:
   m_Name: Woman - Hurry - Familiar - O3
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: d93b5a67-e261-4153-a0f0-b16d8a6ccec7
+  - guid: 7c3cec69-8f54-4890-af5a-cdcc9607d7fe
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 674a4df6-7376-4e19-8edd-6940da1af366
+  - guid: 24e4bf37-0f2d-4ad6-8936-0862296e018b
     kind: 0
     line:
       text: I don't come here for fun...
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: e6c6e06e-8b91-4220-84b4-8c67ac44fe5c
+  - guid: b020fc40-c8f9-4698-98d0-5e104c85cadd
     kind: 0
     line:
       text: Are we clear on that?
       delaySeconds: 2
     editorPosition: {x: 520, y: 0}
-  - guid: 1c0ebbe5-be95-4edf-a92e-3626ae596b9f
+  - guid: 51cbece5-d3ed-4697-b49c-182e0707d5b3
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 780, y: 0}
   edges:
-  - fromNodeGuid: d93b5a67-e261-4153-a0f0-b16d8a6ccec7
+  - fromNodeGuid: 7c3cec69-8f54-4890-af5a-cdcc9607d7fe
     fromOptionGuid: 
-    toNodeGuid: 674a4df6-7376-4e19-8edd-6940da1af366
-  - fromNodeGuid: 674a4df6-7376-4e19-8edd-6940da1af366
+    toNodeGuid: 24e4bf37-0f2d-4ad6-8936-0862296e018b
+  - fromNodeGuid: 24e4bf37-0f2d-4ad6-8936-0862296e018b
     fromOptionGuid: 
-    toNodeGuid: e6c6e06e-8b91-4220-84b4-8c67ac44fe5c
-  - fromNodeGuid: e6c6e06e-8b91-4220-84b4-8c67ac44fe5c
+    toNodeGuid: b020fc40-c8f9-4698-98d0-5e104c85cadd
+  - fromNodeGuid: b020fc40-c8f9-4698-98d0-5e104c85cadd
     fromOptionGuid: 
-    toNodeGuid: 1c0ebbe5-be95-4edf-a92e-3626ae596b9f
+    toNodeGuid: 51cbece5-d3ed-4697-b49c-182e0707d5b3
   isOneShot: 0
   payload: 

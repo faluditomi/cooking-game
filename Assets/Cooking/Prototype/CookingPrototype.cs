@@ -32,6 +32,8 @@ namespace Cooking.Prototype
         [SerializeField] private List<FlavourZone> zones = new List<FlavourZone>();
         [SerializeField] private List<IngredientDefinition> pantry = new List<IngredientDefinition>();
         [SerializeField] private List<RecipeDefinition> menu = new List<RecipeDefinition>();
+        [Tooltip("Dishes only NPCs know (the Sleeper's potato): they can order them by name, but they're not on the menu or in the book.")]
+        [SerializeField] private List<RecipeDefinition> offMenu = new List<RecipeDefinition>();
         [SerializeField] private List<Customer> customers = new List<Customer>();
 
         [Header("Cycle")]
@@ -48,17 +50,17 @@ namespace Cooking.Prototype
 
         [Header("Orders")]
         [Tooltip("Menu price = ingredient cost × margin.")]
-        [SerializeField, Min(0f)] private float margin = 1.6f;
+        [SerializeField, Min(0f)] private float margin = 2.4f;
         [Header("Good enough (how close a dish must be to the order)")]
         [Tooltip("Share of similarity that comes from flavour (radar distance); the rest comes from ingredients, prep and cooking.")]
         [SerializeField, Range(0f, 1f)] private float flavourWeight = 0.5f;
         [Tooltip("Radar distance at which flavour similarity drops to 0.")]
         [SerializeField, Min(0.5f)] private float flavourRange = 6f;
-        [SerializeField, Range(0f, 1f)] private float veryCloseAt = 0.8f;
+        [SerializeField, Range(0f, 1f)] private float veryCloseAt = 0.7f;
         [Tooltip("Share of the price paid for a very close dish.")]
         [SerializeField, Range(0f, 1f)] private float veryClosePay = 0.8f;
         [Tooltip("Below this similarity they refuse to pay.")]
-        [SerializeField, Range(0f, 1f)] private float closeEnoughAt = 0.55f;
+        [SerializeField, Range(0f, 1f)] private float closeEnoughAt = 0.45f;
         [Tooltip("Share of the price paid for a close-enough dish.")]
         [SerializeField, Range(0f, 1f)] private float closeEnoughPay = 0.6f;
 
@@ -73,8 +75,6 @@ namespace Cooking.Prototype
         [SerializeField, Min(1)] private int grateStrokes = 5;
 
         [Header("Debug")]
-        [Tooltip("Show the plate's flavour on the radar while cooking. The design reveals it only after serving; this is for tuning.")]
-        [SerializeField] private bool livePreview = true;
         [Tooltip("Show how close a dish came to the customer's secret desire on the result screen. Tuning only; it gives the secret away.")]
         [SerializeField] private bool showDesireDebug;
         [Tooltip("0 picks a random seed.")]
@@ -163,8 +163,9 @@ namespace Cooking.Prototype
 
         /// <summary>Assigns the data. Used by the editor setup menu.</summary>
         public void Setup(FlavourRules newRules, IEnumerable<FlavourZone> newZones, IEnumerable<IngredientDefinition> newPantry,
-            IEnumerable<RecipeDefinition> newMenu, IEnumerable<Customer> newCustomers)
+            IEnumerable<RecipeDefinition> newMenu, IEnumerable<Customer> newCustomers, IEnumerable<RecipeDefinition> newOffMenu = null)
         {
+            offMenu = newOffMenu != null ? new List<RecipeDefinition>(newOffMenu) : new List<RecipeDefinition>();
             rules = newRules;
             zones = new List<FlavourZone>(newZones);
             pantry = new List<IngredientDefinition>(newPantry);
@@ -184,8 +185,9 @@ namespace Cooking.Prototype
             startingMenu = new List<RecipeDefinition>(menu);
             if(customers.Count == 0) customers.Add(new Customer());
 
-            // Secret desires are undiscovered recipes: never drawn, listed or named as a zone.
+            // Secret desires are undiscovered recipes: never drawn, listed or named as a zone (until found).
             zones.RemoveAll(zone => zone == null || customers.Exists(c => c != null && c.secretDesire == zone));
+            ResetTasteProfiles();
 
             CreateKitchenState();
             EnsureEventSystem();
@@ -199,10 +201,14 @@ namespace Cooking.Prototype
 
         private void Update()
         {
+            UpdatePauseKey();
+            if(paused) return;
+
             // Lines keep typing out on the result screen too.
             TickSpeech(Time.deltaTime);
             // Whatever is held follows the pointer, and drops when the button comes up.
             UpdateHeld();
+            UpdateShopDrag();
             UpdateCookingSounds();
             UpdateTutorial();
 
@@ -293,8 +299,8 @@ namespace Cooking.Prototype
                 (arrivals[i], arrivals[j]) = (arrivals[j], arrivals[i]);
             }
 
-            ShuffleBillboards();
-            ShowTabletPage(TabletPage.Shop);
+            tabletPage = TabletPage.Order;
+            RefreshAll();
             Say("Cycle " + day + ". Fill the cart for " + todaysRegulars + (todaysRegulars == 1 ? " regular" : " regulars")
                 + (away.Count > 0 ? " (" + string.Join(", ", away.ConvertAll(c => c.name)) + " won't come today)" : "")
                 + ", then buy and start the day. Prepping starts with the day.");
@@ -312,8 +318,7 @@ namespace Cooking.Prototype
 
                 if(!cart.Checkout(inventory, ref money))
                 {
-                    Say("You can't afford the cart: $" + total.ToString("0.00") + ", and you have $" + money.ToString("0.00") + ". Take something out first.", UIFactory.Bad);
-                    ShowTabletPage(TabletPage.Shop);
+                    Say("You can't afford the basket: $" + total.ToString("0.00") + ", and you have $" + money.ToString("0.00") + ". Take something out first.", UIFactory.Bad);
                     return;
                 }
 
@@ -324,15 +329,13 @@ namespace Cooking.Prototype
 
             if(inventory.IsEmpty && !DeskHasIngredients())
             {
-                Say("You have nothing to cook with. Put something in the cart first.", UIFactory.Bad);
-                ShowTabletPage(TabletPage.Shop);
+                Say("You have nothing to cook with. Put something in the basket first.", UIFactory.Bad);
                 return;
             }
 
             phase = Phase.Service;
-            // The tablet goes back into the workbench, showing the order.
+            // Back from the market to the stall; the tablet shows the order.
             tabletPage = TabletPage.Order;
-            tabletBig = false;
             ScheduleArrival();
         }
 
@@ -352,7 +355,6 @@ namespace Cooking.Prototype
             float min = Mathf.Max(0f, Mathf.Min(arrivalDelay.x, arrivalDelay.y));
             float max = Mathf.Max(arrivalDelay.x, arrivalDelay.y);
             nextArrivalAt = Time.time + Random.Range(min, max);
-            Say("The counter is empty. Someone's coming.");
             RefreshAll();
         }
 
@@ -460,7 +462,6 @@ namespace Cooking.Prototype
             phase = Phase.DayOver;
             resultOverlay.SetActive(false);
             tabletPage = TabletPage.Order;
-            tabletBig = false;
 
             // Whoever is still here or still coming leaves unserved.
             List<Customer> missed = new List<Customer>();
@@ -587,6 +588,7 @@ namespace Cooking.Prototype
             awayFor.Clear();
             bookRecipe = null;
             selectedEntry = null;
+            ResetTasteProfiles();
             InitNpcs();
             StartDay();
         }
@@ -612,15 +614,19 @@ namespace Cooking.Prototype
             return recipe != null ? recipe.DisplayName : fallback;
         }
 
-        /// <summary>Soup, fried, or neither, from how its ingredients are cooked.</summary>
+        /// <summary>Soup, fried, or raw, from how its ingredients are cooked.</summary>
         private static string DishType(RecipeDefinition recipe)
         {
-            if(recipe == null) return "";
+            return recipe != null ? DishTypeOf(recipe.Portions) : "";
+        }
 
+        /// <summary>Soup, fried, or raw, for what's on a plate.</summary>
+        private static string DishTypeOf(IReadOnlyList<IngredientPortion> portions)
+        {
             bool boiled = false;
             bool fried = false;
 
-            foreach(IngredientPortion portion in recipe.Portions)
+            foreach(IngredientPortion portion in portions)
             {
                 if(portion == null || !portion.IsValid) continue;
                 // Boiled and then fried (like the rice in fried rice) ends up fried.
@@ -629,7 +635,7 @@ namespace Cooking.Prototype
                 fried |= friedToo;
             }
 
-            return boiled && fried ? "Soup, with fried bits" : boiled ? "Soup" : fried ? "Fried" : "Neither (raw)";
+            return boiled && fried ? "Soup, with fried bits" : boiled ? "Soup" : fried ? "Fried" : "Raw";
         }
 
         private void RefreshAll()
@@ -650,6 +656,8 @@ namespace Cooking.Prototype
             RefreshSidebar();
             RefreshMarket();
             RefreshRecipeBook();
+            RefreshFlavours();
+            ApplyOrderZones();
         }
 
         // ------------------------------------------------------------------ Ticket
@@ -671,7 +679,7 @@ namespace Cooking.Prototype
                 }
                 else if(phase == Phase.Service && customer != null)
                 {
-                    ticket.Customer.text = customer.name + "  <size=17><color=#a6a199>" + StageLabel(Relationship(customer).Stage) + "</color></size>";
+                    ticket.Customer.text = customer.name;
 
                     if(orderIn)
                     {
@@ -738,8 +746,7 @@ namespace Cooking.Prototype
             foreach(Customer regular in customers)
             {
                 CustomerRelationship relationship = Relationship(regular);
-                sb.Append("<color=#f28c33>").Append(regular.name).Append("</color> <color=#77736d>(")
-                  .Append(StageLabel(relationship.Stage)).Append(")</color>: ");
+                sb.Append("<color=#f28c33>").Append(regular.name).Append("</color>: ");
 
                 if(phase == Phase.Morning && !arrivals.Contains(regular))
                 {
@@ -751,7 +758,8 @@ namespace Cooking.Prototype
                 if(relationship.DreamMeal != null) dishes.Add(DishName(relationship.DreamMeal) + " <color=#f28c33>(dream)</color>");
                 foreach(RecipeDefinition liked in relationship.LikedMeals) dishes.Add(DishName(liked));
 
-                sb.Append(dishes.Count == 0 ? "anything on the menu" : string.Join(", ", dishes)).Append('\n');
+                string none = regular.firstTasteReplacesLikes && !relationship.HasTasted ? "whatever comes to mind" : "anything on the menu";
+                sb.Append(dishes.Count == 0 ? none : string.Join(", ", dishes)).Append('\n');
             }
 
             return sb.ToString();
@@ -807,11 +815,16 @@ namespace Cooking.Prototype
                 return "<size=24><b>" + recipe.DisplayName + "</b></size>\n<color=#a6a199>" + hint + "</color>";
             }
 
+            return "<size=24><b>" + recipe.DisplayName + "</b></size>\n<color=#a6a199>" + DishType(recipe) + "</color>\n\n" + RecipeLines(recipe);
+        }
+
+        /// <summary>
+        /// A recipe's lines as the order card writes them: each ingredient with its prep and whether
+        /// it's ready (in stock as it should be, or already cooking), then the menu price.
+        /// </summary>
+        private string RecipeLines(RecipeDefinition recipe)
+        {
             StringBuilder sb = new StringBuilder();
-            sb.Append("<size=24><b>").Append(recipe.DisplayName).Append("</b></size>\n");
-            sb.Append("<color=#a6a199>").Append(DishType(recipe));
-            if(!IsOnMenu(recipe)) sb.Append(" · not on the menu");
-            sb.Append("</color>\n\n");
 
             foreach(IngredientPortion portion in recipe.Portions)
             {
@@ -824,12 +837,11 @@ namespace Cooking.Prototype
                 string readiness = cooking != null ? "<color=#73cc73>" + cooking + "</color>"
                     : ready >= portion.quantity ? "<color=#73cc73>ready</color>"
                     : total >= portion.quantity ? "<color=#f28c33>needs prep</color>"
-                    : "<color=#e5594d>short</color>";
+                    : "";
                 // Prep only: how it's cooked is the dish type above, and repeating it wraps the narrow ticket.
                 sb.Append("- ").Append(Describe(new IngredientPortion(portion.ingredient, portion.quantity, portion.prep))).Append("  ").Append(readiness).Append('\n');
             }
 
-            sb.Append("<color=#a6a199>Steps: Menu tab.</color>\n");
             sb.Append("\nMenu price <b>$").Append(DishJudge.MenuPrice(recipe, margin).ToString("0.00")).Append("</b>");
 
             return sb.ToString();
@@ -866,50 +878,32 @@ namespace Cooking.Prototype
         {
             overlayOpen = true;
             tabletPage = TabletPage.Order;
-            tabletBig = false;
             resultOverlay.SetActive(true);
             resultScroll.anchoredPosition = Vector2.zero;
 
-            string title;
+            // The headline is one of three: the order, a different dish they liked, or one they didn't.
             string line;
+            string title;
             Color color;
+            bool liked = change.FirstTaste || (result.IsPaid && !result.PaidAnyway && result.Verdict != Verdict.CloseEnough) || result.Verdict == Verdict.DreamMeal;
 
-            switch(result.Verdict)
+            if(result.ExactMatch && result.Verdict != Verdict.Refused)
             {
-                case Verdict.DreamMeal:
-                    title = change.FoundDream ? "Their dream meal!" : "Their dream meal, again"; line = customer.dreamLine; color = UIFactory.Accent; break;
-                case Verdict.Ordered:
-                    title = "Just what they ordered. They liked it"; line = customer.likedLine; color = UIFactory.Good; break;
-                case Verdict.VeryClose:
-                    title = "Wrong order, good food. They liked it"; line = customer.likedLine; color = UIFactory.Good; break;
-                case Verdict.CloseEnough:
-                    title = "Wrong order, good food. They pay, but not all of it"; line = "It's... fine."; color = UIFactory.Accent; break;
-                case Verdict.Refused:
-                    title = "Wrong order, bad food. They won't eat it"; line = customer.refusedLine; color = UIFactory.Bad; break;
-                default:
-                    title = "Wrong order, bad food. They won't pay"; line = customer.dislikedLine; color = UIFactory.Bad; break;
-            }
-
-            if(result.SameZone && result.Verdict == Verdict.VeryClose)
-            {
-                title = "Wrong order, but just as tasty. They pay in full and tip";
-            }
-
-            if(change.FirstTaste)
-            {
-                title = "They've never tasted anything like it. They liked it";
-                line = customer.likedLine;
+                title = "Correct order";
                 color = UIFactory.Good;
+                line = result.Verdict == Verdict.DreamMeal ? customer.dreamLine : customer.likedLine;
             }
-            else if(result.PaidAnyway)
+            else if(liked)
             {
-                title = "They can't tell good food from bad yet. They pay anyway";
+                title = "Wrong order, but they liked it";
                 color = UIFactory.Accent;
+                line = result.Verdict == Verdict.DreamMeal ? customer.dreamLine : customer.likedLine;
             }
-
-            if(stayingAway > 0)
+            else
             {
-                title += ". They'll stay away for " + (stayingAway == 1 ? "a cycle" : "a couple of cycles");
+                title = "Wrong order and they didn't like it";
+                color = UIFactory.Bad;
+                line = result.Verdict == Verdict.Refused ? customer.refusedLine : customer.dislikedLine;
             }
 
             resultTitle.text = title;
@@ -925,26 +919,18 @@ namespace Cooking.Prototype
 
             StringBuilder sb = new StringBuilder();
             sb.Append(DescribeChange(change));
-            sb.Append("<b>Ordered</b>  ").Append(DishName(order)).Append('\n');
-            sb.Append("<b>Served</b>\n");
-            foreach(IngredientPortion portion in plate) sb.Append("  ").Append(Describe(portion, true)).Append('\n');
-
-            sb.Append("\n<b>Flavour profile</b>\n<size=17>").Append(result.Dish.ToString()).Append("</size>\n\n");
-            sb.Append(DescribeSimilarity(result)).Append('\n');
-            if(result.RefusedIngredient != null) sb.Append("Won't eat: <color=#e5594d>").Append(result.RefusedIngredient.DisplayName).Append("</color>\n");
-            if(showDesireDebug && result.DesireScore >= 0f) sb.Append("<color=#a6a199>Secret desire (debug): ").Append((result.DesireScore * 100f).ToString("0")).Append("%</color>\n");
-
-            float profit = result.Payment + result.Tip - dishCost;
-            sb.Append("\nPaid <b>$").Append(result.Payment.ToString("0.00")).Append("</b>");
-            if(result.IsPaid && result.PayShare < 1f) sb.Append("  <color=#a6a199>(").Append((result.PayShare * 100f).ToString("0")).Append("% of $").Append(result.Price.ToString("0.00")).Append(")</color>");
-            if(result.Tip > 0f) sb.Append("  + tip <b>$").Append(result.Tip.ToString("0.00")).Append("</b>");
-            sb.Append("\nIngredients used $").Append(dishCost.ToString("0.00"));
-            sb.Append("\nProfit <b><color=#").Append(profit >= 0f ? "73cc73" : "e5594d").Append(">$").Append(profit.ToString("0.00")).Append("</color></b>");
+            if(sb.Length > 0) sb.Append('\n');
+            AppendOrderAndReceipt(sb, DishName(order), plate, result.Price, result.Payment + result.Tip, dishCost);
+            if(result.Tip > 0f) sb.Append("  <color=#a6a199>(with a $").Append(result.Tip.ToString("0.00")).Append(" tip)</color>\n");
+            if(result.RefusedIngredient != null) sb.Append("\nWon't eat: <color=#e5594d>").Append(result.RefusedIngredient.DisplayName).Append("</color>\n");
+            if(showDesireDebug && result.DesireScore >= 0f) sb.Append("<color=#a6a199>Favourite flavour (debug): ").Append((result.DesireScore * 100f).ToString("0")).Append("%</color>\n");
             resultBody.text = sb.ToString();
 
-            // Only your dish, and the order when you knew what it was.
+            // The dish on the radar; no zone (the nearest one was misleading when the dish wasn't in it).
             resultRadar.ClearProfiles();
-            if(orderKnown) resultRadar.AddProfile(result.Ordered, new Color(0.85f, 0.85f, 0.85f, 0.7f), false);
+            resultRadar.SetZones(null);
+            // The order's outline, when it's a dish you know, to compare the taste with.
+            if(orderKnown) resultRadar.AddProfile(result.Ordered, new Color(0.85f, 0.85f, 0.85f, 0.8f), false);
             resultRadar.AddProfile(result.Dish, UIFactory.Accent, true);
 
             ShowNaming(currentEntry != null ? currentEntry.Dish : null);
@@ -977,7 +963,11 @@ namespace Cooking.Prototype
             return header;
         }
 
-        /// <summary>The Dish Served page, on the big tablet.</summary>
+        /// <summary>
+        /// The Dish Served page, on the tablet (the tabs hide while it's up): the dish's picture, its
+        /// flavour profile with the tasty zone it fell in, what was ordered and received, the receipt,
+        /// and a chance to save the dish before Continue.
+        /// </summary>
         private void BuildResultOverlay(Transform pages)
         {
             Image overlay = UIFactory.Panel(pages, "Dish Served", UIFactory.PanelColor);
@@ -985,56 +975,56 @@ namespace Cooking.Prototype
             resultOverlay = overlay.gameObject;
             RectTransform panel = overlay.rectTransform;
 
-            RectTransform radarArea = UIFactory.Rect(panel, "Radar");
-            UIFactory.Place(radarArea, 0f, 0f, 0.45f, 1f, 30f);
+            RectTransform left = UIFactory.Rect(panel, "Picture and Flavour");
+            UIFactory.Place(left, 0f, 0f, 0.4f, 1f, 6f);
+            VerticalLayoutGroup leftLayout = UIFactory.Vertical(left.gameObject, 2f, 0);
+            leftLayout.childForceExpandHeight = false;
+            leftLayout.childAlignment = TextAnchor.UpperCenter;
+            leftLayout.childForceExpandWidth = false;
+            resultPicture = UIFactory.Rect(left, "Dish Picture");
+            UIFactory.Size(resultPicture, 84f, 0f, 84f, 0f);
+            RectTransform radarArea = UIFactory.Rect(left, "Radar");
+            UIFactory.Size(radarArea, 120f, 1f, 200f, 1f);
             resultRadar = radarArea.gameObject.AddComponent<FlavourRadarGraphic>();
             resultRadar.raycastTarget = false;
-            resultRadar.CreateLabels(UIFactory.Font, 18, UIFactory.MutedText);
+            resultRadar.SetLabelMargin(26f);
+            resultRadar.CreateLabels(UIFactory.Font, 10, UIFactory.MutedText);
 
             RectTransform right = UIFactory.Rect(panel, "Details");
-            UIFactory.Place(right, 0.45f, 0f, 1f, 1f, 30f);
-            VerticalLayoutGroup layout = UIFactory.Vertical(right.gameObject, 12f, 0);
+            UIFactory.Place(right, 0.4f, 0f, 1f, 1f, 6f);
+            VerticalLayoutGroup layout = UIFactory.Vertical(right.gameObject, 4f, 0);
             layout.childForceExpandHeight = false;
 
-            RectTransform titleRow = UIFactory.Row(right, 150f, 16f);
-            titleRow.GetComponent<HorizontalLayoutGroup>().childForceExpandWidth = false;
-            resultPicture = UIFactory.Rect(titleRow, "Dish Picture");
-            UIFactory.Size(resultPicture, 150f, 0f, 150f, 0f);
-            resultTitle = UIFactory.Label(titleRow, "", 30, TextAnchor.MiddleLeft, FontStyle.Bold);
-            UIFactory.Size(resultTitle, -1f, -1f, -1f, 1f);
+            resultTitle = UIFactory.Label(right, "", 15, TextAnchor.UpperLeft, FontStyle.Bold);
+            UIFactory.Size(resultTitle, 40f, 0f);
+            UIFactory.FitText(resultTitle);
 
-            // What they say and the report scroll; the title, name field and Continue stay put.
-            resultScroll = UIFactory.ScrollList(right, 14f);
-            resultSpeech = UIFactory.Label(resultScroll, "", 20, TextAnchor.UpperLeft, FontStyle.Italic);
-            resultBody = UIFactory.Label(resultScroll, "", 18);
+            resultScroll = UIFactory.ScrollList(right, 4f);
+            resultBody = UIFactory.Label(resultScroll, "", 13);
 
             BuildNamingRow(right);
 
-            RectTransform row = UIFactory.Row(right, 56f);
-            resultButton = UIFactory.Button(row, "Continue", AfterResult, new Color(0.75f, 0.42f, 0.15f, 1f), 24);
+            RectTransform row = UIFactory.Row(right, 34f);
+            resultButton = UIFactory.Button(row, "Continue", AfterResult, Orange, 16);
 
             resultOverlay.SetActive(false);
         }
 
-        /// <summary>The End of Cycle page, on the big tablet.</summary>
+        /// <summary>The End of Cycle page, on the tablet.</summary>
         private void BuildSummaryOverlay(Transform pages)
         {
-            Image overlay = UIFactory.Panel(pages, "End of Cycle", UIFactory.Background);
+            Image overlay = UIFactory.Panel(pages, "End of Cycle", UIFactory.PanelColor);
             UIFactory.Stretch(overlay.rectTransform);
             summaryOverlay = overlay.gameObject;
-
-            RectTransform panel = UIFactory.Panel(overlay.transform, "Summary", UIFactory.PanelColor).rectTransform;
-            panel.anchorMin = new Vector2(0.5f, 0f);
-            panel.anchorMax = new Vector2(0.5f, 1f);
-            panel.sizeDelta = new Vector2(900f, -24f);
-            VerticalLayoutGroup layout = UIFactory.Vertical(panel.gameObject, 14f, 32);
+            VerticalLayoutGroup layout = UIFactory.Vertical(overlay.gameObject, 6f, 10);
             layout.childForceExpandHeight = false;
 
-            summaryTitle = UIFactory.Label(panel, "", 36, TextAnchor.UpperLeft, FontStyle.Bold, UIFactory.Accent);
-            RectTransform scroll = UIFactory.ScrollList(panel, 0f);
-            summaryBody = UIFactory.Label(scroll, "", 19);
-            RectTransform row = UIFactory.Row(panel, 56f);
-            summaryButton = UIFactory.Button(row, "Start next cycle", NextDay, new Color(0.75f, 0.42f, 0.15f, 1f), 24);
+            summaryTitle = UIFactory.Label(overlay.transform, "", 20, TextAnchor.UpperLeft, FontStyle.Bold, UIFactory.Accent);
+            UIFactory.Size(summaryTitle, 28f, 0f);
+            RectTransform scroll = UIFactory.ScrollList(overlay.transform, 0f);
+            summaryBody = UIFactory.Label(scroll, "", 13);
+            RectTransform row = UIFactory.Row(overlay.transform, 34f);
+            summaryButton = UIFactory.Button(row, "Start next cycle", NextDay, Orange, 16);
 
             summaryOverlay.SetActive(false);
         }

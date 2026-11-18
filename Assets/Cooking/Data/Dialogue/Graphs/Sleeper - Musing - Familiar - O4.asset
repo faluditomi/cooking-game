@@ -1,0 +1,78 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Sleeper - Musing - Familiar - O4
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: bee05784-7e9a-4080-8a6c-ee34b9eb2672
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: 9253e52e-317c-4116-82d2-4ca929606bd5
+    kind: 0
+    line:
+      text: Get this, I walked past the seaweed noodle forge the other day. Seaweed noodle sweatshop, more like.
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: ab7b51cc-be17-45db-b14e-9e5839ff5268
+    kind: 0
+    line:
+      text: Anyhow, I was walking, lost in thought, and when I got to the entrance, I instinctively turned in.
+      delaySeconds: 4.6
+    editorPosition: {x: 520, y: 0}
+  - guid: 98fef47f-7f71-43cc-a9b6-6776655b276b
+    kind: 0
+    line:
+      text: Reached for the door terminal and everything.
+      delaySeconds: 4.5
+    editorPosition: {x: 780, y: 0}
+  - guid: 54a4049f-6fd4-4581-bf98-b84406b19a58
+    kind: 0
+    line:
+      text: I was dumbfounded in front of that door. It was the strangest feeling.
+      delaySeconds: 2.6
+    editorPosition: {x: 1040, y: 0}
+  - guid: 5abcafc5-c735-4958-9fbe-1b1788208dbc
+    kind: 0
+    line:
+      text: The smell of seaweed... It was familiar. Like it was always there, enveloping me.
+      delaySeconds: 3.5
+    editorPosition: {x: 1300, y: 0}
+  - guid: 844f65b7-8418-4289-bcf8-28f5a302711d
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 1560, y: 0}
+  edges:
+  - fromNodeGuid: bee05784-7e9a-4080-8a6c-ee34b9eb2672
+    fromOptionGuid: 
+    toNodeGuid: 9253e52e-317c-4116-82d2-4ca929606bd5
+  - fromNodeGuid: 9253e52e-317c-4116-82d2-4ca929606bd5
+    fromOptionGuid: 
+    toNodeGuid: ab7b51cc-be17-45db-b14e-9e5839ff5268
+  - fromNodeGuid: ab7b51cc-be17-45db-b14e-9e5839ff5268
+    fromOptionGuid: 
+    toNodeGuid: 98fef47f-7f71-43cc-a9b6-6776655b276b
+  - fromNodeGuid: 98fef47f-7f71-43cc-a9b6-6776655b276b
+    fromOptionGuid: 
+    toNodeGuid: 54a4049f-6fd4-4581-bf98-b84406b19a58
+  - fromNodeGuid: 54a4049f-6fd4-4581-bf98-b84406b19a58
+    fromOptionGuid: 
+    toNodeGuid: 5abcafc5-c735-4958-9fbe-1b1788208dbc
+  - fromNodeGuid: 5abcafc5-c735-4958-9fbe-1b1788208dbc
+    fromOptionGuid: 
+    toNodeGuid: 844f65b7-8418-4289-bcf8-28f5a302711d
+  isOneShot: 0
+  payload: 

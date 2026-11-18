@@ -104,7 +104,10 @@ namespace Cooking.Prototype
         /// one of <paramref name="known"/> exactly is remembered as that recipe; otherwise a
         /// <see cref="Nameless"/> recipe is made from the plate.
         /// </summary>
-        public RelationshipChange Record(JudgeResult result, IReadOnlyList<IngredientPortion> served, IReadOnlyList<RecipeDefinition> known = null)
+        /// <param name="inFavourite">Whether a recipe tastes like their favourite flavour. After their dream
+        /// meal, the dishes they started out liking that don't are dropped. Null keeps them all.</param>
+        public RelationshipChange Record(JudgeResult result, IReadOnlyList<IngredientPortion> served, IReadOnlyList<RecipeDefinition> known = null,
+            System.Predicate<RecipeDefinition> inFavourite = null)
         {
             RelationshipChange change = new RelationshipChange { Before = Stage };
 
@@ -116,6 +119,14 @@ namespace Cooking.Prototype
                 {
                     DreamMeal = FindMatch(known, served) ?? CreateMeal(Nameless, served);
                     change.FoundDream = true;
+
+                    // The dishes they started out liking only stay if they taste like their favourite.
+                    if(inFavourite != null && Customer.orders != null)
+                    {
+                        likedMeals.RemoveAll(meal => Customer.orders.Contains(meal) && !inFavourite(meal));
+                    }
+
+                    if(!likedMeals.Contains(DreamMeal)) likedMeals.Add(DreamMeal);
                 }
 
                 // Real food at last: their first liked meals go.
@@ -149,8 +160,8 @@ namespace Cooking.Prototype
             {
                 LikedCount++;
 
-                // Very close but not the order: they liked it, so they'll ask for it again.
-                if(result.Verdict == Verdict.VeryClose && FindMatch(likedMeals, served) == null)
+                // In (or close to) their favourite flavour: they'll ask for it again.
+                if(result.Verdict != Verdict.Ordered && (result.Favourite || result.DesireScore >= CloseToFavourite) && FindMatch(likedMeals, served) == null)
                 {
                     change.NewLikedMeal = FindMatch(known, served) ?? CreateMeal(Nameless, served);
                     likedMeals.Add(change.NewLikedMeal);
@@ -163,10 +174,13 @@ namespace Cooking.Prototype
             return change;
         }
 
-        /// <summary>A dish inside one of the desirable flavour zones.</summary>
+        /// <summary>Score against their favourite flavour that counts as "close to it" for remembering a dish they liked.</summary>
+        public const float CloseToFavourite = 0.4f;
+
+        /// <summary>A dish inside one of the desirable flavour zones (forgivingly).</summary>
         public static bool TastesGood(JudgeResult result)
         {
-            return result.BestZone.Zone != null && result.BestZone.Score >= 1f;
+            return DishJudge.IsTasty(result);
         }
 
         /// <summary>The first of <paramref name="recipes"/> the plate makes exactly, or null.</summary>

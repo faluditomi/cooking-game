@@ -1,0 +1,96 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Sleeper - Musing - Friendly - O1
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: 981ed7f6-4a72-4927-9f2a-050c03f69d02
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: fa1f34eb-c334-4be1-bf65-f52ddb8cf8d2
+    kind: 0
+    line:
+      text: Don't think I ever told you the reason I came to your stall the day I got here.
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: 3b1b1829-b917-4491-9be9-96ba875b8e1c
+    kind: 0
+    line:
+      text: You were basically my first stop, and only because I saw someone walking away from here with a weird, steaming plate of stuff -- and a big smile.
+      delaySeconds: 3.8
+    editorPosition: {x: 520, y: 0}
+  - guid: 78cda8f7-dc55-402d-8d9d-35d625b1b983
+    kind: 0
+    line:
+      text: I knew what it was, the smile, that is. Yet, it felt alien.
+      delaySeconds: 6.2
+    editorPosition: {x: 780, y: 0}
+  - guid: 5fed4a62-7c78-4ad4-a097-62d832900f42
+    kind: 0
+    line:
+      text: Like something you read about, but never see in real life. You know, like books.
+      delaySeconds: 3.1
+    editorPosition: {x: 1040, y: 0}
+  - guid: 7f073b95-53d0-45c5-a2f3-99569cc33067
+    kind: 0
+    line:
+      text: And sometimes I think about what would have happened if I don't find your stall that day...
+      delaySeconds: 3.9
+    editorPosition: {x: 1300, y: 0}
+  - guid: 2403794e-5ad0-4bc2-a072-7e0356ebeb70
+    kind: 0
+    line:
+      text: Anyways, I did, and I got my fair share of smiles too.
+      delaySeconds: 4.2
+    editorPosition: {x: 1560, y: 0}
+  - guid: 99a60b06-0e00-4263-abd3-8bac5d4bc147
+    kind: 0
+    line:
+      text: Your stall has a charm, like no other.
+      delaySeconds: 2.9
+    editorPosition: {x: 1820, y: 0}
+  - guid: 594420f0-1f23-4d8a-9374-04b2d1cefe00
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 2080, y: 0}
+  edges:
+  - fromNodeGuid: 981ed7f6-4a72-4927-9f2a-050c03f69d02
+    fromOptionGuid: 
+    toNodeGuid: fa1f34eb-c334-4be1-bf65-f52ddb8cf8d2
+  - fromNodeGuid: fa1f34eb-c334-4be1-bf65-f52ddb8cf8d2
+    fromOptionGuid: 
+    toNodeGuid: 3b1b1829-b917-4491-9be9-96ba875b8e1c
+  - fromNodeGuid: 3b1b1829-b917-4491-9be9-96ba875b8e1c
+    fromOptionGuid: 
+    toNodeGuid: 78cda8f7-dc55-402d-8d9d-35d625b1b983
+  - fromNodeGuid: 78cda8f7-dc55-402d-8d9d-35d625b1b983
+    fromOptionGuid: 
+    toNodeGuid: 5fed4a62-7c78-4ad4-a097-62d832900f42
+  - fromNodeGuid: 5fed4a62-7c78-4ad4-a097-62d832900f42
+    fromOptionGuid: 
+    toNodeGuid: 7f073b95-53d0-45c5-a2f3-99569cc33067
+  - fromNodeGuid: 7f073b95-53d0-45c5-a2f3-99569cc33067
+    fromOptionGuid: 
+    toNodeGuid: 2403794e-5ad0-4bc2-a072-7e0356ebeb70
+  - fromNodeGuid: 2403794e-5ad0-4bc2-a072-7e0356ebeb70
+    fromOptionGuid: 
+    toNodeGuid: 99a60b06-0e00-4263-abd3-8bac5d4bc147
+  - fromNodeGuid: 99a60b06-0e00-4263-abd3-8bac5d4bc147
+    fromOptionGuid: 
+    toNodeGuid: 594420f0-1f23-4d8a-9374-04b2d1cefe00
+  isOneShot: 1
+  payload: 

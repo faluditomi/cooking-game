@@ -13,39 +13,39 @@ MonoBehaviour:
   m_Name: Woman - WrongOrderNasty - Stranger - O1
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: 889ff89f-11b2-4e84-b787-15a80a27aa68
+  - guid: 980f7cb2-be5a-4468-8c86-3db3a4431910
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 7eb3d7b9-7bcc-4847-aaf1-8a70dff10b0d
+  - guid: 328150cf-a66d-4b4f-b2bb-5a5a5d3e4b3e
     kind: 0
     line:
       text: Can't read, can't cook.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: b2d15285-567c-4210-a810-29376a7f389a
+  - guid: 527977ad-5171-4a30-9a4d-66743703b38f
     kind: 0
     line:
       text: You're lucky you're the only food stall in the Bright Market.
       delaySeconds: 1.8
     editorPosition: {x: 520, y: 0}
-  - guid: 12af92ac-a09d-4327-9206-7078d141b2e7
+  - guid: 89f6f3fd-e792-471c-8b66-cc353e59d932
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 780, y: 0}
   edges:
-  - fromNodeGuid: 889ff89f-11b2-4e84-b787-15a80a27aa68
+  - fromNodeGuid: 980f7cb2-be5a-4468-8c86-3db3a4431910
     fromOptionGuid: 
-    toNodeGuid: 7eb3d7b9-7bcc-4847-aaf1-8a70dff10b0d
-  - fromNodeGuid: 7eb3d7b9-7bcc-4847-aaf1-8a70dff10b0d
+    toNodeGuid: 328150cf-a66d-4b4f-b2bb-5a5a5d3e4b3e
+  - fromNodeGuid: 328150cf-a66d-4b4f-b2bb-5a5a5d3e4b3e
     fromOptionGuid: 
-    toNodeGuid: b2d15285-567c-4210-a810-29376a7f389a
-  - fromNodeGuid: b2d15285-567c-4210-a810-29376a7f389a
+    toNodeGuid: 527977ad-5171-4a30-9a4d-66743703b38f
+  - fromNodeGuid: 527977ad-5171-4a30-9a4d-66743703b38f
     fromOptionGuid: 
-    toNodeGuid: 12af92ac-a09d-4327-9206-7078d141b2e7
+    toNodeGuid: 89f6f3fd-e792-471c-8b66-cc353e59d932
   isOneShot: 0
   payload: 

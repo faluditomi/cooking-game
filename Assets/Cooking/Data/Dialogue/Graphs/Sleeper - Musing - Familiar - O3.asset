@@ -1,0 +1,78 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Sleeper - Musing - Familiar - O3
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: d36a0822-e396-4565-8af4-354390962829
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: 18811d9d-1afe-4f89-a3c0-cb5a881d2554
+    kind: 0
+    line:
+      text: Have you ever though about making a Sleeper Menu?
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: d0f6bccd-c021-4b0d-92ae-2846ee566e0a
+    kind: 0
+    line:
+      text: You know... Food meant for Sleepers?
+      delaySeconds: 2.8
+    editorPosition: {x: 520, y: 0}
+  - guid: 8fee432e-f8fd-4eaa-a0d3-65dbed36a01a
+    kind: 0
+    line:
+      text: These tongues don't taste much, but a lot of your dishes... Ohh, they taste plenty!
+      delaySeconds: 2.3
+    editorPosition: {x: 780, y: 0}
+  - guid: a969f547-c9de-46b8-9cfc-b8fb9c2a9ede
+    kind: 0
+    line:
+      text: And, of course, the MSG cubes.
+      delaySeconds: 4
+    editorPosition: {x: 1040, y: 0}
+  - guid: d4770e41-7d73-438d-8391-ede22cbba028
+    kind: 0
+    line:
+      text: Ahhh, the MSG cubes!
+      delaySeconds: 2.1
+    editorPosition: {x: 1300, y: 0}
+  - guid: 2cf9e419-9377-4d72-bdc1-21ddb91b9302
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 1560, y: 0}
+  edges:
+  - fromNodeGuid: d36a0822-e396-4565-8af4-354390962829
+    fromOptionGuid: 
+    toNodeGuid: 18811d9d-1afe-4f89-a3c0-cb5a881d2554
+  - fromNodeGuid: 18811d9d-1afe-4f89-a3c0-cb5a881d2554
+    fromOptionGuid: 
+    toNodeGuid: d0f6bccd-c021-4b0d-92ae-2846ee566e0a
+  - fromNodeGuid: d0f6bccd-c021-4b0d-92ae-2846ee566e0a
+    fromOptionGuid: 
+    toNodeGuid: 8fee432e-f8fd-4eaa-a0d3-65dbed36a01a
+  - fromNodeGuid: 8fee432e-f8fd-4eaa-a0d3-65dbed36a01a
+    fromOptionGuid: 
+    toNodeGuid: a969f547-c9de-46b8-9cfc-b8fb9c2a9ede
+  - fromNodeGuid: a969f547-c9de-46b8-9cfc-b8fb9c2a9ede
+    fromOptionGuid: 
+    toNodeGuid: d4770e41-7d73-438d-8391-ede22cbba028
+  - fromNodeGuid: d4770e41-7d73-438d-8391-ede22cbba028
+    fromOptionGuid: 
+    toNodeGuid: 2cf9e419-9377-4d72-bdc1-21ddb91b9302
+  isOneShot: 0
+  payload: 

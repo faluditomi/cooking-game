@@ -410,14 +410,11 @@ namespace Cooking.Prototype
             {
                 UIFactory.ClearChildren(board.Pieces);
 
-                if(board.Units == null)
-                {
-                    board.Label.text = "Cutting board";
-                    continue;
-                }
+                // No text on the boards: the pieces show what's there.
+                board.Label.text = "";
+                if(board.Units == null) continue;
 
-                AddPile(board.Pieces, board.Units.ingredient.Icon, Mathf.Min(board.Units.quantity, 4), 70f, new Vector2(0.5f, 0.5f));
-                board.Label.text = Describe(board.Units, true);
+                AddPile(board.Pieces, PrepSprites.For(board.Units.ingredient, board.Units.prep), Mathf.Min(board.Units.quantity, 4), 70f, new Vector2(0.5f, 0.5f));
             }
 
             UpdateBoardProgress();

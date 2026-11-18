@@ -13,39 +13,39 @@ MonoBehaviour:
   m_Name: Woman - CorrectOrder - Familiar - O1
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: 5fc2d250-887f-4faa-b99a-b3399b0625d3
+  - guid: 338b68c8-6d67-4f16-8376-d295e333e6b7
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 02a46bcf-a6ce-4aec-a026-621480557f15
+  - guid: 4d6923f9-a0ca-4cf7-9219-c4312faa3a3c
     kind: 0
     line:
       text: That hits the spot.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: 0ae357a5-3cfa-4921-83c0-187f48d6396b
+  - guid: e46df5dd-4908-4bb6-b3dc-adad5993bbae
     kind: 0
     line:
       text: I'll see you around, ey?
       delaySeconds: 1.7
     editorPosition: {x: 520, y: 0}
-  - guid: 62a00f00-655c-4989-8cb0-4abd9a5add38
+  - guid: ba1f536c-c39d-4fee-93c7-07b82a8eca7d
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 780, y: 0}
   edges:
-  - fromNodeGuid: 5fc2d250-887f-4faa-b99a-b3399b0625d3
+  - fromNodeGuid: 338b68c8-6d67-4f16-8376-d295e333e6b7
     fromOptionGuid: 
-    toNodeGuid: 02a46bcf-a6ce-4aec-a026-621480557f15
-  - fromNodeGuid: 02a46bcf-a6ce-4aec-a026-621480557f15
+    toNodeGuid: 4d6923f9-a0ca-4cf7-9219-c4312faa3a3c
+  - fromNodeGuid: 4d6923f9-a0ca-4cf7-9219-c4312faa3a3c
     fromOptionGuid: 
-    toNodeGuid: 0ae357a5-3cfa-4921-83c0-187f48d6396b
-  - fromNodeGuid: 0ae357a5-3cfa-4921-83c0-187f48d6396b
+    toNodeGuid: e46df5dd-4908-4bb6-b3dc-adad5993bbae
+  - fromNodeGuid: e46df5dd-4908-4bb6-b3dc-adad5993bbae
     fromOptionGuid: 
-    toNodeGuid: 62a00f00-655c-4989-8cb0-4abd9a5add38
+    toNodeGuid: ba1f536c-c39d-4fee-93c7-07b82a8eca7d
   isOneShot: 0
   payload: 

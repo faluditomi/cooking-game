@@ -13,48 +13,48 @@ MonoBehaviour:
   m_Name: Woman - WrongOrderTasty - Familiar - O3
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: 3bd1e35c-d99f-4a6f-8c03-acab5fbb010d
+  - guid: f786ba80-ec7f-4987-9a57-69d80fc152af
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: d0fda8ef-630e-49de-9dcd-5f201a6e104c
+  - guid: d0630ab7-b5f6-4589-b130-f52ffa17bd04
     kind: 0
     line:
       text: This...
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: 73515eaa-e27a-4039-b105-496a09f8a887
+  - guid: cebcaf53-0d61-49f9-85c3-3032c5b26a01
     kind: 0
     line:
       text: This is good shit, Pot Boy.
       delaySeconds: 1.2
     editorPosition: {x: 520, y: 0}
-  - guid: e04ed48b-21d8-41e1-9f69-6dc09b6e2aa9
+  - guid: f7a57caf-78af-4ecd-9608-5b834f492ee9
     kind: 0
     line:
       text: Update your menu, for Flux' sake!
       delaySeconds: 2
     editorPosition: {x: 780, y: 0}
-  - guid: a1fdc1e1-2676-42e9-acb6-37e79afc5a56
+  - guid: 851be6a0-354c-42b4-9766-ca78c3ffa1e5
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 1040, y: 0}
   edges:
-  - fromNodeGuid: 3bd1e35c-d99f-4a6f-8c03-acab5fbb010d
+  - fromNodeGuid: f786ba80-ec7f-4987-9a57-69d80fc152af
     fromOptionGuid: 
-    toNodeGuid: d0fda8ef-630e-49de-9dcd-5f201a6e104c
-  - fromNodeGuid: d0fda8ef-630e-49de-9dcd-5f201a6e104c
+    toNodeGuid: d0630ab7-b5f6-4589-b130-f52ffa17bd04
+  - fromNodeGuid: d0630ab7-b5f6-4589-b130-f52ffa17bd04
     fromOptionGuid: 
-    toNodeGuid: 73515eaa-e27a-4039-b105-496a09f8a887
-  - fromNodeGuid: 73515eaa-e27a-4039-b105-496a09f8a887
+    toNodeGuid: cebcaf53-0d61-49f9-85c3-3032c5b26a01
+  - fromNodeGuid: cebcaf53-0d61-49f9-85c3-3032c5b26a01
     fromOptionGuid: 
-    toNodeGuid: e04ed48b-21d8-41e1-9f69-6dc09b6e2aa9
-  - fromNodeGuid: e04ed48b-21d8-41e1-9f69-6dc09b6e2aa9
+    toNodeGuid: f7a57caf-78af-4ecd-9608-5b834f492ee9
+  - fromNodeGuid: f7a57caf-78af-4ecd-9608-5b834f492ee9
     fromOptionGuid: 
-    toNodeGuid: a1fdc1e1-2676-42e9-acb6-37e79afc5a56
+    toNodeGuid: 851be6a0-354c-42b4-9766-ca78c3ffa1e5
   isOneShot: 0
   payload: 

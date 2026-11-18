@@ -7,9 +7,9 @@ namespace Cooking.Prototype
     /// <summary>
     /// The screen from the Miro mock-up. The conversation runs down the left at full height. On the
     /// right, the market and the customer are on top (with the prep tools hanging from the stall roof)
-    /// and the workbench is below. The tablet is built into the workbench: small, it shows the order;
-    /// it opens big over the right side for the shop, recipes, history, and the result and end-of-cycle
-    /// pages.
+    /// and the workbench is below. The tablet is built into the workbench and everything on it fits
+    /// there: the Current Order, Menu, History and Flavour Profiles tabs, and the Dish Served and End
+    /// of Cycle pages (which hide the tabs). Shopping happens at the market stall in the morning.
     /// </summary>
     public partial class CookingPrototype
     {
@@ -17,7 +17,7 @@ namespace Cooking.Prototype
         private const float ConversationWidth = 0.22f;
         /// <summary>Share of the screen height the workbench takes at the bottom right.</summary>
         private const float DeskShare = 0.56f;
-        private const float TabletBarHeight = 42f;
+        private const float TabletBarHeight = 30f;
         private static readonly Color Orange = new Color(0.75f, 0.42f, 0.15f, 1f);
 
         private enum TabletPage
@@ -25,7 +25,7 @@ namespace Cooking.Prototype
             Order,
             Recipes,
             History,
-            Shop,
+            Flavours,
         }
 
         [Header("Market art")]
@@ -47,7 +47,7 @@ namespace Cooking.Prototype
 
         [Header("Labels")]
         [Tooltip("Pantry and desk ingredients show \"x2 Pak Choi\" under them. Off: the name shows only above what's held. Also switchable on the title screen.")]
-        [SerializeField] private bool ingredientLabels = true;
+        [SerializeField] private bool ingredientLabels;
 
         /// <summary>When a warning toast over the desk hides again (unscaled time).</summary>
         private float toastUntil;
@@ -67,13 +67,10 @@ namespace Cooking.Prototype
         private RectTransform tablet;
         private RectTransform tabletPages;
         private TabletPage tabletPage = TabletPage.Order;
-        private bool tabletBig;
-        private bool? tabletShownBig;
         private bool? tabletShownSpecial;
         private GameObject orderPage;
-        private GameObject shopPage;
+        private RectTransform tabletBar;
         private readonly Dictionary<TabletPage, Button> tabletTabs = new Dictionary<TabletPage, Button>();
-        private Button tabletSizeButton;
 
         // Market
         private GameObject npcFigure;
@@ -134,12 +131,6 @@ namespace Cooking.Prototype
 
         private void ShowTabletPage(TabletPage page)
         {
-            if(page == TabletPage.Shop && phase != Phase.Morning)
-            {
-                Say("The market only sells in the morning.", UIFactory.Bad);
-                return;
-            }
-
             tabletPage = page;
 
             if(page == TabletPage.Recipes)
@@ -152,17 +143,6 @@ namespace Cooking.Prototype
 
             if(page == TabletPage.Recipes) bookPage = BookPage.Recipes;
             if(page == TabletPage.History) bookPage = BookPage.History;
-
-            // The order fits the small screen; everything else opens it big.
-            tabletBig = page != TabletPage.Order;
-            RefreshAll();
-        }
-
-        private void ToggleTabletSize()
-        {
-            tabletBig = !tabletBig;
-            // Small, the tablet shows the order.
-            if(!tabletBig) tabletPage = TabletPage.Order;
             RefreshAll();
         }
 
@@ -172,51 +152,29 @@ namespace Cooking.Prototype
 
             bool special = TabletSpecial;
             orderPage.SetActive(!special && tabletPage == TabletPage.Order);
-            shopPage.SetActive(!special && tabletPage == TabletPage.Shop);
             recipeBookOverlay.SetActive(!special && (tabletPage == TabletPage.Recipes || tabletPage == TabletPage.History));
+            flavoursPage.SetActive(!special && tabletPage == TabletPage.Flavours);
 
             foreach(KeyValuePair<TabletPage, Button> pair in tabletTabs)
             {
                 pair.Value.GetComponent<Image>().color = pair.Key == tabletPage && !special ? Orange : UIFactory.ButtonColor;
             }
 
-            tabletTabs[TabletPage.Shop].gameObject.SetActive(phase == Phase.Morning);
-            UIFactory.SetButtonText(tabletSizeButton, tabletBig ? "Shrink" : "Expand");
             SyncTablet();
         }
 
-        /// <summary>Puts the tablet in the workbench, or big over the right side, to match the state. Cheap when nothing changed.</summary>
+        /// <summary>The Dish Served and End of Cycle pages take the whole screen, with no tabs. Cheap when nothing changed.</summary>
         private void SyncTablet()
         {
             if(tablet == null) return;
 
             bool special = TabletSpecial;
-            bool big = tabletBig || special;
+            if(tabletShownSpecial == special) return;
 
-            if(tabletShownBig != big)
-            {
-                tabletShownBig = big;
-                float width = 1f - ConversationWidth;
-
-                if(big)
-                {
-                    UIFactory.Place(tablet, ConversationWidth, 0f, 1f, 1f, 10f);
-                }
-                else
-                {
-                    // Where the mock-up has it: bottom left of the workbench.
-                    UIFactory.Place(tablet, ConversationWidth + width * 0.012f, DeskShare * 0.03f, ConversationWidth + width * 0.385f, DeskShare * 0.62f);
-                }
-            }
-
-            if(tabletShownSpecial != special)
-            {
-                tabletShownSpecial = special;
-                foreach(Button tab in tabletTabs.Values) tab.interactable = !special;
-                tabletSizeButton.interactable = !special;
-                // The result and summary pages are only built for the big screen.
-                if(!special) RefreshTablet();
-            }
+            tabletShownSpecial = special;
+            tabletBar.gameObject.SetActive(!special);
+            tabletPages.offsetMax = new Vector2(0f, special ? 0f : -TabletBarHeight);
+            if(!special) RefreshTablet();
         }
 
         private void LateUpdate()
@@ -250,13 +208,15 @@ namespace Cooking.Prototype
             BuildConversation(root);
             BuildMarket(root);
             BuildDesk(root);
-            BuildToast(root);
             BuildTablet(root);
+            BuildStoreScene(root);
+            BuildToast(root);
             BuildTutorial(root);
             BuildTitle(root);
+            BuildPause(root);
         }
 
-        /// <summary>Left, full height: who's at the counter (just their name) and what they say, newest at the top.</summary>
+        /// <summary>Left, full height: who's at the counter (just their name) and what they say, each new line below the last.</summary>
         private void BuildConversation(Transform root)
         {
             RectTransform panel = UIFactory.Panel(root, "Conversation", UIFactory.PanelDark).rectTransform;
@@ -267,12 +227,16 @@ namespace Cooking.Prototype
             sidebarCustomer = UIFactory.Label(panel, "", 30, TextAnchor.UpperLeft, FontStyle.Bold, UIFactory.Accent);
             UIFactory.Size(sidebarCustomer, 40f, 0f);
 
-            // Newest line on top; older ones move down and off the bottom.
+            // Each line goes below the last; once the box is full, older ones scroll off the top.
             RectTransform speechBox = UIFactory.Rect(panel, "Speech");
             UIFactory.Size(speechBox, 80f, 1f);
             speechBox.gameObject.AddComponent<RectMask2D>();
             sidebarSpeech = UIFactory.Label(speechBox, "", 21, TextAnchor.UpperLeft, FontStyle.Italic);
-            UIFactory.Stretch(sidebarSpeech.rectTransform);
+            RectTransform speechRect = sidebarSpeech.rectTransform;
+            speechRect.anchorMin = new Vector2(0f, 1f);
+            speechRect.anchorMax = new Vector2(1f, 1f);
+            speechRect.pivot = new Vector2(0.5f, 1f);
+            speechRect.sizeDelta = Vector2.zero;
         }
 
         /// <summary>A short warning over the desk when something can't be done (it fades on its own).</summary>
@@ -309,14 +273,13 @@ namespace Cooking.Prototype
             UIFactory.Place(market, ConversationWidth, DeskShare, 1f, 1f);
             market.gameObject.AddComponent<RectMask2D>();
 
-            Image street = UIFactory.Panel(market, "Street", new Color(0.07f, 0.065f, 0.09f, 1f));
-            UIFactory.Place(street.rectTransform, 0f, 0f, 1f, 0.24f);
-            street.raycastTarget = false;
+            // The market in the distance, blurred, behind everything.
+            Image backdrop = UIFactory.Panel(market, "Market Backdrop", Color.white);
+            backdrop.sprite = MarketBackdrop.Create();
+            backdrop.raycastTarget = false;
+            UIFactory.Stretch(backdrop.rectTransform);
 
-            AddBillboard(market, new Vector2(0.3f, 0.66f), 1.4f);
-            AddBillboard(market, new Vector2(0.48f, 0.4f), 2.2f);
-            AddBillboard(market, new Vector2(0.78f, 0.36f), 2.2f);
-            ShuffleBillboards();
+            // No ads (demo feedback): just the market.
 
             // The customer: a placeholder figure, bottom left as in the mock-up.
             RectTransform figure = UIFactory.Rect(market, "Customer");
@@ -332,11 +295,12 @@ namespace Cooking.Prototype
             npcHead.raycastTarget = false;
             UIFactory.Place(npcHead.rectTransform, 0.2f, 0.56f, 0.8f, 0.95f);
 
-            // A regular with art stands here instead of the placeholder.
+            // A regular with art stands here instead of the placeholder: close to the counter, seen
+            // from the hips up as in the Miro mock-up (the picture runs on below the workbench).
             npcPortrait = UIFactory.Panel(market, "Portrait", Color.white);
             npcPortrait.preserveAspect = true;
             npcPortrait.raycastTarget = false;
-            UIFactory.Place(npcPortrait.rectTransform, 0f, -0.04f, 0.2f, 0.98f);
+            UIFactory.Place(npcPortrait.rectTransform, 0f, -0.82f, 0.32f, 0.97f);
             npcPortrait.rectTransform.pivot = new Vector2(0.5f, 0f);
             npcPortrait.gameObject.SetActive(false);
 
@@ -351,7 +315,7 @@ namespace Cooking.Prototype
 
         private void AddBillboard(RectTransform market, Vector2 anchor, float scale)
         {
-            Image frame = UIFactory.Panel(market, "Billboard", billboardFrame != null ? Color.white : new Color(0.2f, 0.2f, 0.25f, 1f));
+            Image frame = UIFactory.Panel(market, "Billboard", billboardFrame != null ? new Color(0.75f, 0.72f, 0.8f, 0.85f) : new Color(0.2f, 0.2f, 0.25f, 1f));
             frame.sprite = billboardFrame;
             frame.raycastTarget = false;
             RectTransform rt = frame.rectTransform;
@@ -381,7 +345,8 @@ namespace Cooking.Prototype
                 }
 
                 slot.sprite = ad;
-                slot.color = ad != null ? Color.white : new Color(0.3f, 0.25f, 0.4f, 1f);
+                // Dimmed: they're across the street.
+                slot.color = ad != null ? new Color(0.78f, 0.74f, 0.82f, 0.9f) : new Color(0.3f, 0.25f, 0.4f, 1f);
             }
         }
 
@@ -408,39 +373,34 @@ namespace Cooking.Prototype
                 npcName.text = "";
             }
 
-            marketHint.text = phase == Phase.Morning ? "The market is waking up. Shop on the tablet, then start the day."
-                : phase == Phase.DayOver ? "The market is closing for the night."
-                : customer == null && arrivals.Count > 0 ? "Someone's coming..."
-                : "";
+            marketHint.text = phase == Phase.DayOver ? "The market is closing for the night." : "";
         }
 
-        /// <summary>The tablet: a bezel, a tab bar, and the pages (order, shop, recipe book, result, summary).</summary>
+        /// <summary>The tablet, in the workbench: a bezel, a tab bar, and the pages (order, menu, history, flavour profiles, result, summary).</summary>
         private void BuildTablet(Transform root)
         {
             Image bezel = UIFactory.Panel(root, "Tablet", new Color(0.04f, 0.04f, 0.05f, 1f));
             UIFactory.SkinGlass(bezel, new Color(0.16f, 0.17f, 0.21f, 1f));
             tablet = bezel.rectTransform;
+            // Where the mock-up has it: bottom left of the workbench.
+            float width = 1f - ConversationWidth;
+            UIFactory.Place(tablet, ConversationWidth + width * 0.012f, DeskShare * 0.03f, ConversationWidth + width * 0.385f, DeskShare * 0.62f);
 
             RectTransform screen = UIFactory.Panel(tablet, "Screen", UIFactory.Background).rectTransform;
             UIFactory.Stretch(screen, 8f);
 
-            RectTransform bar = UIFactory.Panel(screen, "Tabs", UIFactory.PanelDark).rectTransform;
-            bar.anchorMin = new Vector2(0f, 1f);
-            bar.anchorMax = Vector2.one;
-            bar.offsetMin = new Vector2(0f, -TabletBarHeight);
-            bar.offsetMax = Vector2.zero;
-            HorizontalLayoutGroup barLayout = UIFactory.Horizontal(bar.gameObject, 4f, 4);
+            tabletBar = UIFactory.Panel(screen, "Tabs", UIFactory.PanelDark).rectTransform;
+            tabletBar.anchorMin = new Vector2(0f, 1f);
+            tabletBar.anchorMax = Vector2.one;
+            tabletBar.offsetMin = new Vector2(0f, -TabletBarHeight);
+            tabletBar.offsetMax = Vector2.zero;
+            HorizontalLayoutGroup barLayout = UIFactory.Horizontal(tabletBar.gameObject, 3f, 3);
             barLayout.childForceExpandWidth = false;
 
-            tabletTabs[TabletPage.Order] = TabletTab(bar, "Current Order", TabletPage.Order);
-            UIFactory.Size(tabletTabs[TabletPage.Order], -1f, -1f, 140f, 0f);
-            tabletTabs[TabletPage.Recipes] = TabletTab(bar, "Menu", TabletPage.Recipes);
-            tabletTabs[TabletPage.History] = TabletTab(bar, "History", TabletPage.History);
-            tabletTabs[TabletPage.Shop] = TabletTab(bar, "Shop", TabletPage.Shop);
-            RectTransform spacer = UIFactory.Rect(bar, "Spacer");
-            UIFactory.Size(spacer, -1f, -1f, 0f, 1f);
-            tabletSizeButton = UIFactory.Button(bar, "Expand", ToggleTabletSize, null, 15);
-            UIFactory.Size(tabletSizeButton, -1f, -1f, 84f, 0f);
+            tabletTabs[TabletPage.Order] = TabletTab(tabletBar, "Current Order", TabletPage.Order, 104f);
+            tabletTabs[TabletPage.Recipes] = TabletTab(tabletBar, "Menu", TabletPage.Recipes, 60f);
+            tabletTabs[TabletPage.History] = TabletTab(tabletBar, "History", TabletPage.History, 68f);
+            tabletTabs[TabletPage.Flavours] = TabletTab(tabletBar, "Flavour Profiles", TabletPage.Flavours, 116f);
 
             tabletPages = UIFactory.Rect(screen, "Pages");
             UIFactory.Stretch(tabletPages);
@@ -451,21 +411,17 @@ namespace Cooking.Prototype
             orderPage = orderRoot.gameObject;
             BuildOrderPage(orderRoot);
 
-            RectTransform shop = UIFactory.Rect(tabletPages, "Shop");
-            UIFactory.Stretch(shop, 8f);
-            shopPage = shop.gameObject;
-            BuildStoreArea(shop);
-
             BuildRecipeBook(tabletPages);
+            BuildFlavoursPage(tabletPages);
             BuildResultOverlay(tabletPages);
             BuildSummaryOverlay(tabletPages);
             SyncTablet();
         }
 
-        private Button TabletTab(RectTransform bar, string label, TabletPage page)
+        private Button TabletTab(RectTransform bar, string label, TabletPage page, float width)
         {
-            Button tab = UIFactory.Button(bar, label, () => ShowTabletPage(page), null, 15);
-            UIFactory.Size(tab, -1f, -1f, 92f, 0f);
+            Button tab = UIFactory.Button(bar, label, () => ShowTabletPage(page), null, 12);
+            UIFactory.Size(tab, -1f, -1f, width, 0f);
             return tab;
         }
 
@@ -509,8 +465,9 @@ namespace Cooking.Prototype
             UIFactory.Size(radarArea, 120f, 1f);
             plateRadar = radarArea.gameObject.AddComponent<FlavourRadarGraphic>();
             plateRadar.raycastTarget = false;
-            // No zones: just your dish and, when you know it, the order.
-            plateRadar.CreateLabels(UIFactory.Font, 12, UIFactory.MutedText);
+            // Your dish and, when you know it, the order; plus any zones ticked on the Flavour Profiles tab.
+            plateRadar.SetLabelMargin(30f);
+            plateRadar.CreateLabels(UIFactory.Font, 11, UIFactory.MutedText);
 
         }
     }

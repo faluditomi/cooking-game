@@ -13,48 +13,48 @@ MonoBehaviour:
   m_Name: Woman - Order - Stranger - O1
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: 4bca0e63-2580-4403-a7a7-21799f0ba184
+  - guid: dd73ae83-ae62-4dfa-ad48-e85052404b77
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 7aa6acb3-b4a7-49cd-abfc-428e93c8bab4
+  - guid: 3387ac25-6043-48f4-852a-508db15b0fc2
     kind: 0
     line:
-      text: Whip me up an MSBeef rice real quick!
+      text: Whip me up some MSBeef noodles real quick!
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: becca868-1f9f-4878-aaaf-429e5c33ba0b
+  - guid: c10cca9a-4d02-42f7-b6d7-7f414cc673d5
     kind: 0
     line:
       text: "And none of that beef shit, you hear me? I only eat Real Beef\u2122!"
-      delaySeconds: 2.3
+      delaySeconds: 2.5
     editorPosition: {x: 520, y: 0}
-  - guid: 683421fc-8287-402e-8d0c-f58a86cc1aa1
+  - guid: dec652ec-7260-4891-b58c-beaf096f2f63
     kind: 0
     line:
       text: Fuck knows what they put in those animals...
       delaySeconds: 3.2
     editorPosition: {x: 780, y: 0}
-  - guid: 4a51bf56-a64d-42b9-b98d-a8421bff7679
+  - guid: 5ae34e3a-4a40-4f5e-8627-e683572e0e61
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 1040, y: 0}
   edges:
-  - fromNodeGuid: 4bca0e63-2580-4403-a7a7-21799f0ba184
+  - fromNodeGuid: dd73ae83-ae62-4dfa-ad48-e85052404b77
     fromOptionGuid: 
-    toNodeGuid: 7aa6acb3-b4a7-49cd-abfc-428e93c8bab4
-  - fromNodeGuid: 7aa6acb3-b4a7-49cd-abfc-428e93c8bab4
+    toNodeGuid: 3387ac25-6043-48f4-852a-508db15b0fc2
+  - fromNodeGuid: 3387ac25-6043-48f4-852a-508db15b0fc2
     fromOptionGuid: 
-    toNodeGuid: becca868-1f9f-4878-aaaf-429e5c33ba0b
-  - fromNodeGuid: becca868-1f9f-4878-aaaf-429e5c33ba0b
+    toNodeGuid: c10cca9a-4d02-42f7-b6d7-7f414cc673d5
+  - fromNodeGuid: c10cca9a-4d02-42f7-b6d7-7f414cc673d5
     fromOptionGuid: 
-    toNodeGuid: 683421fc-8287-402e-8d0c-f58a86cc1aa1
-  - fromNodeGuid: 683421fc-8287-402e-8d0c-f58a86cc1aa1
+    toNodeGuid: dec652ec-7260-4891-b58c-beaf096f2f63
+  - fromNodeGuid: dec652ec-7260-4891-b58c-beaf096f2f63
     fromOptionGuid: 
-    toNodeGuid: 4a51bf56-a64d-42b9-b98d-a8421bff7679
+    toNodeGuid: 5ae34e3a-4a40-4f5e-8627-e683572e0e61
   isOneShot: 0
-  payload: MSBeef fried rice
+  payload: MSBeef noodles

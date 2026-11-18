@@ -13,30 +13,30 @@ MonoBehaviour:
   m_Name: Man - WrongOrderNasty - Any - O1
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: 2a188f3e-e4b4-4bcf-8fb5-cedd1b255914
+  - guid: 1b0e8dd9-2e0b-470c-a32c-25073b9bb4e7
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: a53f1c2b-71a6-4597-b17d-50cb42d59254
+  - guid: 08e4f8a3-aa6b-4eef-a6c9-991a7c83c0fc
     kind: 0
     line:
       text: Healthy, I suppose. Joyless.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: 78ec8f74-4f26-49fe-802e-b3a8e7afb51c
+  - guid: d3200380-bbd5-4148-b22b-450b24bd55d7
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 520, y: 0}
   edges:
-  - fromNodeGuid: 2a188f3e-e4b4-4bcf-8fb5-cedd1b255914
+  - fromNodeGuid: 1b0e8dd9-2e0b-470c-a32c-25073b9bb4e7
     fromOptionGuid: 
-    toNodeGuid: a53f1c2b-71a6-4597-b17d-50cb42d59254
-  - fromNodeGuid: a53f1c2b-71a6-4597-b17d-50cb42d59254
+    toNodeGuid: 08e4f8a3-aa6b-4eef-a6c9-991a7c83c0fc
+  - fromNodeGuid: 08e4f8a3-aa6b-4eef-a6c9-991a7c83c0fc
     fromOptionGuid: 
-    toNodeGuid: 78ec8f74-4f26-49fe-802e-b3a8e7afb51c
+    toNodeGuid: d3200380-bbd5-4148-b22b-450b24bd55d7
   isOneShot: 0
   payload: 

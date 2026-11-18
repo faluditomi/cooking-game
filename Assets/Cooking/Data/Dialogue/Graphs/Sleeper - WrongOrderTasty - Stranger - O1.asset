@@ -1,0 +1,69 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Sleeper - WrongOrderTasty - Stranger - O1
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: b8b696c4-ef83-43a1-8d0e-f21f7aca3422
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: 05c78293-a82c-4217-8388-561d6f30ad7f
+    kind: 0
+    line:
+      text: Wow...
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: b2a13d29-495b-4c42-a914-3f0759248547
+    kind: 0
+    line:
+      text: That kinda tastes, man.
+      delaySeconds: 1.2
+    editorPosition: {x: 520, y: 0}
+  - guid: 7d3f72dc-bff0-498f-be3d-85320b2ba135
+    kind: 0
+    line:
+      text: Is this why people come here?
+      delaySeconds: 1.8
+    editorPosition: {x: 780, y: 0}
+  - guid: 6f6fe168-1a97-4edb-97f1-05dffd68145f
+    kind: 0
+    line:
+      text: Ohh... I'll be back!
+      delaySeconds: 2
+    editorPosition: {x: 1040, y: 0}
+  - guid: 80764d85-ac25-4825-ba4b-2a113fcfdd9e
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 1300, y: 0}
+  edges:
+  - fromNodeGuid: b8b696c4-ef83-43a1-8d0e-f21f7aca3422
+    fromOptionGuid: 
+    toNodeGuid: 05c78293-a82c-4217-8388-561d6f30ad7f
+  - fromNodeGuid: 05c78293-a82c-4217-8388-561d6f30ad7f
+    fromOptionGuid: 
+    toNodeGuid: b2a13d29-495b-4c42-a914-3f0759248547
+  - fromNodeGuid: b2a13d29-495b-4c42-a914-3f0759248547
+    fromOptionGuid: 
+    toNodeGuid: 7d3f72dc-bff0-498f-be3d-85320b2ba135
+  - fromNodeGuid: 7d3f72dc-bff0-498f-be3d-85320b2ba135
+    fromOptionGuid: 
+    toNodeGuid: 6f6fe168-1a97-4edb-97f1-05dffd68145f
+  - fromNodeGuid: 6f6fe168-1a97-4edb-97f1-05dffd68145f
+    fromOptionGuid: 
+    toNodeGuid: 80764d85-ac25-4825-ba4b-2a113fcfdd9e
+  isOneShot: 0
+  payload: 

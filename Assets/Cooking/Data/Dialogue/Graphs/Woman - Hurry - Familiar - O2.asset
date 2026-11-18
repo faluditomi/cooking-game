@@ -13,39 +13,39 @@ MonoBehaviour:
   m_Name: Woman - Hurry - Familiar - O2
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: 12116828-e9fc-4a07-b3d5-ec09d3d3f6c5
+  - guid: addaeb9f-1746-49a1-9c2e-56717d79b5c8
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: f5cc19d1-831b-44fd-bb57-38d0dbdd8bba
+  - guid: 0c24aa03-eba0-418b-8576-c937577d6c91
     kind: 0
     line:
       text: I haven't been here much, but even I know better how your kitchen-eque patchwork station functions.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: 1fd3e7c0-2a90-4096-bf45-c24b094cc943
+  - guid: c80c45dd-ad3a-439e-b2c6-aed271f0d030
     kind: 0
     line:
       text: Need help finding something?
       delaySeconds: 4.5
     editorPosition: {x: 520, y: 0}
-  - guid: ac62a556-6e9b-4079-806e-78d897b9ff33
+  - guid: 12f5305d-41a8-4bdc-925b-7c70a2930dd1
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 780, y: 0}
   edges:
-  - fromNodeGuid: 12116828-e9fc-4a07-b3d5-ec09d3d3f6c5
+  - fromNodeGuid: addaeb9f-1746-49a1-9c2e-56717d79b5c8
     fromOptionGuid: 
-    toNodeGuid: f5cc19d1-831b-44fd-bb57-38d0dbdd8bba
-  - fromNodeGuid: f5cc19d1-831b-44fd-bb57-38d0dbdd8bba
+    toNodeGuid: 0c24aa03-eba0-418b-8576-c937577d6c91
+  - fromNodeGuid: 0c24aa03-eba0-418b-8576-c937577d6c91
     fromOptionGuid: 
-    toNodeGuid: 1fd3e7c0-2a90-4096-bf45-c24b094cc943
-  - fromNodeGuid: 1fd3e7c0-2a90-4096-bf45-c24b094cc943
+    toNodeGuid: c80c45dd-ad3a-439e-b2c6-aed271f0d030
+  - fromNodeGuid: c80c45dd-ad3a-439e-b2c6-aed271f0d030
     fromOptionGuid: 
-    toNodeGuid: ac62a556-6e9b-4079-806e-78d897b9ff33
+    toNodeGuid: 12f5305d-41a8-4bdc-925b-7c70a2930dd1
   isOneShot: 0
   payload: 

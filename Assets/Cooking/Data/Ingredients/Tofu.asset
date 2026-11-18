@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Tofu
   m_EditorClassIdentifier: Cooking.Runtime::Cooking.IngredientDefinition
   displayName: Tofu
-  icon: {fileID: -5350936062833865590, guid: e88672c8b54788940b77271a1d84bf57, type: 3}
+  icon: {fileID: -3900674227958914785, guid: 06a1ee84cc4d017459e16eaaa357ae34, type: 3}
   price: 3
   bulk: 1
   flavour:

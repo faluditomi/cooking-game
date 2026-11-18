@@ -13,30 +13,30 @@ MonoBehaviour:
   m_Name: Woman - Order - Friendly - O2
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: 7e806e40-cc8a-40f2-b592-2dfd257af9d2
+  - guid: 369041cd-3f4f-4c6a-b7fc-8b03cd53d287
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: e60b5924-e788-4b50-b0bd-e7242da6fd7a
+  - guid: 13f1c05e-7f5c-4222-9814-98af352db54e
     kind: 0
     line:
       text: Hit me with that [liked dish], boss!
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: 3d185da3-453f-4541-92ed-22d34ebf1d89
+  - guid: 644d7dec-c7f7-4fd1-9d89-845aa385dc57
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 520, y: 0}
   edges:
-  - fromNodeGuid: 7e806e40-cc8a-40f2-b592-2dfd257af9d2
+  - fromNodeGuid: 369041cd-3f4f-4c6a-b7fc-8b03cd53d287
     fromOptionGuid: 
-    toNodeGuid: e60b5924-e788-4b50-b0bd-e7242da6fd7a
-  - fromNodeGuid: e60b5924-e788-4b50-b0bd-e7242da6fd7a
+    toNodeGuid: 13f1c05e-7f5c-4222-9814-98af352db54e
+  - fromNodeGuid: 13f1c05e-7f5c-4222-9814-98af352db54e
     fromOptionGuid: 
-    toNodeGuid: 3d185da3-453f-4541-92ed-22d34ebf1d89
+    toNodeGuid: 644d7dec-c7f7-4fd1-9d89-845aa385dc57
   isOneShot: 0
   payload: '[liked meal]'

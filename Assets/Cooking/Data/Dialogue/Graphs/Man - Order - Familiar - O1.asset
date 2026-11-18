@@ -13,39 +13,39 @@ MonoBehaviour:
   m_Name: Man - Order - Familiar - O1
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: 9ed5dee8-b7ca-44fc-a919-a980a5ba947c
+  - guid: d04b2e15-a97c-4bd3-a0ff-569f6b96e4e0
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 5d945413-afcc-4d88-8122-8b6aa06e0a13
+  - guid: d177a33d-f4b9-4f31-b122-96cd8cd1d4e0
     kind: 0
     line:
       text: I look after kids, down in the lower rings.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: 0a3bc1fe-cd19-4175-a878-4244561ee987
+  - guid: 429fce81-41a6-4f70-a019-c320a232d284
     kind: 0
     line:
       text: I just want something simple. Something I could make for them without feeling sick about where it came from.
       delaySeconds: 2.5
     editorPosition: {x: 520, y: 0}
-  - guid: 61c60c95-777e-457b-ba9b-3567eb28f100
+  - guid: d8f81942-2cd2-4954-9131-5e14dbbb6b1f
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 780, y: 0}
   edges:
-  - fromNodeGuid: 9ed5dee8-b7ca-44fc-a919-a980a5ba947c
+  - fromNodeGuid: d04b2e15-a97c-4bd3-a0ff-569f6b96e4e0
     fromOptionGuid: 
-    toNodeGuid: 5d945413-afcc-4d88-8122-8b6aa06e0a13
-  - fromNodeGuid: 5d945413-afcc-4d88-8122-8b6aa06e0a13
+    toNodeGuid: d177a33d-f4b9-4f31-b122-96cd8cd1d4e0
+  - fromNodeGuid: d177a33d-f4b9-4f31-b122-96cd8cd1d4e0
     fromOptionGuid: 
-    toNodeGuid: 0a3bc1fe-cd19-4175-a878-4244561ee987
-  - fromNodeGuid: 0a3bc1fe-cd19-4175-a878-4244561ee987
+    toNodeGuid: 429fce81-41a6-4f70-a019-c320a232d284
+  - fromNodeGuid: 429fce81-41a6-4f70-a019-c320a232d284
     fromOptionGuid: 
-    toNodeGuid: 61c60c95-777e-457b-ba9b-3567eb28f100
+    toNodeGuid: d8f81942-2cd2-4954-9131-5e14dbbb6b1f
   isOneShot: 0
   payload: 

@@ -13,39 +13,39 @@ MonoBehaviour:
   m_Name: Woman - Hurry - Friendly - O1
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: a4544ba0-eb08-4400-b16e-77f3978bfe33
+  - guid: 74927488-f461-4833-9130-5e9f0d5d0c19
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 9bc95f63-ffde-42f0-8c01-3849fa431140
+  - guid: e909f5db-d9af-418e-aa3d-e8ae61d72a59
     kind: 0
     line:
       text: Umm... Yeah...
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: c1909426-6faa-45a3-8f7f-77cadcbbe996
+  - guid: fc424206-d579-42cb-99b8-cc6f71830db1
     kind: 0
     line:
       text: Take your time, boss.
       delaySeconds: 1.5
     editorPosition: {x: 520, y: 0}
-  - guid: 54a2da6a-8343-428c-968e-01d839d2d6ac
+  - guid: 38f24b29-f7d1-4ab2-9c5c-cbd3230a7b66
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 780, y: 0}
   edges:
-  - fromNodeGuid: a4544ba0-eb08-4400-b16e-77f3978bfe33
+  - fromNodeGuid: 74927488-f461-4833-9130-5e9f0d5d0c19
     fromOptionGuid: 
-    toNodeGuid: 9bc95f63-ffde-42f0-8c01-3849fa431140
-  - fromNodeGuid: 9bc95f63-ffde-42f0-8c01-3849fa431140
+    toNodeGuid: e909f5db-d9af-418e-aa3d-e8ae61d72a59
+  - fromNodeGuid: e909f5db-d9af-418e-aa3d-e8ae61d72a59
     fromOptionGuid: 
-    toNodeGuid: c1909426-6faa-45a3-8f7f-77cadcbbe996
-  - fromNodeGuid: c1909426-6faa-45a3-8f7f-77cadcbbe996
+    toNodeGuid: fc424206-d579-42cb-99b8-cc6f71830db1
+  - fromNodeGuid: fc424206-d579-42cb-99b8-cc6f71830db1
     fromOptionGuid: 
-    toNodeGuid: 54a2da6a-8343-428c-968e-01d839d2d6ac
+    toNodeGuid: 38f24b29-f7d1-4ab2-9c5c-cbd3230a7b66
   isOneShot: 0
   payload: 

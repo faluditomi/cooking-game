@@ -13,39 +13,39 @@ MonoBehaviour:
   m_Name: Sleeper - CorrectOrder - Any - O1
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: 9deebe06-64c0-4041-96e5-8f0cd48eeb90
+  - guid: 90104e39-17c6-4b47-86fa-fe63cde5d0b8
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: e23a59b3-c2e5-46ab-a0fe-d9d5cc4bc639
+  - guid: 075aecad-42c7-4864-aa54-47e85e2b4ea5
     kind: 0
     line:
       text: Wow! That kinda tastes.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: 3231a008-c4dd-4f33-98bc-f1287297d714
+  - guid: f1425011-9d18-4aea-bc37-3118e92c3365
     kind: 0
     line:
       text: So that's why people stuff their face?
       delaySeconds: 1.8
     editorPosition: {x: 520, y: 0}
-  - guid: 852c22f5-0a78-4689-a77c-5c9b8dd406b0
+  - guid: affc0227-d9bc-436b-83dd-97224cc91f60
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 780, y: 0}
   edges:
-  - fromNodeGuid: 9deebe06-64c0-4041-96e5-8f0cd48eeb90
+  - fromNodeGuid: 90104e39-17c6-4b47-86fa-fe63cde5d0b8
     fromOptionGuid: 
-    toNodeGuid: e23a59b3-c2e5-46ab-a0fe-d9d5cc4bc639
-  - fromNodeGuid: e23a59b3-c2e5-46ab-a0fe-d9d5cc4bc639
+    toNodeGuid: 075aecad-42c7-4864-aa54-47e85e2b4ea5
+  - fromNodeGuid: 075aecad-42c7-4864-aa54-47e85e2b4ea5
     fromOptionGuid: 
-    toNodeGuid: 3231a008-c4dd-4f33-98bc-f1287297d714
-  - fromNodeGuid: 3231a008-c4dd-4f33-98bc-f1287297d714
+    toNodeGuid: f1425011-9d18-4aea-bc37-3118e92c3365
+  - fromNodeGuid: f1425011-9d18-4aea-bc37-3118e92c3365
     fromOptionGuid: 
-    toNodeGuid: 852c22f5-0a78-4689-a77c-5c9b8dd406b0
+    toNodeGuid: affc0227-d9bc-436b-83dd-97224cc91f60
   isOneShot: 0
   payload: 

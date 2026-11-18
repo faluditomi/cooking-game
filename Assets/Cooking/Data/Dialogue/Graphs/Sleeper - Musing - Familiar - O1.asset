@@ -1,0 +1,87 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Sleeper - Musing - Familiar - O1
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: d02ccf22-dfb9-4fd3-b7d5-aad33fb848a4
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: 17d50113-8f08-4ad1-949b-dddf40df93c9
+    kind: 0
+    line:
+      text: And when did you get here, man?
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: 4a78c1b7-42b9-46d3-95d1-2d3e229dd661
+    kind: 0
+    line:
+      text: To Erlin's Eye, that is.
+      delaySeconds: 2.1
+    editorPosition: {x: 520, y: 0}
+  - guid: fbc974f6-ae0b-4e2f-baa9-18e1ca826758
+    kind: 0
+    line:
+      text: Does it get any easier?
+      delaySeconds: 1.9
+    editorPosition: {x: 780, y: 0}
+  - guid: 08f71d46-6727-4d9e-9b39-a8b015453382
+    kind: 0
+    line:
+      text: I've been here a few days now, and still just as clueless as when I got here.
+      delaySeconds: 1.8
+    editorPosition: {x: 1040, y: 0}
+  - guid: f8cb46e3-1166-4525-80d0-da39e46c92cb
+    kind: 0
+    line:
+      text: It's strange, this place feels like home, yet I recognise nothing at all.
+      delaySeconds: 3.8
+    editorPosition: {x: 1300, y: 0}
+  - guid: d56ff768-2fcb-40a1-a2e9-f439176d27e4
+    kind: 0
+    line:
+      text: But, at least I know you now, man, and this stall gives me refuge.
+      delaySeconds: 3.6
+    editorPosition: {x: 1560, y: 0}
+  - guid: 6a357a1a-1002-472d-8ff3-accbc5f62320
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 1820, y: 0}
+  edges:
+  - fromNodeGuid: d02ccf22-dfb9-4fd3-b7d5-aad33fb848a4
+    fromOptionGuid: 
+    toNodeGuid: 17d50113-8f08-4ad1-949b-dddf40df93c9
+  - fromNodeGuid: 17d50113-8f08-4ad1-949b-dddf40df93c9
+    fromOptionGuid: 
+    toNodeGuid: 4a78c1b7-42b9-46d3-95d1-2d3e229dd661
+  - fromNodeGuid: 4a78c1b7-42b9-46d3-95d1-2d3e229dd661
+    fromOptionGuid: 
+    toNodeGuid: fbc974f6-ae0b-4e2f-baa9-18e1ca826758
+  - fromNodeGuid: fbc974f6-ae0b-4e2f-baa9-18e1ca826758
+    fromOptionGuid: 
+    toNodeGuid: 08f71d46-6727-4d9e-9b39-a8b015453382
+  - fromNodeGuid: 08f71d46-6727-4d9e-9b39-a8b015453382
+    fromOptionGuid: 
+    toNodeGuid: f8cb46e3-1166-4525-80d0-da39e46c92cb
+  - fromNodeGuid: f8cb46e3-1166-4525-80d0-da39e46c92cb
+    fromOptionGuid: 
+    toNodeGuid: d56ff768-2fcb-40a1-a2e9-f439176d27e4
+  - fromNodeGuid: d56ff768-2fcb-40a1-a2e9-f439176d27e4
+    fromOptionGuid: 
+    toNodeGuid: 6a357a1a-1002-472d-8ff3-accbc5f62320
+  isOneShot: 0
+  payload: 

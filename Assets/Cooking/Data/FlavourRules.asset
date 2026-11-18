@@ -84,4 +84,4 @@ MonoBehaviour:
     pain: 0
     nutrition: 0
     texture: 3
-  zoneFalloff: 2
+  zoneFalloff: 3

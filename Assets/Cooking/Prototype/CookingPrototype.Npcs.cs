@@ -46,9 +46,11 @@ namespace Cooking.Prototype
         private bool mused;
         /// <summary>The liked meal this visit's [liked meal] tokens stand for.</summary>
         private RecipeDefinition visitLiked;
+        /// <summary>What the order dialogue asks for, worked out from its first line; it shows on the tablet once they say it.</summary>
+        private RecipeDefinition pendingOrder;
+        private bool pendingResolved;
         /// <summary>Letters of the newest line shown so far.</summary>
         private float typed;
-        private Text resultSpeech;
         private Text sidebarCustomer;
         private Text sidebarSpeech;
 
@@ -142,10 +144,11 @@ namespace Cooking.Prototype
             // Lines from a customer who already left don't belong to this visit.
             if(customer == null || line.TriggerNpc != customer.dialogueId) return;
 
-            // The first order line says what they want.
-            if(line.EventType == DialogueEventType.Order && !orderIn)
+            // The order dialogue says what they want; work it out from its first line.
+            if(line.EventType == DialogueEventType.Order && !orderIn && !pendingResolved)
             {
-                ResolveOrder(line.Graph != null ? line.Graph.payload : null, line.Text);
+                pendingOrder = ResolveOrder(line.Graph != null ? line.Graph.payload : null, line.Text);
+                pendingResolved = true;
             }
 
             string text = CustomerDialogue.FillTokens(line.Text, NameIfSaved(visitLiked), NameIfSaved(Relationship(customer).DreamMeal));
@@ -158,14 +161,25 @@ namespace Cooking.Prototype
             }
 
             AddSpeech(text, SpeechTag(line.EventType));
+
+            // The order shows on the tablet when they actually name it.
+            if(line.EventType == DialogueEventType.Order && !orderIn && pendingResolved && MentionsOrder(line.Text, text)) SetOrder(pendingOrder);
+        }
+
+        /// <summary>The line names the dish they want (or stands for it with a [liked meal] / [dream dish] token).</summary>
+        private bool MentionsOrder(string raw, string filled)
+        {
+            if(pendingOrder == null) return false;
+            if(raw != null && raw.IndexOf('[') >= 0 && raw.IndexOf(']') > raw.IndexOf('[')) return true;
+            return filled != null && filled.IndexOf(pendingOrder.DisplayName, System.StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
         private void HandleDialogueEnded(DialogueEndedEventArgs ended)
         {
             if(customer == null || ended.TriggerNpc != customer.dialogueId) return;
 
-            // An order dialogue without lines still has to end in an order.
-            if(ended.EventType == DialogueEventType.Order && !orderIn) SetOrder(DefaultOrder());
+            // An order dialogue that never named the dish (or had no lines) still ends in an order.
+            if(ended.EventType == DialogueEventType.Order && !orderIn) SetOrder(pendingResolved && pendingOrder != null ? pendingOrder : DefaultOrder());
 
             if(clueAfter == DialogueEventType.None || ended.EventType != clueAfter) return;
             FlushClue();
@@ -193,7 +207,7 @@ namespace Cooking.Prototype
         }
 
         /// <summary>Works out the order from the order dialogue's payload or tokens.</summary>
-        private void ResolveOrder(string payload, string text)
+        private RecipeDefinition ResolveOrder(string payload, string text)
         {
             CustomerRelationship relationship = Relationship(customer);
             RecipeDefinition pick = null;
@@ -201,7 +215,9 @@ namespace Cooking.Prototype
             switch(CustomerDialogue.ReadOrder(payload, text, out string dishName))
             {
                 case CustomerDialogue.OrderKind.Named:
-                    pick = CustomerDialogue.FindByName(menu, dishName);
+                    // The menu, or a dish only NPCs know (the Sleeper's potato), or one they like.
+                    pick = CustomerDialogue.FindByName(menu, dishName) ?? CustomerDialogue.FindByName(offMenu, dishName)
+                           ?? CustomerDialogue.FindByName(relationship.LikedMeals, dishName);
                     if(pick == null) Debug.LogWarning("[Cooking] Order dialogue names \"" + dishName + "\", which isn't a dish. Using a default order.");
                     break;
                 case CustomerDialogue.OrderKind.Liked:
@@ -214,7 +230,7 @@ namespace Cooking.Prototype
 
             // Once they've had their dream meal they always ask for it, whatever the line says.
             if(relationship.DreamMeal != null) pick = relationship.DreamMeal;
-            SetOrder(pick ?? DefaultOrder());
+            return pick ?? DefaultOrder();
         }
 
         /// <summary>Seconds since the current customer arrived.</summary>
@@ -259,8 +275,8 @@ namespace Cooking.Prototype
         {
             StringBuilder sb = new StringBuilder();
 
-            // Newest first: what they're saying now is at the top.
-            for(int i = speech.Count - 1; i >= 0; i--)
+            // Oldest first: each new line goes below the one before.
+            for(int i = 0; i < speech.Count; i++)
             {
                 bool newest = i == speech.Count - 1;
                 string line = newest ? speech[i].Substring(0, Mathf.Clamp(Mathf.FloorToInt(typed), 0, speech[i].Length)) : speech[i];
@@ -272,8 +288,15 @@ namespace Cooking.Prototype
             }
 
             string text = sb.ToString();
-            if(sidebarSpeech != null) sidebarSpeech.text = text;
-            if(resultSpeech != null) resultSpeech.text = text;
+            if(sidebarSpeech == null) return;
+
+            sidebarSpeech.text = text;
+            // Grow with the text; once it's taller than the box, keep the newest line in view at the bottom.
+            RectTransform rect = sidebarSpeech.rectTransform;
+            RectTransform box = (RectTransform)rect.parent;
+            float height = sidebarSpeech.preferredHeight;
+            rect.sizeDelta = new Vector2(0f, height);
+            rect.anchoredPosition = new Vector2(0f, Mathf.Max(0f, height - box.rect.height));
         }
 
         private void RefreshSidebar()
@@ -302,6 +325,8 @@ namespace Cooking.Prototype
             pendingClue = null;
             clueAfter = DialogueEventType.None;
             visitStarted = Time.time;
+            pendingOrder = null;
+            pendingResolved = false;
             orderInAt = 0f;
             nextHurryAt = Time.time + Mathf.Max(5f, customer.hurryAfter);
             musingAt = float.MaxValue;
@@ -381,13 +406,15 @@ namespace Cooking.Prototype
             CustomerRelationship relationship = Relationship(customer);
             NpcStage stageBefore = relationship.Stage;
             List<RecipeDefinition> known = KnownRecipes();
-            RelationshipChange change = relationship.Record(result, plate, known);
+            RelationshipChange change = relationship.Record(result, plate, known, InFavourite);
+            if(change.FoundDream) UnlockTaste(customer);
 
             if(currentEntry == null) currentEntry = new HistoryEntry { Day = day, Visit = servedToday, Customer = customer };
 
             // The dish as a recipe: a menu dish it makes exactly, a dish they already know, or a new nameless one.
             known = KnownRecipes();
-            RecipeDefinition dish = CustomerRelationship.FindMatch(known, plate);
+            // (Or one only NPCs know, like the Sleeper's potato: that's not a new dish to name.)
+            RecipeDefinition dish = CustomerRelationship.FindMatch(known, plate) ?? CustomerRelationship.FindMatch(offMenu, plate);
             foreach(HistoryEntry past in history) if(dish == null && past.Dish != null && CustomerRelationship.FindMatch(new[] { past.Dish }, plate) != null) dish = past.Dish;
             if(dish == null && plate.Count > 0) dish = CustomerRelationship.CreateMeal(CustomerRelationship.Nameless, plate);
 
@@ -430,13 +457,6 @@ namespace Cooking.Prototype
                 }
             }
 
-            if(change.StageChanged)
-            {
-                progressToday.Add(change.After == NpcStage.Friendly
-                    ? customer.name + " had their dream meal. You're friends now."
-                    : customer.name + " is getting familiar with you.");
-            }
-
             if(change.NewLikedMeal != null) progressToday.Add(customer.name + " liked something new: " + DishName(change.NewLikedMeal) + ".");
             return change;
         }
@@ -446,27 +466,10 @@ namespace Cooking.Prototype
         {
             StringBuilder sb = new StringBuilder();
 
-            if(change.StageChanged)
+            // Nothing about how well they know you: that's for the conversation to show.
+            if(change.FirstTaste || change.NewLikedMeal != null)
             {
-                sb.Append("<color=#f28c33><b>")
-                  .Append(change.After == NpcStage.Friendly ? customer.name + " found their dream meal. You're friends now." : customer.name + " is getting familiar with you.")
-                  .Append("</b></color>\n");
-            }
-
-            if(change.FirstTaste)
-            {
-                sb.Append("<color=#73cc73>Real food at last. They'll forget the raw stuff and order this instead.</color>\n");
-            }
-            else if(change.NewLikedMeal != null)
-            {
-                sb.Append("<color=#73cc73>They liked it and will order it again.</color>\n");
-            }
-
-            CustomerRelationship relationship = Relationship(customer);
-            if(relationship.Stage == NpcStage.Stranger)
-            {
-                int left = Mathf.Max(0, customer.likedMealsToFamiliar - relationship.LikedCount);
-                sb.Append("<color=#a6a199>").Append(left).Append(left == 1 ? " more liked meal" : " more liked meals").Append(" until they're familiar.</color>\n");
+                sb.Append("<color=#73cc73>They'll order it again.</color>\n");
             }
 
             return sb.ToString();

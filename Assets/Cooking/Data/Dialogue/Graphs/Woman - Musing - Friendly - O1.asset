@@ -13,93 +13,93 @@ MonoBehaviour:
   m_Name: Woman - Musing - Friendly - O1
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: a15ee77e-82da-4546-b514-1201bd5e597c
+  - guid: d9d4d488-4cfe-4bfc-a94b-ca7d6ee935bd
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: acca2cce-a6a3-48e7-b68a-a720740f9c3b
+  - guid: 90cf7e37-70ff-4bf3-9bd2-a7ab5355bd8d
     kind: 0
     line:
       text: I still don't know how you did that by the way.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: f5101142-d010-4a6d-a036-c3c18d5af363
+  - guid: 213c259d-12f9-47a6-8628-1f00f815280a
     kind: 0
     line:
       text: Dusty ass market cook turns out not just to be a beef boss, but a clairvoyant recipe thief, sending my brain reeling with some street food.
       delaySeconds: 2.7
     editorPosition: {x: 520, y: 0}
-  - guid: 89d9fcab-ea65-4fdd-8981-c4c745aa3b93
+  - guid: e3e84a93-cce7-4d2c-8567-5ab6870b3a0b
     kind: 0
     line:
       text: Anyways... Your soup made me realise some things I should have realised a long time ago.
       delaySeconds: 6
     editorPosition: {x: 780, y: 0}
-  - guid: 65f68da1-b3ad-4080-88f9-45a936f95488
+  - guid: 93e60a61-185c-42af-af57-3703577c0766
     kind: 0
     line:
       text: All those cycles ago, I fucked up majorly.
       delaySeconds: 4.1
     editorPosition: {x: 1040, y: 0}
-  - guid: e77e8fcb-1268-4c77-b740-842bab697e1f
+  - guid: 873274f6-3366-408e-ab2e-3194beb3320e
     kind: 0
     line:
       text: I shouldn't have let her leave on her own, and though I might have fucked it permanently, I have to try and make things right.
       delaySeconds: 2.5
     editorPosition: {x: 1300, y: 0}
-  - guid: 549ad2db-869b-4d7c-8b17-d87c48bae3a9
+  - guid: 017369b0-2e28-4889-99cf-d2caec0f1a9e
     kind: 0
     line:
-      text: I have to make [name of her lover] her favourite soup once more.
+      text: I have to make Jessa her favourite soup once more.
       delaySeconds: 5.5
     editorPosition: {x: 1560, y: 0}
-  - guid: 0b342e94-dceb-4365-b517-49cd464783aa
+  - guid: be523a72-4ba8-40cf-9432-4ccba29e326e
     kind: 0
     line:
       text: What I'm trying to say is thank you, I owe you one.
-      delaySeconds: 3.3
+      delaySeconds: 2.8
     editorPosition: {x: 1820, y: 0}
-  - guid: 6d0541bd-025f-4d4d-98fc-e8289168621d
+  - guid: aaabdb6d-c4a8-4823-8927-9f4ae575fa74
     kind: 0
     line:
       text: But don't expect no tips from me. Especially now that I have to buy my way off this piece of metal.
       delaySeconds: 2.8
     editorPosition: {x: 2080, y: 0}
-  - guid: 4f44a1b4-ea03-4e5a-bcef-d2d321774112
+  - guid: e585f2c9-e44a-4a8c-b0c6-d46476c6df1a
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 2340, y: 0}
   edges:
-  - fromNodeGuid: a15ee77e-82da-4546-b514-1201bd5e597c
+  - fromNodeGuid: d9d4d488-4cfe-4bfc-a94b-ca7d6ee935bd
     fromOptionGuid: 
-    toNodeGuid: acca2cce-a6a3-48e7-b68a-a720740f9c3b
-  - fromNodeGuid: acca2cce-a6a3-48e7-b68a-a720740f9c3b
+    toNodeGuid: 90cf7e37-70ff-4bf3-9bd2-a7ab5355bd8d
+  - fromNodeGuid: 90cf7e37-70ff-4bf3-9bd2-a7ab5355bd8d
     fromOptionGuid: 
-    toNodeGuid: f5101142-d010-4a6d-a036-c3c18d5af363
-  - fromNodeGuid: f5101142-d010-4a6d-a036-c3c18d5af363
+    toNodeGuid: 213c259d-12f9-47a6-8628-1f00f815280a
+  - fromNodeGuid: 213c259d-12f9-47a6-8628-1f00f815280a
     fromOptionGuid: 
-    toNodeGuid: 89d9fcab-ea65-4fdd-8981-c4c745aa3b93
-  - fromNodeGuid: 89d9fcab-ea65-4fdd-8981-c4c745aa3b93
+    toNodeGuid: e3e84a93-cce7-4d2c-8567-5ab6870b3a0b
+  - fromNodeGuid: e3e84a93-cce7-4d2c-8567-5ab6870b3a0b
     fromOptionGuid: 
-    toNodeGuid: 65f68da1-b3ad-4080-88f9-45a936f95488
-  - fromNodeGuid: 65f68da1-b3ad-4080-88f9-45a936f95488
+    toNodeGuid: 93e60a61-185c-42af-af57-3703577c0766
+  - fromNodeGuid: 93e60a61-185c-42af-af57-3703577c0766
     fromOptionGuid: 
-    toNodeGuid: e77e8fcb-1268-4c77-b740-842bab697e1f
-  - fromNodeGuid: e77e8fcb-1268-4c77-b740-842bab697e1f
+    toNodeGuid: 873274f6-3366-408e-ab2e-3194beb3320e
+  - fromNodeGuid: 873274f6-3366-408e-ab2e-3194beb3320e
     fromOptionGuid: 
-    toNodeGuid: 549ad2db-869b-4d7c-8b17-d87c48bae3a9
-  - fromNodeGuid: 549ad2db-869b-4d7c-8b17-d87c48bae3a9
+    toNodeGuid: 017369b0-2e28-4889-99cf-d2caec0f1a9e
+  - fromNodeGuid: 017369b0-2e28-4889-99cf-d2caec0f1a9e
     fromOptionGuid: 
-    toNodeGuid: 0b342e94-dceb-4365-b517-49cd464783aa
-  - fromNodeGuid: 0b342e94-dceb-4365-b517-49cd464783aa
+    toNodeGuid: be523a72-4ba8-40cf-9432-4ccba29e326e
+  - fromNodeGuid: be523a72-4ba8-40cf-9432-4ccba29e326e
     fromOptionGuid: 
-    toNodeGuid: 6d0541bd-025f-4d4d-98fc-e8289168621d
-  - fromNodeGuid: 6d0541bd-025f-4d4d-98fc-e8289168621d
+    toNodeGuid: aaabdb6d-c4a8-4823-8927-9f4ae575fa74
+  - fromNodeGuid: aaabdb6d-c4a8-4823-8927-9f4ae575fa74
     fromOptionGuid: 
-    toNodeGuid: 4f44a1b4-ea03-4e5a-bcef-d2d321774112
+    toNodeGuid: e585f2c9-e44a-4a8c-b0c6-d46476c6df1a
   isOneShot: 1
   payload: 

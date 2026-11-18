@@ -13,30 +13,30 @@ MonoBehaviour:
   m_Name: Woman - WrongOrderNasty - Friendly - O3
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: 67d74ade-c3c0-40ca-8ea1-746575a5252b
+  - guid: 410e5d77-5e27-41a8-b280-680085e9d75e
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: ca4bbe90-98f2-496a-947a-6aa8cc8f896f
+  - guid: 4a513739-32e3-43ce-8943-915ec45a81e3
     kind: 0
     line:
       text: You know, I'm not disappointed, just fucking mad.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: 7fb1fad9-cc4e-44dc-8d41-985d31159fb5
+  - guid: 160be0d9-3a68-45b1-ba73-9ad7d68f08af
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 520, y: 0}
   edges:
-  - fromNodeGuid: 67d74ade-c3c0-40ca-8ea1-746575a5252b
+  - fromNodeGuid: 410e5d77-5e27-41a8-b280-680085e9d75e
     fromOptionGuid: 
-    toNodeGuid: ca4bbe90-98f2-496a-947a-6aa8cc8f896f
-  - fromNodeGuid: ca4bbe90-98f2-496a-947a-6aa8cc8f896f
+    toNodeGuid: 4a513739-32e3-43ce-8943-915ec45a81e3
+  - fromNodeGuid: 4a513739-32e3-43ce-8943-915ec45a81e3
     fromOptionGuid: 
-    toNodeGuid: 7fb1fad9-cc4e-44dc-8d41-985d31159fb5
+    toNodeGuid: 160be0d9-3a68-45b1-ba73-9ad7d68f08af
   isOneShot: 0
   payload: 

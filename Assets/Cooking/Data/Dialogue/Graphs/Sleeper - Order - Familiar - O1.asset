@@ -13,39 +13,57 @@ MonoBehaviour:
   m_Name: Sleeper - Order - Familiar - O1
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: 8f8441d1-c424-48b4-88ac-e2ad392489dd
+  - guid: f34154ee-ad2c-4edc-9e67-dec95971f312
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 18ba93ae-7dc4-490e-b2c4-26741bed435c
+  - guid: 520404ba-56cd-4650-9eca-e23784b77b82
     kind: 0
     line:
-      text: This place feels like home. I've never been here.
+      text: Hey, man.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: 8d628a21-38e1-441c-8ee1-b11e82b8a7ca
+  - guid: 4be59e60-95b7-4ecf-b9c5-30b6c4b73a95
     kind: 0
     line:
-      text: I remember heat. A kitchen that made your eyes water.
-      delaySeconds: 2.8
+      text: Can I please get the [liked meal]?
+      delaySeconds: 1.3
     editorPosition: {x: 520, y: 0}
-  - guid: 9f6a80c3-6aea-4e1b-9615-4e636db7da04
+  - guid: dbf99d5e-5c76-4e3e-b707-603ea4f234e7
+    kind: 0
+    line:
+      text: Or whatever else you may cook up.
+      delaySeconds: 2.2
+    editorPosition: {x: 780, y: 0}
+  - guid: 5928cd15-f02b-4e7d-985f-b7e01a545944
+    kind: 0
+    line:
+      text: I want your tastiest tastes, all in my mouth.
+      delaySeconds: 2.2
+    editorPosition: {x: 1040, y: 0}
+  - guid: bbd4155f-ebff-4197-b1f0-b63689242187
     kind: 4
     line:
       text: 
       delaySeconds: 1
-    editorPosition: {x: 780, y: 0}
+    editorPosition: {x: 1300, y: 0}
   edges:
-  - fromNodeGuid: 8f8441d1-c424-48b4-88ac-e2ad392489dd
+  - fromNodeGuid: f34154ee-ad2c-4edc-9e67-dec95971f312
     fromOptionGuid: 
-    toNodeGuid: 18ba93ae-7dc4-490e-b2c4-26741bed435c
-  - fromNodeGuid: 18ba93ae-7dc4-490e-b2c4-26741bed435c
+    toNodeGuid: 520404ba-56cd-4650-9eca-e23784b77b82
+  - fromNodeGuid: 520404ba-56cd-4650-9eca-e23784b77b82
     fromOptionGuid: 
-    toNodeGuid: 8d628a21-38e1-441c-8ee1-b11e82b8a7ca
-  - fromNodeGuid: 8d628a21-38e1-441c-8ee1-b11e82b8a7ca
+    toNodeGuid: 4be59e60-95b7-4ecf-b9c5-30b6c4b73a95
+  - fromNodeGuid: 4be59e60-95b7-4ecf-b9c5-30b6c4b73a95
     fromOptionGuid: 
-    toNodeGuid: 9f6a80c3-6aea-4e1b-9615-4e636db7da04
+    toNodeGuid: dbf99d5e-5c76-4e3e-b707-603ea4f234e7
+  - fromNodeGuid: dbf99d5e-5c76-4e3e-b707-603ea4f234e7
+    fromOptionGuid: 
+    toNodeGuid: 5928cd15-f02b-4e7d-985f-b7e01a545944
+  - fromNodeGuid: 5928cd15-f02b-4e7d-985f-b7e01a545944
+    fromOptionGuid: 
+    toNodeGuid: bbd4155f-ebff-4197-b1f0-b63689242187
   isOneShot: 0
-  payload: 
+  payload: '[liked meal]'

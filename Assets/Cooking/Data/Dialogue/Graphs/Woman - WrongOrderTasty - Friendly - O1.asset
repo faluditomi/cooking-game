@@ -13,48 +13,48 @@ MonoBehaviour:
   m_Name: Woman - WrongOrderTasty - Friendly - O1
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: 0f8f0ca2-fee6-4067-9908-499d166a65d3
+  - guid: ddd0e051-f01e-43f2-8f9a-8606dfe50c23
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 2dc3d0ba-5f91-4dde-9627-0035db4e53c2
+  - guid: 70b5273f-1d66-407d-b502-c3219f19a804
     kind: 0
     line:
       text: Dunno how you does it, and to be honest, I don't care either.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: d33cb19b-c592-40cb-b14b-4c84916bac05
+  - guid: d0fc0908-bbbf-499f-8fb8-4fc40d9946b7
     kind: 0
     line:
       text: Just keep doing what you're doing.
       delaySeconds: 3.2
     editorPosition: {x: 520, y: 0}
-  - guid: 98d765be-7ddc-47fe-85e7-48de5221a531
+  - guid: 78fa436e-fa7a-4ae8-989d-566589cfc1c2
     kind: 0
     line:
       text: Same time tomorrow.
       delaySeconds: 2.2
     editorPosition: {x: 780, y: 0}
-  - guid: 4a31b140-e2c3-418d-a538-30ac339f95a8
+  - guid: 12500653-e502-43a9-9f57-9616f0dd8310
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 1040, y: 0}
   edges:
-  - fromNodeGuid: 0f8f0ca2-fee6-4067-9908-499d166a65d3
+  - fromNodeGuid: ddd0e051-f01e-43f2-8f9a-8606dfe50c23
     fromOptionGuid: 
-    toNodeGuid: 2dc3d0ba-5f91-4dde-9627-0035db4e53c2
-  - fromNodeGuid: 2dc3d0ba-5f91-4dde-9627-0035db4e53c2
+    toNodeGuid: 70b5273f-1d66-407d-b502-c3219f19a804
+  - fromNodeGuid: 70b5273f-1d66-407d-b502-c3219f19a804
     fromOptionGuid: 
-    toNodeGuid: d33cb19b-c592-40cb-b14b-4c84916bac05
-  - fromNodeGuid: d33cb19b-c592-40cb-b14b-4c84916bac05
+    toNodeGuid: d0fc0908-bbbf-499f-8fb8-4fc40d9946b7
+  - fromNodeGuid: d0fc0908-bbbf-499f-8fb8-4fc40d9946b7
     fromOptionGuid: 
-    toNodeGuid: 98d765be-7ddc-47fe-85e7-48de5221a531
-  - fromNodeGuid: 98d765be-7ddc-47fe-85e7-48de5221a531
+    toNodeGuid: 78fa436e-fa7a-4ae8-989d-566589cfc1c2
+  - fromNodeGuid: 78fa436e-fa7a-4ae8-989d-566589cfc1c2
     fromOptionGuid: 
-    toNodeGuid: 4a31b140-e2c3-418d-a538-30ac339f95a8
+    toNodeGuid: 12500653-e502-43a9-9f57-9616f0dd8310
   isOneShot: 0
   payload: 

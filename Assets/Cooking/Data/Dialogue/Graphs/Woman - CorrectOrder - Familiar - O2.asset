@@ -13,48 +13,48 @@ MonoBehaviour:
   m_Name: Woman - CorrectOrder - Familiar - O2
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: 47fd912f-30dd-4513-a6cd-a6109a7717fe
+  - guid: 45a1ca35-55a8-433c-be88-1840c2565e19
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 8e05253f-d41f-4799-aed3-9085e7e337e4
+  - guid: 2f47e6f3-a4b6-4ec7-8229-1868e118c97a
     kind: 0
     line:
       text: Thanks.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: 61d6dd74-6246-4530-b680-a9360783f323
+  - guid: 782149d9-2335-43e9-90f8-ddb2598f0f22
     kind: 0
     line:
       text: Reminds me of the stuff I used to make. 'Twas a long time ago now...
       delaySeconds: 1.2
     editorPosition: {x: 520, y: 0}
-  - guid: 04d5a01c-ce20-4021-8217-ce74be31e075
+  - guid: a5fa66e3-ab1a-43c4-a9b5-bf606cbe2c5b
     kind: 0
     line:
       text: How time flies, Pot Boy.
       delaySeconds: 3.4
     editorPosition: {x: 780, y: 0}
-  - guid: 5b2bbfd6-7873-4eac-aff3-2839b8fbb47c
+  - guid: e51ddb88-2761-44a2-a553-36abd6eb6d84
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 1040, y: 0}
   edges:
-  - fromNodeGuid: 47fd912f-30dd-4513-a6cd-a6109a7717fe
+  - fromNodeGuid: 45a1ca35-55a8-433c-be88-1840c2565e19
     fromOptionGuid: 
-    toNodeGuid: 8e05253f-d41f-4799-aed3-9085e7e337e4
-  - fromNodeGuid: 8e05253f-d41f-4799-aed3-9085e7e337e4
+    toNodeGuid: 2f47e6f3-a4b6-4ec7-8229-1868e118c97a
+  - fromNodeGuid: 2f47e6f3-a4b6-4ec7-8229-1868e118c97a
     fromOptionGuid: 
-    toNodeGuid: 61d6dd74-6246-4530-b680-a9360783f323
-  - fromNodeGuid: 61d6dd74-6246-4530-b680-a9360783f323
+    toNodeGuid: 782149d9-2335-43e9-90f8-ddb2598f0f22
+  - fromNodeGuid: 782149d9-2335-43e9-90f8-ddb2598f0f22
     fromOptionGuid: 
-    toNodeGuid: 04d5a01c-ce20-4021-8217-ce74be31e075
-  - fromNodeGuid: 04d5a01c-ce20-4021-8217-ce74be31e075
+    toNodeGuid: a5fa66e3-ab1a-43c4-a9b5-bf606cbe2c5b
+  - fromNodeGuid: a5fa66e3-ab1a-43c4-a9b5-bf606cbe2c5b
     fromOptionGuid: 
-    toNodeGuid: 5b2bbfd6-7873-4eac-aff3-2839b8fbb47c
+    toNodeGuid: e51ddb88-2761-44a2-a553-36abd6eb6d84
   isOneShot: 0
   payload: 

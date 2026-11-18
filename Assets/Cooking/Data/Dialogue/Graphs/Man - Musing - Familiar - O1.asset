@@ -13,48 +13,48 @@ MonoBehaviour:
   m_Name: Man - Musing - Familiar - O1
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: 36702bcd-fb47-4604-a554-83ab9ba40df6
+  - guid: b3ec02b5-d9fd-41e2-9f5f-ce88c284c370
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 25cb56b3-a49d-4c61-84cd-f9d063f798fc
+  - guid: 666c0204-84b8-485c-bbc0-e86d7bb81af1
     kind: 0
     line:
       text: Did you know MSG stands for Major Societal deGeneracy?
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: 724ed453-5050-4774-8276-2daa0a0dad60
+  - guid: 41adeb67-97bd-4760-9bcf-b41d1f0625d6
     kind: 0
     line:
       text: And they made two of them!
       delaySeconds: 2.9
     editorPosition: {x: 520, y: 0}
-  - guid: 0b0db60f-8bf7-4187-bd44-61e35a43aa06
+  - guid: 268b8b34-8fc2-445f-9d34-694c11e1f5f0
     kind: 0
     line:
       text: The bastards.
       delaySeconds: 1.9
     editorPosition: {x: 780, y: 0}
-  - guid: 679ea3f7-6285-42c8-9a03-452d544cf10e
+  - guid: dd2523bb-c54a-45f0-a9e8-7f98b9f881e4
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 1040, y: 0}
   edges:
-  - fromNodeGuid: 36702bcd-fb47-4604-a554-83ab9ba40df6
+  - fromNodeGuid: b3ec02b5-d9fd-41e2-9f5f-ce88c284c370
     fromOptionGuid: 
-    toNodeGuid: 25cb56b3-a49d-4c61-84cd-f9d063f798fc
-  - fromNodeGuid: 25cb56b3-a49d-4c61-84cd-f9d063f798fc
+    toNodeGuid: 666c0204-84b8-485c-bbc0-e86d7bb81af1
+  - fromNodeGuid: 666c0204-84b8-485c-bbc0-e86d7bb81af1
     fromOptionGuid: 
-    toNodeGuid: 724ed453-5050-4774-8276-2daa0a0dad60
-  - fromNodeGuid: 724ed453-5050-4774-8276-2daa0a0dad60
+    toNodeGuid: 41adeb67-97bd-4760-9bcf-b41d1f0625d6
+  - fromNodeGuid: 41adeb67-97bd-4760-9bcf-b41d1f0625d6
     fromOptionGuid: 
-    toNodeGuid: 0b0db60f-8bf7-4187-bd44-61e35a43aa06
-  - fromNodeGuid: 0b0db60f-8bf7-4187-bd44-61e35a43aa06
+    toNodeGuid: 268b8b34-8fc2-445f-9d34-694c11e1f5f0
+  - fromNodeGuid: 268b8b34-8fc2-445f-9d34-694c11e1f5f0
     fromOptionGuid: 
-    toNodeGuid: 679ea3f7-6285-42c8-9a03-452d544cf10e
+    toNodeGuid: dd2523bb-c54a-45f0-a9e8-7f98b9f881e4
   isOneShot: 0
   payload: 

@@ -13,39 +13,39 @@ MonoBehaviour:
   m_Name: Woman - WrongOrderNasty - Familiar - O1
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: e04c6ffa-672c-4741-ab5d-5b5d2fe94c07
+  - guid: 512baf61-c1c9-461e-aff6-0cd85ce70d3c
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 8c6bd007-f02b-4d94-b9f7-74e002e498fb
+  - guid: bc32613e-bfcf-4c21-9e3c-35c2e990c434
     kind: 0
     line:
       text: Is that you, Pot Boy? Am I at the wrong stall?
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: f7c66c25-44d0-412c-945b-91f613f014d9
+  - guid: 9f3d0205-3aa3-4de7-915c-3928033d164f
     kind: 0
     line:
       text: Why would you do me like this?
       delaySeconds: 2.6
     editorPosition: {x: 520, y: 0}
-  - guid: fb1b1ba5-6a97-450c-8f35-a092625987f3
+  - guid: f8f116ae-52ee-49ce-ac59-8ce7a190e10f
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 780, y: 0}
   edges:
-  - fromNodeGuid: e04c6ffa-672c-4741-ab5d-5b5d2fe94c07
+  - fromNodeGuid: 512baf61-c1c9-461e-aff6-0cd85ce70d3c
     fromOptionGuid: 
-    toNodeGuid: 8c6bd007-f02b-4d94-b9f7-74e002e498fb
-  - fromNodeGuid: 8c6bd007-f02b-4d94-b9f7-74e002e498fb
+    toNodeGuid: bc32613e-bfcf-4c21-9e3c-35c2e990c434
+  - fromNodeGuid: bc32613e-bfcf-4c21-9e3c-35c2e990c434
     fromOptionGuid: 
-    toNodeGuid: f7c66c25-44d0-412c-945b-91f613f014d9
-  - fromNodeGuid: f7c66c25-44d0-412c-945b-91f613f014d9
+    toNodeGuid: 9f3d0205-3aa3-4de7-915c-3928033d164f
+  - fromNodeGuid: 9f3d0205-3aa3-4de7-915c-3928033d164f
     fromOptionGuid: 
-    toNodeGuid: fb1b1ba5-6a97-450c-8f35-a092625987f3
+    toNodeGuid: f8f116ae-52ee-49ce-ac59-8ce7a190e10f
   isOneShot: 0
   payload: 

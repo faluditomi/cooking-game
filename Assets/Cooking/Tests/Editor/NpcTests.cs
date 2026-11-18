@@ -43,6 +43,15 @@ namespace Cooking.Tests
             return new JudgeResult { Verdict = verdict, Payment = paid ? 5f : 0f };
         }
 
+        /// <summary>A liked dish in their favourite flavour.</summary>
+        private static JudgeResult Favourite()
+        {
+            JudgeResult result = Result(Verdict.VeryClose);
+            result.Favourite = true;
+            result.DesireScore = 0.7f;
+            return result;
+        }
+
         // ------------------------------------------------------------------ Stages
 
         [Test]
@@ -181,16 +190,16 @@ namespace Cooking.Tests
         }
 
         [Test]
-        public void VeryCloseDish_IsAddedToWhatTheyOrder_Once()
+        public void DishInTheirFavouriteFlavour_IsAddedToWhatTheyOrder_Once()
         {
             RecipeDefinition usual = Recipe("Usual", new IngredientPortion(Ingredient("Rice"), 1, cooking: CookMethods.Fried));
-            Customer customer = new Customer { name = "The Sleeper", orders = new List<RecipeDefinition> { usual } };
+            Customer customer = new Customer { name = "Petor", orders = new List<RecipeDefinition> { usual } };
             CustomerRelationship relationship = new CustomerRelationship(customer);
             List<IngredientPortion> served = new List<IngredientPortion> { new IngredientPortion(Ingredient("Chilli"), 3, PrepSteps.Grated, CookMethods.Fried) };
 
-            RelationshipChange first = relationship.Record(Result(Verdict.VeryClose), served);
+            RelationshipChange first = relationship.Record(Favourite(), served);
             created.Add(first.NewLikedMeal);
-            RelationshipChange again = relationship.Record(Result(Verdict.VeryClose), served);
+            RelationshipChange again = relationship.Record(Favourite(), served);
 
             Assert.IsNotNull(first.NewLikedMeal);
             Assert.AreEqual(CustomerRelationship.Nameless, first.NewLikedMeal.DisplayName);
@@ -199,14 +208,45 @@ namespace Cooking.Tests
         }
 
         [Test]
-        public void VeryCloseDish_ThatIsAKnownRecipe_IsLikedAsThatRecipe()
+        public void TastyDish_FarFromTheirFavourite_IsNotRemembered()
+        {
+            RecipeDefinition usual = Recipe("Usual", new IngredientPortion(Ingredient("Rice"), 1, cooking: CookMethods.Fried));
+            CustomerRelationship relationship = new CustomerRelationship(new Customer { orders = new List<RecipeDefinition> { usual } });
+            JudgeResult tasty = Result(Verdict.VeryClose);
+            tasty.SameZone = true;
+            tasty.DesireScore = 0.1f;
+
+            RelationshipChange change = relationship.Record(tasty, new List<IngredientPortion> { new IngredientPortion(Ingredient("Chilli"), 3, PrepSteps.Grated, CookMethods.Fried) });
+
+            Assert.IsNull(change.NewLikedMeal);
+            Assert.AreEqual(1, relationship.LikedMeals.Count);
+        }
+
+        [Test]
+        public void AfterTheDream_StartingDishesOutsideTheirFavourite_AreDropped()
+        {
+            RecipeDefinition keep = Recipe("Keep", new IngredientPortion(Ingredient("Rice"), 1, cooking: CookMethods.Fried));
+            RecipeDefinition drop = Recipe("Drop", new IngredientPortion(Ingredient("Tofu"), 1, cooking: CookMethods.Fried));
+            CustomerRelationship relationship = new CustomerRelationship(new Customer { orders = new List<RecipeDefinition> { keep, drop } });
+            List<IngredientPortion> dream = new List<IngredientPortion> { new IngredientPortion(Ingredient("Beef"), 1, cooking: CookMethods.Boiled, doneness: Doneness.Perfect) };
+
+            relationship.Record(Result(Verdict.DreamMeal), dream, null, recipe => recipe == keep);
+            created.Add(relationship.DreamMeal);
+
+            CollectionAssert.Contains(relationship.LikedMeals, keep);
+            CollectionAssert.DoesNotContain(relationship.LikedMeals, drop);
+            CollectionAssert.Contains(relationship.LikedMeals, relationship.DreamMeal);
+        }
+
+        [Test]
+        public void FavouriteDish_ThatIsAKnownRecipe_IsLikedAsThatRecipe()
         {
             RecipeDefinition usual = Recipe("Usual", new IngredientPortion(Ingredient("Rice"), 1, cooking: CookMethods.Fried));
             IngredientPortion chilli = new IngredientPortion(Ingredient("Chilli"), 3, PrepSteps.Grated, CookMethods.Fried);
             RecipeDefinition hot = Recipe("Hot one", chilli);
             CustomerRelationship relationship = new CustomerRelationship(new Customer { orders = new List<RecipeDefinition> { usual } });
 
-            RelationshipChange change = relationship.Record(Result(Verdict.VeryClose), new List<IngredientPortion> { chilli }, new[] { usual, hot });
+            RelationshipChange change = relationship.Record(Favourite(), new List<IngredientPortion> { chilli }, new[] { usual, hot });
 
             Assert.AreSame(hot, change.NewLikedMeal);
         }
@@ -237,8 +277,8 @@ namespace Cooking.Tests
         [Test]
         public void OrderDialogue_ReadsPayloadThenTokens()
         {
-            Assert.AreEqual(CustomerDialogue.OrderKind.Named, CustomerDialogue.ReadOrder("MSBeef fried rice", "Whip me up an MSBeef rice", out string dish));
-            Assert.AreEqual("MSBeef fried rice", dish);
+            Assert.AreEqual(CustomerDialogue.OrderKind.Named, CustomerDialogue.ReadOrder("MSBeef noodles", "Whip me up some MSBeef noodles", out string dish));
+            Assert.AreEqual("MSBeef noodles", dish);
             Assert.AreEqual(CustomerDialogue.OrderKind.Dream, CustomerDialogue.ReadOrder("[dream dish]", "Hey Pot Boy.", out _));
             Assert.AreEqual(CustomerDialogue.OrderKind.Liked, CustomerDialogue.ReadOrder("", "Need that [liked meal], Pot Boy.", out _));
             Assert.AreEqual(CustomerDialogue.OrderKind.Liked, CustomerDialogue.ReadOrder(null, "Hit me with that [Liked Dish], boss!", out _));

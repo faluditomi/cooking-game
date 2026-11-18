@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9dbf973f6ffa355418567f4b61dcc68e, type: 3}
-  m_Name: MSBeef fried rice
+  m_Name: MSBeef noodles
   m_EditorClassIdentifier: Cooking.Runtime::Cooking.RecipeDefinition
-  displayName: MSBeef fried rice
+  displayName: MSBeef noodles
   origin: Erlin's Eye street food
   description: 
   portions:
-  - ingredient: {fileID: 11400000, guid: fc4d9c7d893d459888f20847bba96260, type: 2}
+  - ingredient: {fileID: 11400000, guid: 39a8192f178849dea224e9f34f562f68, type: 2}
     quantity: 1
     prep: 0
     cooking: 3

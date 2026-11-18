@@ -44,7 +44,7 @@ namespace Cooking.Prototype
 
                 // Seasonings are a sprinkle, not a piece of the heap.
                 List<Sprite> into = portion.ingredient.IsSeasoning ? seasonings : pieces;
-                for(int i = 0; i < portion.quantity && into.Count < MaxPieces; i++) into.Add(portion.ingredient.Icon);
+                for(int i = 0; i < portion.quantity && into.Count < MaxPieces; i++) into.Add(PrepSprites.For(portion.ingredient, portion.prep));
             }
 
             // A plate of only seasonings (an MSG2 cube, say) shows them.

@@ -13,39 +13,39 @@ MonoBehaviour:
   m_Name: Woman - WrongOrderTasty - Stranger - O1
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: 1b5885e1-3bf2-475a-aaec-a475c6b21257
+  - guid: 8553c5e0-0ae6-4c3c-b510-e3fee9862a18
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 7bd0a326-4af9-4d49-8632-63810876fe75
+  - guid: d8f846f1-7213-4cca-8eb0-5c219765ca4e
     kind: 0
     line:
       text: You fucked up, Pot Boy.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: 644cf6a1-8918-4cf6-81ee-ab318543bb61
+  - guid: 7fe39e86-eca7-4318-8c99-9c7b85ab3202
     kind: 0
     line:
       text: But I'll let you live...
       delaySeconds: 1.8
     editorPosition: {x: 520, y: 0}
-  - guid: 23a3d0c8-8bcb-47cb-8009-8007e3cddcdd
+  - guid: 5cb92d4d-039d-415d-a5ad-f4f99622c9ec
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 780, y: 0}
   edges:
-  - fromNodeGuid: 1b5885e1-3bf2-475a-aaec-a475c6b21257
+  - fromNodeGuid: 8553c5e0-0ae6-4c3c-b510-e3fee9862a18
     fromOptionGuid: 
-    toNodeGuid: 7bd0a326-4af9-4d49-8632-63810876fe75
-  - fromNodeGuid: 7bd0a326-4af9-4d49-8632-63810876fe75
+    toNodeGuid: d8f846f1-7213-4cca-8eb0-5c219765ca4e
+  - fromNodeGuid: d8f846f1-7213-4cca-8eb0-5c219765ca4e
     fromOptionGuid: 
-    toNodeGuid: 644cf6a1-8918-4cf6-81ee-ab318543bb61
-  - fromNodeGuid: 644cf6a1-8918-4cf6-81ee-ab318543bb61
+    toNodeGuid: 7fe39e86-eca7-4318-8c99-9c7b85ab3202
+  - fromNodeGuid: 7fe39e86-eca7-4318-8c99-9c7b85ab3202
     fromOptionGuid: 
-    toNodeGuid: 23a3d0c8-8bcb-47cb-8009-8007e3cddcdd
+    toNodeGuid: 5cb92d4d-039d-415d-a5ad-f4f99622c9ec
   isOneShot: 0
   payload: 

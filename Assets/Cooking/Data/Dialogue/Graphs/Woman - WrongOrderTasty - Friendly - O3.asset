@@ -13,39 +13,39 @@ MonoBehaviour:
   m_Name: Woman - WrongOrderTasty - Friendly - O3
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: 1db52659-ccad-41ae-b134-5e2d04b808e7
+  - guid: c6605cec-b9d1-4013-8f4a-2d5866a1c3ab
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 145579d0-7656-4de3-8dff-959b69a0cedc
+  - guid: 141ac476-bae9-41c9-b525-3fe1eaea4961
     kind: 0
     line:
       text: All this taste... Obliterating my mouth right now.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: b0217b95-110b-4731-8111-ac116dcc0fb0
+  - guid: 9efbc68c-2b01-47ee-b91d-1d84fe6f106f
     kind: 0
     line:
       text: I fuckin' love it.
       delaySeconds: 2.8
     editorPosition: {x: 520, y: 0}
-  - guid: 4b015924-00e2-4f2e-a63b-208b4cd593f8
+  - guid: 9e6f5a57-8b0f-4668-9607-93533fe72b88
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 780, y: 0}
   edges:
-  - fromNodeGuid: 1db52659-ccad-41ae-b134-5e2d04b808e7
+  - fromNodeGuid: c6605cec-b9d1-4013-8f4a-2d5866a1c3ab
     fromOptionGuid: 
-    toNodeGuid: 145579d0-7656-4de3-8dff-959b69a0cedc
-  - fromNodeGuid: 145579d0-7656-4de3-8dff-959b69a0cedc
+    toNodeGuid: 141ac476-bae9-41c9-b525-3fe1eaea4961
+  - fromNodeGuid: 141ac476-bae9-41c9-b525-3fe1eaea4961
     fromOptionGuid: 
-    toNodeGuid: b0217b95-110b-4731-8111-ac116dcc0fb0
-  - fromNodeGuid: b0217b95-110b-4731-8111-ac116dcc0fb0
+    toNodeGuid: 9efbc68c-2b01-47ee-b91d-1d84fe6f106f
+  - fromNodeGuid: 9efbc68c-2b01-47ee-b91d-1d84fe6f106f
     fromOptionGuid: 
-    toNodeGuid: 4b015924-00e2-4f2e-a63b-208b4cd593f8
+    toNodeGuid: 9e6f5a57-8b0f-4668-9607-93533fe72b88
   isOneShot: 0
   payload: 

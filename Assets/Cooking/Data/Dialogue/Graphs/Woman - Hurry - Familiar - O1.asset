@@ -13,30 +13,30 @@ MonoBehaviour:
   m_Name: Woman - Hurry - Familiar - O1
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: f768c7fc-9ea6-4be4-9892-348137279640
+  - guid: 4309b80c-9266-486d-b6cd-50ed33eb9c7b
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 3cd0091c-c737-4721-b719-fec79cc9d2b0
+  - guid: 77ed330b-ad11-4c82-97ba-b029ee261983
     kind: 0
     line:
       text: Ya know, when I woke up this morning, I didn't expect I'd spend half my cycle watching you tryna whip up a passing dish.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: 4293559c-cb19-4dbf-80a4-9a0dbf2aa2d7
+  - guid: 600a532e-ac26-4fee-9b20-b988b1aa8906
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 520, y: 0}
   edges:
-  - fromNodeGuid: f768c7fc-9ea6-4be4-9892-348137279640
+  - fromNodeGuid: 4309b80c-9266-486d-b6cd-50ed33eb9c7b
     fromOptionGuid: 
-    toNodeGuid: 3cd0091c-c737-4721-b719-fec79cc9d2b0
-  - fromNodeGuid: 3cd0091c-c737-4721-b719-fec79cc9d2b0
+    toNodeGuid: 77ed330b-ad11-4c82-97ba-b029ee261983
+  - fromNodeGuid: 77ed330b-ad11-4c82-97ba-b029ee261983
     fromOptionGuid: 
-    toNodeGuid: 4293559c-cb19-4dbf-80a4-9a0dbf2aa2d7
+    toNodeGuid: 600a532e-ac26-4fee-9b20-b988b1aa8906
   isOneShot: 0
   payload: 

@@ -13,75 +13,75 @@ MonoBehaviour:
   m_Name: Woman - Musing - Friendly - O2
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: 458b7cca-c5d8-417c-82e3-9b22a1419f5f
+  - guid: 3c10dbf7-86c5-4cd3-9640-4f18b4ba5c38
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 344eb83a-4783-4b36-b76c-281869871f9a
+  - guid: b9c6148e-87dc-4f1b-a57f-8a9c884edf43
     kind: 0
     line:
-      text: Catch this, I got a lead on [name of her lover].
+      text: Catch this, I got a lead on Jessa.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: 9a200010-31b5-47c6-a343-534b273de53e
+  - guid: 9daacded-d7d4-4ba8-a73c-6f49e986f567
     kind: 0
     line:
       text: She hitched a ride on a cargo run that still comes around today. It's coming out of an agriculture sector not far from here.
-      delaySeconds: 2.7
+      delaySeconds: 2.2
     editorPosition: {x: 520, y: 0}
-  - guid: d1b1e65f-53c8-4418-8610-56352e4e1148
+  - guid: b6c8bbf2-7df4-4598-872f-5e336bca58d2
     kind: 0
     line:
       text: Dunno where she headed from there, but hey, it's a start.
       delaySeconds: 5.4
     editorPosition: {x: 780, y: 0}
-  - guid: cade4e07-6d4c-463b-9774-01eac2d6531e
+  - guid: 7170c492-e294-414e-bd6c-bb5e030be43d
     kind: 0
     line:
       text: Maybe I'll even see how your precious potatoes are created.
       delaySeconds: 3
     editorPosition: {x: 1040, y: 0}
-  - guid: 63ee51a2-6954-4251-b61c-db9a59534519
+  - guid: 7b23e01d-9260-4ffc-951e-2c8247d0b968
     kind: 0
     line:
       text: Or... Maybe it's a beef factory...
       delaySeconds: 3.1
     editorPosition: {x: 1300, y: 0}
-  - guid: 96135818-45ad-4792-9505-2b7ccf776ad5
+  - guid: 841f4e4f-9dac-44a4-92d9-fdbfd48f4ce1
     kind: 0
     line:
       text: Fuck, I didn't think of that!
       delaySeconds: 2.2
     editorPosition: {x: 1560, y: 0}
-  - guid: 175c70ab-fcfb-40de-a323-367c985f526d
+  - guid: 85af3d5b-1a32-41b8-8156-9b6bdb2a055a
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 1820, y: 0}
   edges:
-  - fromNodeGuid: 458b7cca-c5d8-417c-82e3-9b22a1419f5f
+  - fromNodeGuid: 3c10dbf7-86c5-4cd3-9640-4f18b4ba5c38
     fromOptionGuid: 
-    toNodeGuid: 344eb83a-4783-4b36-b76c-281869871f9a
-  - fromNodeGuid: 344eb83a-4783-4b36-b76c-281869871f9a
+    toNodeGuid: b9c6148e-87dc-4f1b-a57f-8a9c884edf43
+  - fromNodeGuid: b9c6148e-87dc-4f1b-a57f-8a9c884edf43
     fromOptionGuid: 
-    toNodeGuid: 9a200010-31b5-47c6-a343-534b273de53e
-  - fromNodeGuid: 9a200010-31b5-47c6-a343-534b273de53e
+    toNodeGuid: 9daacded-d7d4-4ba8-a73c-6f49e986f567
+  - fromNodeGuid: 9daacded-d7d4-4ba8-a73c-6f49e986f567
     fromOptionGuid: 
-    toNodeGuid: d1b1e65f-53c8-4418-8610-56352e4e1148
-  - fromNodeGuid: d1b1e65f-53c8-4418-8610-56352e4e1148
+    toNodeGuid: b6c8bbf2-7df4-4598-872f-5e336bca58d2
+  - fromNodeGuid: b6c8bbf2-7df4-4598-872f-5e336bca58d2
     fromOptionGuid: 
-    toNodeGuid: cade4e07-6d4c-463b-9774-01eac2d6531e
-  - fromNodeGuid: cade4e07-6d4c-463b-9774-01eac2d6531e
+    toNodeGuid: 7170c492-e294-414e-bd6c-bb5e030be43d
+  - fromNodeGuid: 7170c492-e294-414e-bd6c-bb5e030be43d
     fromOptionGuid: 
-    toNodeGuid: 63ee51a2-6954-4251-b61c-db9a59534519
-  - fromNodeGuid: 63ee51a2-6954-4251-b61c-db9a59534519
+    toNodeGuid: 7b23e01d-9260-4ffc-951e-2c8247d0b968
+  - fromNodeGuid: 7b23e01d-9260-4ffc-951e-2c8247d0b968
     fromOptionGuid: 
-    toNodeGuid: 96135818-45ad-4792-9505-2b7ccf776ad5
-  - fromNodeGuid: 96135818-45ad-4792-9505-2b7ccf776ad5
+    toNodeGuid: 841f4e4f-9dac-44a4-92d9-fdbfd48f4ce1
+  - fromNodeGuid: 841f4e4f-9dac-44a4-92d9-fdbfd48f4ce1
     fromOptionGuid: 
-    toNodeGuid: 175c70ab-fcfb-40de-a323-367c985f526d
+    toNodeGuid: 85af3d5b-1a32-41b8-8156-9b6bdb2a055a
   isOneShot: 0
   payload: 

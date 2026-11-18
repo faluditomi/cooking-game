@@ -10,16 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9dbf973f6ffa355418567f4b61dcc68e, type: 3}
-  m_Name: Hellchick noodles
+  m_Name: Hellspawn fried rice
   m_EditorClassIdentifier: Cooking.Runtime::Cooking.RecipeDefinition
-  displayName: Hellchick noodles
+  displayName: Hellspawn fried rice
   origin: Erlin's Eye street food
   description: 
   portions:
-  - ingredient: {fileID: 11400000, guid: 39a8192f178849dea224e9f34f562f68, type: 2}
+  - ingredient: {fileID: 11400000, guid: fc4d9c7d893d459888f20847bba96260, type: 2}
     quantity: 1
     prep: 0
-    cooking: 2
+    cooking: 3
     doneness: 0
   - ingredient: {fileID: 11400000, guid: 5035d26bc0f24b75a77290d61af78064, type: 2}
     quantity: 1
@@ -36,13 +36,13 @@ MonoBehaviour:
     prep: 4
     cooking: 2
     doneness: 0
-  - ingredient: {fileID: 11400000, guid: e15d7792cf294d49a5eb817bfd4c6af4, type: 2}
-    quantity: 2
-    prep: 4
-    cooking: 2
-    doneness: 0
   - ingredient: {fileID: 11400000, guid: 87c42bb69b65492898283d0dd8889f78, type: 2}
     quantity: 2
+    prep: 0
+    cooking: 2
+    doneness: 0
+  - ingredient: {fileID: 11400000, guid: 3e30b972fe0043b981e4906d33a2fc46, type: 2}
+    quantity: 1
     prep: 0
     cooking: 2
     doneness: 0

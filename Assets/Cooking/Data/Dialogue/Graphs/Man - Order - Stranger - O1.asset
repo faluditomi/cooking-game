@@ -13,30 +13,30 @@ MonoBehaviour:
   m_Name: Man - Order - Stranger - O1
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: c0396652-2467-4429-9682-787d6d5fa725
+  - guid: 760382a4-bd63-4f19-9792-a65b9e69c947
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 5fc95e19-f1d5-4728-b2af-0cbe00ca172c
+  - guid: 4318d25b-8920-4813-bb02-9d5b7219590c
     kind: 0
     line:
       text: The food on this station... Don't get me started.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: a53966d7-10fa-4001-b86c-1e886208997d
+  - guid: 63c34de3-cb9c-4e05-b630-63805f6d38cd
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 520, y: 0}
   edges:
-  - fromNodeGuid: c0396652-2467-4429-9682-787d6d5fa725
+  - fromNodeGuid: 760382a4-bd63-4f19-9792-a65b9e69c947
     fromOptionGuid: 
-    toNodeGuid: 5fc95e19-f1d5-4728-b2af-0cbe00ca172c
-  - fromNodeGuid: 5fc95e19-f1d5-4728-b2af-0cbe00ca172c
+    toNodeGuid: 4318d25b-8920-4813-bb02-9d5b7219590c
+  - fromNodeGuid: 4318d25b-8920-4813-bb02-9d5b7219590c
     fromOptionGuid: 
-    toNodeGuid: a53966d7-10fa-4001-b86c-1e886208997d
+    toNodeGuid: 63c34de3-cb9c-4e05-b630-63805f6d38cd
   isOneShot: 0
   payload: 

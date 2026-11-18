@@ -13,39 +13,39 @@ MonoBehaviour:
   m_Name: Woman - CorrectOrder - Stranger - O2
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: 05ed21d3-6fba-4bd2-b8ee-627aaf5e2643
+  - guid: a0db8535-e857-49d3-8c07-55cc96bb3155
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: d824142f-553e-411e-8a81-cfbbaf0585a8
+  - guid: d8f2a807-d816-44e4-bc8e-4dd5f67b8e5b
     kind: 0
     line:
       text: Be here tomorrow.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: f6eeb134-78bd-468f-8171-62f5013438c4
+  - guid: e0256341-22a2-401b-8b8a-8c5f28fd1b10
     kind: 0
     line:
       text: Not like I got options.
       delaySeconds: 1.6
     editorPosition: {x: 520, y: 0}
-  - guid: 73c6279c-67f2-428c-9598-0a1aa039d9d5
+  - guid: 8737a59c-cb2b-4e65-8021-4059e2659e42
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 780, y: 0}
   edges:
-  - fromNodeGuid: 05ed21d3-6fba-4bd2-b8ee-627aaf5e2643
+  - fromNodeGuid: a0db8535-e857-49d3-8c07-55cc96bb3155
     fromOptionGuid: 
-    toNodeGuid: d824142f-553e-411e-8a81-cfbbaf0585a8
-  - fromNodeGuid: d824142f-553e-411e-8a81-cfbbaf0585a8
+    toNodeGuid: d8f2a807-d816-44e4-bc8e-4dd5f67b8e5b
+  - fromNodeGuid: d8f2a807-d816-44e4-bc8e-4dd5f67b8e5b
     fromOptionGuid: 
-    toNodeGuid: f6eeb134-78bd-468f-8171-62f5013438c4
-  - fromNodeGuid: f6eeb134-78bd-468f-8171-62f5013438c4
+    toNodeGuid: e0256341-22a2-401b-8b8a-8c5f28fd1b10
+  - fromNodeGuid: e0256341-22a2-401b-8b8a-8c5f28fd1b10
     fromOptionGuid: 
-    toNodeGuid: 73c6279c-67f2-428c-9598-0a1aa039d9d5
+    toNodeGuid: 8737a59c-cb2b-4e65-8021-4059e2659e42
   isOneShot: 0
   payload: 

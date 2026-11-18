@@ -1,0 +1,69 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Sleeper - Order - Stranger - O4
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: d20a4442-ad5e-4285-9d3c-1359848c0e75
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: 72f89cc7-f400-4830-afba-62526362668c
+    kind: 0
+    line:
+      text: Hey, man.
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: e7a93e17-3cb8-4668-ab18-db2648687036
+    kind: 0
+    line:
+      text: Wait... You had a menu all this time??
+      delaySeconds: 1.3
+    editorPosition: {x: 520, y: 0}
+  - guid: 11742529-87fb-428e-b342-023b89d809d3
+    kind: 0
+    line:
+      text: Ohh, no, that's tough.
+      delaySeconds: 2.4
+    editorPosition: {x: 780, y: 0}
+  - guid: 05e47077-2e06-4faf-a041-4dc7a78e4f9e
+    kind: 0
+    line:
+      text: I'll uuh.. take a soup on the rock, please.
+      delaySeconds: 1.8
+    editorPosition: {x: 1040, y: 0}
+  - guid: 0d2ee016-c8f9-47c3-bef8-d32b8cec6b43
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 1300, y: 0}
+  edges:
+  - fromNodeGuid: d20a4442-ad5e-4285-9d3c-1359848c0e75
+    fromOptionGuid: 
+    toNodeGuid: 72f89cc7-f400-4830-afba-62526362668c
+  - fromNodeGuid: 72f89cc7-f400-4830-afba-62526362668c
+    fromOptionGuid: 
+    toNodeGuid: e7a93e17-3cb8-4668-ab18-db2648687036
+  - fromNodeGuid: e7a93e17-3cb8-4668-ab18-db2648687036
+    fromOptionGuid: 
+    toNodeGuid: 11742529-87fb-428e-b342-023b89d809d3
+  - fromNodeGuid: 11742529-87fb-428e-b342-023b89d809d3
+    fromOptionGuid: 
+    toNodeGuid: 05e47077-2e06-4faf-a041-4dc7a78e4f9e
+  - fromNodeGuid: 05e47077-2e06-4faf-a041-4dc7a78e4f9e
+    fromOptionGuid: 
+    toNodeGuid: 0d2ee016-c8f9-47c3-bef8-d32b8cec6b43
+  isOneShot: 1
+  payload: Soup on the rock

@@ -45,6 +45,9 @@ namespace Cooking.Prototype
         [SerializeField, Range(0f, 1f)] private float ambienceVolume = 0.35f;
         [Tooltip("The pan's sizzle and the pot's bubbling, at full.")]
         [SerializeField, Range(0f, 1f)] private float cookingVolume = 0.45f;
+        [Tooltip("The game's music, looping. Empty until the track is in.")]
+        [SerializeField] private AudioClip music;
+        [SerializeField, Range(0f, 1f)] private float musicVolume = 0.6f;
 
         private const int SfxVoices = 8;
         private const float BlipEvery = 0.05f;
@@ -54,6 +57,7 @@ namespace Cooking.Prototype
         private AudioSource sizzleSource;
         private AudioSource boilSource;
         private AudioSource ambienceSource;
+        private AudioSource musicSource;
         private float lastBlip;
 
         /// <summary>Sets the clips. Used by the editor's Assign Sounds menu.</summary>
@@ -65,6 +69,7 @@ namespace Cooking.Prototype
         private void InitAudio()
         {
             if(FindAnyObjectByType<AudioListener>() == null) gameObject.AddComponent<AudioListener>();
+            LoadVolumes();
 
             sfxSources = new AudioSource[SfxVoices];
 
@@ -77,8 +82,10 @@ namespace Cooking.Prototype
             sizzleSource = LoopSource(sounds.sizzle);
             boilSource = LoopSource(sounds.boil);
             ambienceSource = LoopSource(sounds.ambience);
-            ambienceSource.volume = ambienceVolume;
+            musicSource = LoopSource(music);
+            ApplyVolumes();
             if(ambienceSource.clip != null) ambienceSource.Play();
+            if(musicSource.clip != null) musicSource.Play();
 
             // Every button clicks.
             UIFactory.Clicked = () => Play(sounds.uiClick, 0.5f, 0.03f);
@@ -102,7 +109,14 @@ namespace Cooking.Prototype
             AudioSource source = sfxSources[nextSfx];
             nextSfx = (nextSfx + 1) % sfxSources.Length;
             source.pitch = pitch * (1f + UnityEngine.Random.Range(-pitchJitter, pitchJitter));
-            source.PlayOneShot(clip, volume * sfxVolume);
+            source.PlayOneShot(clip, volume * sfxVolume * playerSfx);
+        }
+
+        /// <summary>The ambience and music at the player's settings (the cooking loops follow in UpdateCookingSounds).</summary>
+        private void ApplyVolumes()
+        {
+            if(ambienceSource != null) ambienceSource.volume = ambienceVolume * playerSfx;
+            if(musicSource != null) musicSource.volume = musicVolume * playerMusic;
         }
 
         /// <summary>Sizzle while the pan fries on the heat, bubbling while the pot boils; both fade in and out.</summary>
@@ -110,13 +124,11 @@ namespace Cooking.Prototype
         {
             if(sizzleSource == null) return;
 
-            bool live = phase == Phase.Service && !overlayOpen;
-            Fade(sizzleSource, live && wok.IsCooking && heldStation != wokView ? cookingVolume * (0.6f + 0.4f * wok.Progress) : 0f);
-            Fade(boilSource, live && pot.IsCooking && heldStation != potView ? cookingVolume * 0.8f : 0f);
-            if(ambienceSource != null) ambienceSource.volume = ambienceVolume;
-
-            // Something in the pan just burnt.
-            // (The burn itself plays from UpdateStationView when a station goes into the red.)
+            bool live = phase == Phase.Service && !overlayOpen && !paused;
+            float loud = cookingVolume * playerSfx;
+            Fade(sizzleSource, live && wok.IsCooking && heldStation != wokView ? loud * (0.6f + 0.4f * wok.Progress) : 0f);
+            Fade(boilSource, live && pot.IsCooking && heldStation != potView ? loud * 0.8f : 0f);
+            // (The burn plays from UpdateStationView when a station goes into the red.)
         }
 
         private static void Fade(AudioSource source, float target)

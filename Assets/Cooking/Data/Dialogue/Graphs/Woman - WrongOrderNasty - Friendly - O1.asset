@@ -13,39 +13,39 @@ MonoBehaviour:
   m_Name: Woman - WrongOrderNasty - Friendly - O1
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: 5c53ae7b-1f59-4700-8776-53fbf708d308
+  - guid: 7f6e8186-c97c-4de1-99ba-d39217ad6245
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: eda09eba-b81e-4934-9d26-e74edf840d32
+  - guid: 41e3565b-91ec-475c-b4bf-f74e23626b19
     kind: 0
     line:
       text: Is this your evil twin, or what?
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: 07f64815-2b04-4b05-a698-961008e1e719
+  - guid: 2e9afd0f-439c-4af3-b357-edb727f2cf7e
     kind: 0
     line:
       text: Did you sleep alright? I see some bad energies under your eyes.
       delaySeconds: 2.1
     editorPosition: {x: 520, y: 0}
-  - guid: e435df58-8323-4800-9c8c-147d6c6134eb
+  - guid: 2cb6d7fa-c3eb-4727-8b1c-4271dbcc2311
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 780, y: 0}
   edges:
-  - fromNodeGuid: 5c53ae7b-1f59-4700-8776-53fbf708d308
+  - fromNodeGuid: 7f6e8186-c97c-4de1-99ba-d39217ad6245
     fromOptionGuid: 
-    toNodeGuid: eda09eba-b81e-4934-9d26-e74edf840d32
-  - fromNodeGuid: eda09eba-b81e-4934-9d26-e74edf840d32
+    toNodeGuid: 41e3565b-91ec-475c-b4bf-f74e23626b19
+  - fromNodeGuid: 41e3565b-91ec-475c-b4bf-f74e23626b19
     fromOptionGuid: 
-    toNodeGuid: 07f64815-2b04-4b05-a698-961008e1e719
-  - fromNodeGuid: 07f64815-2b04-4b05-a698-961008e1e719
+    toNodeGuid: 2e9afd0f-439c-4af3-b357-edb727f2cf7e
+  - fromNodeGuid: 2e9afd0f-439c-4af3-b357-edb727f2cf7e
     fromOptionGuid: 
-    toNodeGuid: e435df58-8323-4800-9c8c-147d6c6134eb
+    toNodeGuid: 2cb6d7fa-c3eb-4727-8b1c-4271dbcc2311
   isOneShot: 0
   payload: 

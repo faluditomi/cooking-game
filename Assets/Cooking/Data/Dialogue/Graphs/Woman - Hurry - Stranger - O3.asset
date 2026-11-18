@@ -13,39 +13,39 @@ MonoBehaviour:
   m_Name: Woman - Hurry - Stranger - O3
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: 16fac41f-a42c-420f-abf7-4ef7311e2fd5
+  - guid: c1a9b0e6-77ac-4010-adab-b12e0d8d09f7
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 6567df71-e216-4b0b-bf13-5e76a85fd845
+  - guid: 35bca4fb-8cd0-4d08-ad31-60be0564e1b4
     kind: 0
     line:
       text: aaaaaaaaAAAAAAHHHHH!!!
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: 93443f0f-016b-4694-b7ae-73d9a779eb24
+  - guid: 89aeb28a-50b8-4c7e-bbd7-774c9f8b47cb
     kind: 0
     line:
       text: What is even taking you this long!?
       delaySeconds: 1.8
     editorPosition: {x: 520, y: 0}
-  - guid: 26638a82-3d2d-4bad-9d69-5142b0b59675
+  - guid: 824b5c76-d29a-492a-8fc1-eb695a11d98b
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 780, y: 0}
   edges:
-  - fromNodeGuid: 16fac41f-a42c-420f-abf7-4ef7311e2fd5
+  - fromNodeGuid: c1a9b0e6-77ac-4010-adab-b12e0d8d09f7
     fromOptionGuid: 
-    toNodeGuid: 6567df71-e216-4b0b-bf13-5e76a85fd845
-  - fromNodeGuid: 6567df71-e216-4b0b-bf13-5e76a85fd845
+    toNodeGuid: 35bca4fb-8cd0-4d08-ad31-60be0564e1b4
+  - fromNodeGuid: 35bca4fb-8cd0-4d08-ad31-60be0564e1b4
     fromOptionGuid: 
-    toNodeGuid: 93443f0f-016b-4694-b7ae-73d9a779eb24
-  - fromNodeGuid: 93443f0f-016b-4694-b7ae-73d9a779eb24
+    toNodeGuid: 89aeb28a-50b8-4c7e-bbd7-774c9f8b47cb
+  - fromNodeGuid: 89aeb28a-50b8-4c7e-bbd7-774c9f8b47cb
     fromOptionGuid: 
-    toNodeGuid: 26638a82-3d2d-4bad-9d69-5142b0b59675
+    toNodeGuid: 824b5c76-d29a-492a-8fc1-eb695a11d98b
   isOneShot: 0
   payload: 
