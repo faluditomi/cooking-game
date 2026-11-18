@@ -77,6 +77,7 @@ namespace Cooking.Tests
         {
             JudgeResult result = Result(verdict);
             result.BestZone = new FlavourZoneMatch(Track(ScriptableObject.CreateInstance<FlavourZone>()), 1f);
+            result.Proper = true;
             return result;
         }
 

@@ -12,24 +12,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce3b2af0cee65f04b8b8553a214d35ac, type: 3}
   m_Name: Sweet and Sour
   m_EditorClassIdentifier: Cooking.Runtime::Cooking.FlavourZone
-  displayName: Sweet & Sour
+  displayName: Briny Broth
   color: {r: 0.9, g: 0.4, b: 0.7, a: 1}
-  description: Bright and tangy. Nobody on the Eye cooks like this anymore.
+  description: Salt first, then everything else. A sailor's soup on a station with no sea.
   min:
     savoury: 0
     salty: 0
-    sweet: 3
-    bitter: 0
-    sour: 3
+    sweet: 0
+    bitter: 0.5
+    sour: 2.5
     pain: 0
     nutrition: 0
     texture: 0
   max:
-    savoury: 5
-    salty: 3
-    sweet: 6
+    savoury: 7.5
+    salty: 5
+    sweet: 3
     bitter: 2
-    sour: 6
-    pain: 2.5
+    sour: 5
+    pain: 2
     nutrition: 6
-    texture: 6
+    texture: 3
+  chartAxis: 0.5
+  chartSpread: 0.6
+  chartInner: 0.35
+  chartOuter: 0.8

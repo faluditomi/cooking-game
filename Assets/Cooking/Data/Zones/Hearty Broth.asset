@@ -14,22 +14,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: Cooking.Runtime::Cooking.FlavourZone
   displayName: Hearty Broth
   color: {r: 0.35, g: 0.75, b: 0.55, a: 1}
-  description: Warm, salty soup with something to chew on.
+  description: Warm, salty and filling soup. Soft, nothing sharp.
   min:
-    savoury: 4
-    salty: 2.5
+    savoury: 3.5
+    salty: 2
     sweet: 0
     bitter: 0
     sour: 0
     pain: 0
-    nutrition: 5
+    nutrition: 0
     texture: 0
   max:
-    savoury: 6.5
-    salty: 5
+    savoury: 6
+    salty: 8.5
     sweet: 2
     bitter: 1.5
-    sour: 2
-    pain: 2
-    nutrition: 8
+    sour: 1
+    pain: 1.5
+    nutrition: 5.5
     texture: 2.5
+  chartAxis: 7.45
+  chartSpread: 0.55
+  chartInner: 0.2
+  chartOuter: 0.38

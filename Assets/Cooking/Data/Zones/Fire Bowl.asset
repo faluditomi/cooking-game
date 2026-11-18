@@ -16,20 +16,24 @@ MonoBehaviour:
   color: {r: 0.95, g: 0.25, b: 0.2, a: 1}
   description: Hurts in the right way. Strong enough for dull sensors.
   min:
-    savoury: 5
-    salty: 2.5
+    savoury: 0
+    salty: 0
     sweet: 0
     bitter: 0
     sour: 0
-    pain: 5
-    nutrition: 4
+    pain: 5.5
+    nutrition: 0
     texture: 0
   max:
-    savoury: 8
-    salty: 5.5
-    sweet: 3.5
-    bitter: 2.5
-    sour: 2.5
-    pain: 8
-    nutrition: 8
-    texture: 6
+    savoury: 6
+    salty: 3
+    sweet: 6.5
+    bitter: 1.5
+    sour: 2
+    pain: 9
+    nutrition: 6
+    texture: 7
+  chartAxis: 5.8
+  chartSpread: 0.5
+  chartInner: 0.15
+  chartOuter: 0.6

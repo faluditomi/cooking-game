@@ -38,6 +38,9 @@ namespace Cooking
         {
             if(zone == null) return 0f;
 
+            // A zone with a shape on the chart is judged by where the dish's dot lands.
+            if(zone.HasChartShape) return FlavourDot.Score(FlavourDot.Of(profile), zone);
+
             float distance = zone.DistanceOutside(profile);
 
             if(distance <= 0f) return 1f;

@@ -923,15 +923,21 @@ namespace Cooking.Prototype
             AppendOrderAndReceipt(sb, DishName(order), plate, result.Price, result.Payment + result.Tip, dishCost);
             if(result.Tip > 0f) sb.Append("  <color=#a6a199>(with a $").Append(result.Tip.ToString("0.00")).Append(" tip)</color>\n");
             if(result.RefusedIngredient != null) sb.Append("\nWon't eat: <color=#e5594d>").Append(result.RefusedIngredient.DisplayName).Append("</color>\n");
+            if(!result.ExactMatch && !result.Proper)
+            {
+                sb.Append("\n<color=#a6a199>Too simple to count as a dish: it needs at least ").Append(DishJudge.Settings.Default.MinIngredients)
+                  .Append(" different ingredients and something cooked.</color>\n");
+            }
             if(showDesireDebug && result.DesireScore >= 0f) sb.Append("<color=#a6a199>Favourite flavour (debug): ").Append((result.DesireScore * 100f).ToString("0")).Append("%</color>\n");
             resultBody.text = sb.ToString();
 
-            // The dish on the radar; no zone (the nearest one was misleading when the dish wasn't in it).
+            // The dish as a dot, the order's dot when it's a dish you know, and the tasty zone only
+            // when the dish actually landed in it (not the nearest one).
             resultRadar.ClearProfiles();
             resultRadar.SetZones(null);
-            // The order's outline, when it's a dish you know, to compare the taste with.
-            if(orderKnown) resultRadar.AddProfile(result.Ordered, new Color(0.85f, 0.85f, 0.85f, 0.8f), false);
-            resultRadar.AddProfile(result.Dish, UIFactory.Accent, true);
+            if(result.Proper && result.BestZone.Zone != null && result.BestZone.Score >= DishJudge.Settings.Default.ZoneAt) resultRadar.AddZone(result.BestZone.Zone, TastyZoneBlue);
+            if(orderKnown) resultRadar.AddDot(result.Ordered, OrderGrey);
+            resultRadar.AddDot(result.Dish, result.Proper || result.ExactMatch ? UIFactory.Accent : SimpleGrey);
 
             ShowNaming(currentEntry != null ? currentEntry.Dish : null);
             UIFactory.SetButtonText(resultButton, arrivals.Count == 0 ? "Continue (close for the day)" : "Continue");
