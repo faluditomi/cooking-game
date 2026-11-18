@@ -51,11 +51,15 @@ namespace Cooking.Prototype.EditorTools
             };
 
             prototype.SetSounds(set);
+            prototype.SetMusic(AssetDatabase.LoadAssetAtPath<AudioClip>(MusicPath));
             EditorUtility.SetDirty(prototype);
             EditorSceneManager.MarkSceneDirty(prototype.gameObject.scene);
             EditorSceneManager.SaveScene(prototype.gameObject.scene);
             Debug.Log("[Cooking] Sounds assigned" + (set.uiClick == null ? " (clips missing from " + Folder + "; run Audio/Source/synth_sounds.py)." : "."));
         }
+
+        /// <summary>The game's music track.</summary>
+        private const string MusicPath = "Assets/Cooking/Audio/Music/hunger.wav";
 
         private static AudioClip Clip(string name)
         {
