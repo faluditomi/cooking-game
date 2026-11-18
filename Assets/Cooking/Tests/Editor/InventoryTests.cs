@@ -122,6 +122,7 @@ namespace Cooking.Tests
             settings.Margin = 2f;
             // Two-ingredient dishes, cooked, are enough to count here.
             settings.MinIngredients = 2;
+            settings.MinPrepped = 0;
 
             JudgeResult withoutBeef = DishJudge.Judge(order, new[] { new IngredientPortion(sweet, 1) }, customer, new[] { zone }, null, settings);
             JudgeResult withBeef = DishJudge.Judge(order, new[] { new IngredientPortion(sweet, 1, cooking: CookMethods.Boiled), new IngredientPortion(beef, 1, cooking: CookMethods.Boiled) },

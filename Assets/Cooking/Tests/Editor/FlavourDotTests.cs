@@ -54,6 +54,7 @@ namespace Cooking.Tests
             {
                 DishJudge.Settings settings = DishJudge.Settings.Default;
                 settings.MinIngredients = 1;
+                settings.MinPrepped = 0;
                 return settings;
             }
         }

@@ -90,6 +90,11 @@ namespace Cooking.Prototype
             public float DreamAt;
             /// <summary>Different ingredients a dish needs before it can count as tasty (and something cooked).</summary>
             public int MinIngredients;
+            /// <summary>
+            /// Ingredients of a dish that must have been prepped (peeled, sliced, grated...) before it can
+            /// count as tasty, for a customer who cares (<see cref="Customer.wantsPreppedFood"/>).
+            /// </summary>
+            public int MinPrepped;
 
             public static Settings Default => new Settings
             {
@@ -105,6 +110,7 @@ namespace Cooking.Prototype
                 ZoneAt = 1f,
                 DreamAt = 1f,
                 MinIngredients = 3,
+                MinPrepped = 1,
             };
         }
 
@@ -138,7 +144,7 @@ namespace Cooking.Prototype
 
             if(!HasFood(dish)) return result;
 
-            result.Proper = IsProperDish(dish, settings.MinIngredients);
+            result.Proper = IsProperDish(dish, settings.MinIngredients, PreppedNeeded(customer, settings));
             result.Favourite = result.Proper && result.DesireScore >= settings.ZoneAt && WellCooked(dish);
 
             // Their dream meal wins over anything they'd otherwise refuse.
@@ -220,25 +226,35 @@ namespace Cooking.Prototype
             return result.Proper && result.BestZone.Zone != null && result.BestZone.Score >= Settings.Default.ZoneAt;
         }
 
+        /// <summary>How many prepped ingredients this customer needs in a dish they didn't order (none for the Sleeper).</summary>
+        public static int PreppedNeeded(Customer customer, Settings settings)
+        {
+            return customer == null || customer.wantsPreppedFood ? settings.MinPrepped : 0;
+        }
+
         /// <summary>
-        /// At least <paramref name="minIngredients"/> different ingredients, and at least one of them
-        /// cooked: something that can be called a dish, rather than a lone ingredient.
+        /// At least <paramref name="minIngredients"/> different ingredients, at least
+        /// <paramref name="minPrepped"/> of them prepped on a board (peeled, sliced, grated...), and at
+        /// least one of them cooked: something that took some cooking, rather than a lone ingredient
+        /// or a few things tipped in a pot as they come.
         /// </summary>
-        public static bool IsProperDish(IReadOnlyList<IngredientPortion> dish, int minIngredients)
+        public static bool IsProperDish(IReadOnlyList<IngredientPortion> dish, int minIngredients, int minPrepped = 1)
         {
             if(dish == null) return false;
 
             List<IngredientDefinition> kinds = new List<IngredientDefinition>();
+            List<IngredientDefinition> prepped = new List<IngredientDefinition>();
             bool cooked = false;
 
             foreach(IngredientPortion portion in dish)
             {
                 if(portion == null || !portion.IsValid) continue;
                 if(!kinds.Contains(portion.ingredient)) kinds.Add(portion.ingredient);
+                if(portion.prep != PrepSteps.None && !prepped.Contains(portion.ingredient)) prepped.Add(portion.ingredient);
                 cooked |= !portion.IsRaw;
             }
 
-            return cooked && kinds.Count >= minIngredients;
+            return cooked && kinds.Count >= minIngredients && prepped.Count >= minPrepped;
         }
 
         private static bool HasFood(IReadOnlyList<IngredientPortion> dish)

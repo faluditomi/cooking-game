@@ -21,6 +21,8 @@ namespace Cooking.Prototype
         public bool firstTasteReplacesLikes;
         [Tooltip("They pay full price for anything they'll eat while they're still Strangers (the Sleeper doesn't know food yet).")]
         public bool alwaysPaysAsStranger;
+        [Tooltip("A dish they didn't order only tastes good to them with something prepped on a board in it (the DishJudge's MinPrepped). Off for the Sleeper, who doesn't know food.")]
+        public bool wantsPreppedFood = true;
         [Tooltip("Their picture at the counter. Optional: without one they're a placeholder figure.")]
         public Sprite portrait;
         [Tooltip("Hitting this zone is their dream meal. Optional.")]

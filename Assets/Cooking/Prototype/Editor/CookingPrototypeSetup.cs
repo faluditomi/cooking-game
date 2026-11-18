@@ -320,6 +320,8 @@ namespace Cooking.Prototype.EditorTools
                     orders = new List<RecipeDefinition>(),
                     firstTasteReplacesLikes = true,
                     alwaysPaysAsStranger = true,
+                    // He doesn't know food: any proper dish will do, prepped or not.
+                    wantsPreppedFood = false,
                     likedMealsToFamiliar = 1,
                     portrait = Portrait("the_sleeper"),
                     secretDesire = desires["The Sleeper"],

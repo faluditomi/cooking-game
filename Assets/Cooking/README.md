@@ -264,9 +264,13 @@ units per prep state ("3× Onion raw", "2× Onion peeled, sliced").
   its dot is inside a tasty zone's wedge, and in their favourite when it's inside the customer's
   wedge**: exactly what the radar shows. A zone without a chart shape falls back to its per-axis
   min/max (the tests use those).
-- **Only a proper dish counts** (`DishJudge.IsProperDish`, `MinIngredients` 3): to be tasty, their
-  favourite or their dream, a dish needs at least 3 different ingredients and something cooked, so
-  a lone ingredient can't land in a zone and get paid. The exact order is always paid (the
+- **Only a proper dish counts** (`DishJudge.IsProperDish`, `MinIngredients` 3, `MinPrepped` 1): to
+  be tasty, their favourite or their dream, a dish needs at least 3 different ingredients and
+  something cooked, so a lone ingredient can't land in a zone and get paid. Hera and Petor also want
+  at least one of them prepped on a board (peeled, sliced, grated...), so a few things tipped into
+  the pot as they come won't do (`Customer.wantsPreppedFood`; off for the Sleeper, who doesn't know
+  food). It only decides whether they like it: anything can still be cooked and served, and every
+  menu dish has a prepped ingredient. The exact order is always paid (the
   Sleeper's raw potato). Until a dish is proper its dot is grey on the radar, and the Dish Served
   page says why it didn't count.
 - **Cooking by taste** (`CookingPrototype.Taste.cs`): the Current Order radar is the guide while
@@ -307,7 +311,7 @@ player to actually do it:
 7. Put a clean plate on the desk; when the bar is orange, lift the pot onto it (the spoon holds it there).
 8. Drag the plate to the food delivery spot; the Dish Served page; Continue.
 9. What real days add (every regular, a timer, rent), the pan, and the pay rules for a dish that
-   isn't the order: a proper dish (3 ingredients, something cooked) in a tasty zone is paid, in
+   isn't the order: a proper dish (3 ingredients, something cooked, and for most regulars one prepped) in a tasty zone is paid, in
    their favourite zone it's tipped; the Flavour Profiles tab and its ticks.
    **Start cycle 1** then begins the real game fresh (starting money, empty pantry, the morning
    shop), so the player plans the shopping and prep for the real day themselves.
