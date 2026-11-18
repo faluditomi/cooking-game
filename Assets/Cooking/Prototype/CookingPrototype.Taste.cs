@@ -67,10 +67,12 @@ namespace Cooking.Prototype
 
             // Dots: the order is where to aim, the dish is where you are, the ring is where you'd go.
             if(target) plateRadar.AddDot(orderProfile, OrderGrey);
-            // Grey until it's a proper dish (enough ingredients, something cooked): only then can it count.
-            int needed = DishJudge.Settings.Default.MinIngredients;
-            if(dish.Count > 0) plateRadar.AddDot(FlavourCalculator.Calculate(dish, rules), DishJudge.IsProperDish(dish, needed) ? UIFactory.Accent : SimpleGrey);
-            if(hoverDish != null) plateRadar.AddDot(FlavourCalculator.Calculate(hoverDish, rules), DishJudge.IsProperDish(hoverDish, needed) ? PreviewColor : SimpleGrey, true);
+            // Grey until it's a proper dish for this customer (enough ingredients, something cooked and,
+            // unless it's the Sleeper, something prepped): only then can it count.
+            DishJudge.Settings judging = DishJudge.Settings.Default;
+            int prepped = DishJudge.PreppedNeeded(customer, judging);
+            if(dish.Count > 0) plateRadar.AddDot(FlavourCalculator.Calculate(dish, rules), DishJudge.IsProperDish(dish, judging.MinIngredients, prepped) ? UIFactory.Accent : SimpleGrey);
+            if(hoverDish != null) plateRadar.AddDot(FlavourCalculator.Calculate(hoverDish, rules), DishJudge.IsProperDish(hoverDish, judging.MinIngredients, prepped) ? PreviewColor : SimpleGrey, true);
         }
 
         /// <summary>

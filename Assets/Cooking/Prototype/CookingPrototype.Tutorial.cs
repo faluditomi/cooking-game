@@ -304,7 +304,7 @@ namespace Cooking.Prototype
                     break;
                 default:
                     text = "That's the loop! Real days bring every regular, a timer, and rent at the end. The pan works like the pot, but you shake it; rice is boiled before it's fried.\n\n"
-                           + "Not what they ordered? A <b>proper dish</b> (3 ingredients, something cooked) in a <b>tasty zone</b> still gets paid, "
+                           + "Not what they ordered? A <b>proper dish</b> (3 ingredients, one prepped, something cooked) in a <b>tasty zone</b> still gets paid, "
                            + "and in their favourite zone they tip. <b>Flavour Profiles</b> shows every zone.\n\nCycle 1 starts fresh: plan the shopping for everyone.";
                     next = true;
                     break;

@@ -926,7 +926,9 @@ namespace Cooking.Prototype
             if(!result.ExactMatch && !result.Proper)
             {
                 sb.Append("\n<color=#a6a199>Too simple to count as a dish: it needs at least ").Append(DishJudge.Settings.Default.MinIngredients)
-                  .Append(" different ingredients and something cooked.</color>\n");
+                  .Append(DishJudge.PreppedNeeded(customer, DishJudge.Settings.Default) > 0
+                      ? " different ingredients, something prepped on a board and something cooked.</color>\n"
+                      : " different ingredients and something cooked.</color>\n");
             }
             if(showDesireDebug && result.DesireScore >= 0f) sb.Append("<color=#a6a199>Favourite flavour (debug): ").Append((result.DesireScore * 100f).ToString("0")).Append("%</color>\n");
             resultBody.text = sb.ToString();

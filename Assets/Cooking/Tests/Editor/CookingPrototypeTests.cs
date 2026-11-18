@@ -341,6 +341,7 @@ namespace Cooking.Tests
                 settings.Margin = 2f;
                 // These tests use one-ingredient dishes to test the zones on their own.
                 settings.MinIngredients = 1;
+                settings.MinPrepped = 0;
                 return settings;
             }
         }
@@ -364,12 +365,17 @@ namespace Cooking.Tests
             JudgeFixture f = Fixture();
             IngredientDefinition third = Ingredient("Third", new FlavourProfile { sour = 2f }, price: 1f);
             IngredientPortion[] raw = { new IngredientPortion(f.Salty, 1), new IngredientPortion(f.Sweet, 1), new IngredientPortion(third, 1) };
-            IngredientPortion[] cooked = { new IngredientPortion(f.Salty, 1, cooking: CookMethods.Boiled), new IngredientPortion(f.Sweet, 1), new IngredientPortion(third, 1) };
-            IngredientPortion[] two = { new IngredientPortion(f.Salty, 2, cooking: CookMethods.Boiled), new IngredientPortion(f.Sweet, 1) };
+            IngredientPortion[] unprepped = { new IngredientPortion(f.Salty, 1, cooking: CookMethods.Boiled), new IngredientPortion(f.Sweet, 1), new IngredientPortion(third, 1) };
+            IngredientPortion[] cooked = { new IngredientPortion(f.Salty, 1, PrepSteps.Sliced, CookMethods.Boiled), new IngredientPortion(f.Sweet, 1), new IngredientPortion(third, 1) };
+            IngredientPortion[] two = { new IngredientPortion(f.Salty, 2, PrepSteps.Sliced, CookMethods.Boiled), new IngredientPortion(f.Sweet, 1) };
 
             Assert.IsFalse(DishJudge.IsProperDish(raw, 3), "nothing cooked");
+            Assert.IsFalse(DishJudge.IsProperDish(unprepped, 3), "nothing prepped");
             Assert.IsTrue(DishJudge.IsProperDish(cooked, 3));
             Assert.IsFalse(DishJudge.IsProperDish(two, 3), "only two ingredients");
+            Assert.IsTrue(DishJudge.IsProperDish(unprepped, 3, 0), "for someone who doesn't need it prepped (the Sleeper)");
+            Assert.AreEqual(0, DishJudge.PreppedNeeded(new Customer { wantsPreppedFood = false }, DishJudge.Settings.Default));
+            Assert.AreEqual(1, DishJudge.PreppedNeeded(new Customer(), DishJudge.Settings.Default));
         }
 
         [Test]
