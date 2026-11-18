@@ -13,30 +13,30 @@ MonoBehaviour:
   m_Name: Woman - CorrectOrder - Stranger - O3
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: 25ec0151-74b8-40f5-af98-e560ac87ef3f
+  - guid: 44def6f8-af89-4a9b-ab50-b00f92c23e3a
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: dd5a67de-f58c-405b-a20c-be60008a87a0
+  - guid: d148460e-7d90-4f2a-ae9d-248c35d7e0b1
     kind: 0
     line:
       text: Alright.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: c26427bc-b9cd-47f2-9840-7972cd794cb7
+  - guid: 916aae9b-d66d-45af-bc45-7d3dcdd0f172
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 520, y: 0}
   edges:
-  - fromNodeGuid: 25ec0151-74b8-40f5-af98-e560ac87ef3f
+  - fromNodeGuid: 44def6f8-af89-4a9b-ab50-b00f92c23e3a
     fromOptionGuid: 
-    toNodeGuid: dd5a67de-f58c-405b-a20c-be60008a87a0
-  - fromNodeGuid: dd5a67de-f58c-405b-a20c-be60008a87a0
+    toNodeGuid: d148460e-7d90-4f2a-ae9d-248c35d7e0b1
+  - fromNodeGuid: d148460e-7d90-4f2a-ae9d-248c35d7e0b1
     fromOptionGuid: 
-    toNodeGuid: c26427bc-b9cd-47f2-9840-7972cd794cb7
+    toNodeGuid: 916aae9b-d66d-45af-bc45-7d3dcdd0f172
   isOneShot: 0
   payload: 

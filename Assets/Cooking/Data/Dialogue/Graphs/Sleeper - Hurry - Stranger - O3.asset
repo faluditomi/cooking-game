@@ -10,33 +10,33 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
-  m_Name: Eyesider - WrongOrderNasty - Any - O1
+  m_Name: Sleeper - Hurry - Stranger - O3
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: d7b1d7d2-4fe4-4853-b41e-60291b94821c
+  - guid: 977dea60-f8c2-416b-b966-0e2ff786e0bf
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: fb8cda4e-68b9-4349-820f-8f00fe4d43f6
+  - guid: f46685f4-e7fa-4a52-b3a0-3b25eba9aaeb
     kind: 0
     line:
-      text: Tch.
+      text: Need any help?
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: 838e30ad-86f5-4a66-8800-005d0d63b458
+  - guid: a699d3ee-894d-424c-ade4-4710892973e8
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 520, y: 0}
   edges:
-  - fromNodeGuid: d7b1d7d2-4fe4-4853-b41e-60291b94821c
+  - fromNodeGuid: 977dea60-f8c2-416b-b966-0e2ff786e0bf
     fromOptionGuid: 
-    toNodeGuid: fb8cda4e-68b9-4349-820f-8f00fe4d43f6
-  - fromNodeGuid: fb8cda4e-68b9-4349-820f-8f00fe4d43f6
+    toNodeGuid: f46685f4-e7fa-4a52-b3a0-3b25eba9aaeb
+  - fromNodeGuid: f46685f4-e7fa-4a52-b3a0-3b25eba9aaeb
     fromOptionGuid: 
-    toNodeGuid: 838e30ad-86f5-4a66-8800-005d0d63b458
+    toNodeGuid: a699d3ee-894d-424c-ade4-4710892973e8
   isOneShot: 0
   payload: 

@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Sleeper - WrongOrderNasty - Stranger - O2
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: 54d0f712-b19b-4d14-a886-76e331de8556
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: 79bc4f39-4d30-4923-b37f-8f90f62a63c5
+    kind: 0
+    line:
+      text: Mmm... Good.
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: c139a7c4-0531-4432-98a0-c9a9aac35c89
+    kind: 0
+    line:
+      text: Yeah...
+      delaySeconds: 1.4
+    editorPosition: {x: 520, y: 0}
+  - guid: 20ad2811-cfc3-4035-a633-0d81e1882e5a
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 780, y: 0}
+  edges:
+  - fromNodeGuid: 54d0f712-b19b-4d14-a886-76e331de8556
+    fromOptionGuid: 
+    toNodeGuid: 79bc4f39-4d30-4923-b37f-8f90f62a63c5
+  - fromNodeGuid: 79bc4f39-4d30-4923-b37f-8f90f62a63c5
+    fromOptionGuid: 
+    toNodeGuid: c139a7c4-0531-4432-98a0-c9a9aac35c89
+  - fromNodeGuid: c139a7c4-0531-4432-98a0-c9a9aac35c89
+    fromOptionGuid: 
+    toNodeGuid: 20ad2811-cfc3-4035-a633-0d81e1882e5a
+  isOneShot: 0
+  payload: 

@@ -13,39 +13,39 @@ MonoBehaviour:
   m_Name: Woman - WrongOrderNasty - Friendly - O2
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: ebad2322-9a3a-406f-a36f-490c3b5bf73f
+  - guid: 46485dee-6edd-4340-a33e-d145b75e410f
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 5ac370fe-324d-41eb-8f47-23d935737e91
+  - guid: 5b902f0f-e95c-412e-b7b9-2164f35d6eb0
     kind: 0
     line:
       text: No, not evil Pot Boy again...
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: 5027a46f-b377-4813-9daa-1afaeffd83d9
+  - guid: 47c1c9eb-5ce0-46b9-8d7a-8fc014d90148
     kind: 0
     line:
       text: Now that I look at you, you do look about as bad today as this meal.
       delaySeconds: 2
     editorPosition: {x: 520, y: 0}
-  - guid: 0c77ea7d-f98a-4c65-b8c0-0ba67484ea93
+  - guid: 63a54dd8-3e54-4a21-b7d5-42e3195f5297
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 780, y: 0}
   edges:
-  - fromNodeGuid: ebad2322-9a3a-406f-a36f-490c3b5bf73f
+  - fromNodeGuid: 46485dee-6edd-4340-a33e-d145b75e410f
     fromOptionGuid: 
-    toNodeGuid: 5ac370fe-324d-41eb-8f47-23d935737e91
-  - fromNodeGuid: 5ac370fe-324d-41eb-8f47-23d935737e91
+    toNodeGuid: 5b902f0f-e95c-412e-b7b9-2164f35d6eb0
+  - fromNodeGuid: 5b902f0f-e95c-412e-b7b9-2164f35d6eb0
     fromOptionGuid: 
-    toNodeGuid: 5027a46f-b377-4813-9daa-1afaeffd83d9
-  - fromNodeGuid: 5027a46f-b377-4813-9daa-1afaeffd83d9
+    toNodeGuid: 47c1c9eb-5ce0-46b9-8d7a-8fc014d90148
+  - fromNodeGuid: 47c1c9eb-5ce0-46b9-8d7a-8fc014d90148
     fromOptionGuid: 
-    toNodeGuid: 0c77ea7d-f98a-4c65-b8c0-0ba67484ea93
+    toNodeGuid: 63a54dd8-3e54-4a21-b7d5-42e3195f5297
   isOneShot: 0
   payload: 

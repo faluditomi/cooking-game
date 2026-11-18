@@ -13,129 +13,129 @@ MonoBehaviour:
   m_Name: Woman - DreamOrder - Any - O1
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: c176f4f2-b8e0-4f8a-821b-21bc95e0e74f
+  - guid: 1f2dc18e-4b60-4a46-ba0e-d05c9e52776e
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 0d84dd29-e799-4716-ad9e-23222519813f
+  - guid: d963c416-421a-4fd4-82c4-cb65e5140741
     kind: 0
     line:
       text: This... This is...
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: 76e0c619-ab2d-4061-9690-ffb53169bd3b
+  - guid: d0fa48fa-45c2-4130-a2b5-a654876bcecd
     kind: 0
     line:
       text: It can't be.
       delaySeconds: 1.6
     editorPosition: {x: 520, y: 0}
-  - guid: ef96f822-06d7-4cd1-93e4-1b5420285dcb
+  - guid: ec972893-977c-4fff-9bd3-97eb437720c2
     kind: 0
     line:
       text: I know this soup, I used to make it over and over again for...
       delaySeconds: 1.4
     editorPosition: {x: 780, y: 0}
-  - guid: 83481fb2-de89-4b5c-89da-d3fee3fa55d3
+  - guid: 906c925d-62b8-4ba5-af9e-2bb3a060cabf
     kind: 0
     line:
-      text: Ohh, [name of her lover], where might you be be now. Why did you have to leave it all behind... Leave me behind...
+      text: Ohh, Jessa, where might you be be now. Why did you have to leave it all behind... Leave me behind...
       delaySeconds: 3.2
     editorPosition: {x: 1040, y: 0}
-  - guid: 726297e0-142f-4b80-a79c-3593a22d5656
+  - guid: 9ebd0a44-bb97-4638-a0d8-54a4921977e9
     kind: 0
     line:
       text: Pot Boy, who the fuck are you? Why do you know my recipe?
-      delaySeconds: 5.1
+      delaySeconds: 4.6
     editorPosition: {x: 1300, y: 0}
-  - guid: 7de725e3-c236-40ae-83e9-fac2c545db1e
+  - guid: b4270593-3155-432d-ae6f-1be442fcab4e
     kind: 0
     line:
       text: The balance of sweet and sour, the thickness of the broth, and the beef!?
       delaySeconds: 3
     editorPosition: {x: 1560, y: 0}
-  - guid: 88863598-9d06-4750-b191-cb12d6276d0e
+  - guid: 4fd27614-d515-42ee-9905-5a4e749a761a
     kind: 0
     line:
       text: The beef is tender, just the way she liked it. Just the way she always was.
       delaySeconds: 3.6
     editorPosition: {x: 1820, y: 0}
-  - guid: d333663a-9434-4957-9a7d-0f7560b02e15
+  - guid: a99608a2-3cfc-4147-86f4-f1f422d53667
     kind: 0
     line:
-      text: '[name of her lover] is my partner. Or, was my partner. Once the Flux events started she wanted nothing more to do with this place and left.'
+      text: Jessa is my partner. Or, was my partner. Once the Flux events started she wanted nothing more to do with this place and left.
       delaySeconds: 3.7
     editorPosition: {x: 2080, y: 0}
-  - guid: 6a90aa21-d3e0-4b30-9da4-c281e71acdc1
+  - guid: 7cef599e-a68e-402b-98ed-f55110c619b4
     kind: 0
     line:
       text: More like I let her go, the bonehead that I am.
-      delaySeconds: 6
+      delaySeconds: 5.5
     editorPosition: {x: 2340, y: 0}
-  - guid: f599cdfd-2520-4f4b-a1db-fac131f8898f
+  - guid: e4abe4ac-aa19-4c30-9a50-b6f38edfd3fd
     kind: 0
     line:
       text: She was smart to leave and I was too caught up in the sour to see the sweetness slip away. Been caught up ever since.
       delaySeconds: 2.7
     editorPosition: {x: 2600, y: 0}
-  - guid: 38d06327-4ee9-4d4e-9687-a32e07ddf428
+  - guid: e9fae2fd-cd6e-48d9-be6c-e166ab9f452e
     kind: 0
     line:
       text: I have to go now.
       delaySeconds: 5.2
     editorPosition: {x: 2860, y: 0}
-  - guid: 80bbe709-5a1e-4f13-835b-3b9f492f67e9
+  - guid: dd1e63b2-950b-42bc-9acb-2fe7ee5049b2
     kind: 0
     line:
       text: I have to go but I'll be back. I'm not done with you yet.
       delaySeconds: 1.6
     editorPosition: {x: 3120, y: 0}
-  - guid: 33f0b4a0-10fe-4139-8b99-55d956936d52
+  - guid: f2563ede-1752-4480-9495-f4680fc2b154
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 3380, y: 0}
   edges:
-  - fromNodeGuid: c176f4f2-b8e0-4f8a-821b-21bc95e0e74f
+  - fromNodeGuid: 1f2dc18e-4b60-4a46-ba0e-d05c9e52776e
     fromOptionGuid: 
-    toNodeGuid: 0d84dd29-e799-4716-ad9e-23222519813f
-  - fromNodeGuid: 0d84dd29-e799-4716-ad9e-23222519813f
+    toNodeGuid: d963c416-421a-4fd4-82c4-cb65e5140741
+  - fromNodeGuid: d963c416-421a-4fd4-82c4-cb65e5140741
     fromOptionGuid: 
-    toNodeGuid: 76e0c619-ab2d-4061-9690-ffb53169bd3b
-  - fromNodeGuid: 76e0c619-ab2d-4061-9690-ffb53169bd3b
+    toNodeGuid: d0fa48fa-45c2-4130-a2b5-a654876bcecd
+  - fromNodeGuid: d0fa48fa-45c2-4130-a2b5-a654876bcecd
     fromOptionGuid: 
-    toNodeGuid: ef96f822-06d7-4cd1-93e4-1b5420285dcb
-  - fromNodeGuid: ef96f822-06d7-4cd1-93e4-1b5420285dcb
+    toNodeGuid: ec972893-977c-4fff-9bd3-97eb437720c2
+  - fromNodeGuid: ec972893-977c-4fff-9bd3-97eb437720c2
     fromOptionGuid: 
-    toNodeGuid: 83481fb2-de89-4b5c-89da-d3fee3fa55d3
-  - fromNodeGuid: 83481fb2-de89-4b5c-89da-d3fee3fa55d3
+    toNodeGuid: 906c925d-62b8-4ba5-af9e-2bb3a060cabf
+  - fromNodeGuid: 906c925d-62b8-4ba5-af9e-2bb3a060cabf
     fromOptionGuid: 
-    toNodeGuid: 726297e0-142f-4b80-a79c-3593a22d5656
-  - fromNodeGuid: 726297e0-142f-4b80-a79c-3593a22d5656
+    toNodeGuid: 9ebd0a44-bb97-4638-a0d8-54a4921977e9
+  - fromNodeGuid: 9ebd0a44-bb97-4638-a0d8-54a4921977e9
     fromOptionGuid: 
-    toNodeGuid: 7de725e3-c236-40ae-83e9-fac2c545db1e
-  - fromNodeGuid: 7de725e3-c236-40ae-83e9-fac2c545db1e
+    toNodeGuid: b4270593-3155-432d-ae6f-1be442fcab4e
+  - fromNodeGuid: b4270593-3155-432d-ae6f-1be442fcab4e
     fromOptionGuid: 
-    toNodeGuid: 88863598-9d06-4750-b191-cb12d6276d0e
-  - fromNodeGuid: 88863598-9d06-4750-b191-cb12d6276d0e
+    toNodeGuid: 4fd27614-d515-42ee-9905-5a4e749a761a
+  - fromNodeGuid: 4fd27614-d515-42ee-9905-5a4e749a761a
     fromOptionGuid: 
-    toNodeGuid: d333663a-9434-4957-9a7d-0f7560b02e15
-  - fromNodeGuid: d333663a-9434-4957-9a7d-0f7560b02e15
+    toNodeGuid: a99608a2-3cfc-4147-86f4-f1f422d53667
+  - fromNodeGuid: a99608a2-3cfc-4147-86f4-f1f422d53667
     fromOptionGuid: 
-    toNodeGuid: 6a90aa21-d3e0-4b30-9da4-c281e71acdc1
-  - fromNodeGuid: 6a90aa21-d3e0-4b30-9da4-c281e71acdc1
+    toNodeGuid: 7cef599e-a68e-402b-98ed-f55110c619b4
+  - fromNodeGuid: 7cef599e-a68e-402b-98ed-f55110c619b4
     fromOptionGuid: 
-    toNodeGuid: f599cdfd-2520-4f4b-a1db-fac131f8898f
-  - fromNodeGuid: f599cdfd-2520-4f4b-a1db-fac131f8898f
+    toNodeGuid: e4abe4ac-aa19-4c30-9a50-b6f38edfd3fd
+  - fromNodeGuid: e4abe4ac-aa19-4c30-9a50-b6f38edfd3fd
     fromOptionGuid: 
-    toNodeGuid: 38d06327-4ee9-4d4e-9687-a32e07ddf428
-  - fromNodeGuid: 38d06327-4ee9-4d4e-9687-a32e07ddf428
+    toNodeGuid: e9fae2fd-cd6e-48d9-be6c-e166ab9f452e
+  - fromNodeGuid: e9fae2fd-cd6e-48d9-be6c-e166ab9f452e
     fromOptionGuid: 
-    toNodeGuid: 80bbe709-5a1e-4f13-835b-3b9f492f67e9
-  - fromNodeGuid: 80bbe709-5a1e-4f13-835b-3b9f492f67e9
+    toNodeGuid: dd1e63b2-950b-42bc-9acb-2fe7ee5049b2
+  - fromNodeGuid: dd1e63b2-950b-42bc-9acb-2fe7ee5049b2
     fromOptionGuid: 
-    toNodeGuid: 33f0b4a0-10fe-4139-8b99-55d956936d52
+    toNodeGuid: f2563ede-1752-4480-9495-f4680fc2b154
   isOneShot: 1
   payload: 

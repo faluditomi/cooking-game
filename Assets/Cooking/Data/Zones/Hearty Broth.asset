@@ -16,20 +16,20 @@ MonoBehaviour:
   color: {r: 0.35, g: 0.75, b: 0.55, a: 1}
   description: Warm, salty soup with something to chew on.
   min:
-    savoury: 2.5
-    salty: 1.5
+    savoury: 4
+    salty: 2.5
     sweet: 0
     bitter: 0
     sour: 0
     pain: 0
-    nutrition: 3
+    nutrition: 5
     texture: 0
   max:
-    savoury: 8
-    salty: 6
-    sweet: 3
-    bitter: 2.5
-    sour: 3
-    pain: 3
-    nutrition: 10
-    texture: 4.5
+    savoury: 6.5
+    salty: 5
+    sweet: 2
+    bitter: 1.5
+    sour: 2
+    pain: 2
+    nutrition: 8
+    texture: 2.5

@@ -13,30 +13,30 @@ MonoBehaviour:
   m_Name: Man - WrongOrderNasty - Any - O2
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: b3ec5377-e040-4ff6-b4d7-3406137afdff
+  - guid: fac8a0d0-61d3-44fa-a61c-594157526393
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 73238a4f-6241-4ee4-a2ac-499354604575
+  - guid: 2703591c-f141-4654-87bf-227e1eb2577c
     kind: 0
     line:
       text: Don't even get me started on the synthetic chicken.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: b32a2214-d4bb-4ce8-867a-98c378c14702
+  - guid: 4c0b9906-573f-4dc3-9f87-75e09bfde3bb
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 520, y: 0}
   edges:
-  - fromNodeGuid: b3ec5377-e040-4ff6-b4d7-3406137afdff
+  - fromNodeGuid: fac8a0d0-61d3-44fa-a61c-594157526393
     fromOptionGuid: 
-    toNodeGuid: 73238a4f-6241-4ee4-a2ac-499354604575
-  - fromNodeGuid: 73238a4f-6241-4ee4-a2ac-499354604575
+    toNodeGuid: 2703591c-f141-4654-87bf-227e1eb2577c
+  - fromNodeGuid: 2703591c-f141-4654-87bf-227e1eb2577c
     fromOptionGuid: 
-    toNodeGuid: b32a2214-d4bb-4ce8-867a-98c378c14702
+    toNodeGuid: 4c0b9906-573f-4dc3-9f87-75e09bfde3bb
   isOneShot: 0
   payload: 

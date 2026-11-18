@@ -13,39 +13,39 @@ MonoBehaviour:
   m_Name: Woman - Order - Stranger - O2
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: e404feac-8541-425d-ad88-25a9c98996c4
+  - guid: cce09066-73f1-4a56-9323-124ccbd9298d
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 86120909-687f-400a-bd94-3b08bd08364b
+  - guid: f7525a18-5fe1-4498-925f-1300bc6ecc0d
     kind: 0
     line:
       text: '[liked meal]. Get on it!'
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: 30186665-f489-41ee-955b-13674c6dbd2a
+  - guid: bd447793-f0b0-49c4-b996-09c896e0aa75
     kind: 0
     line:
       text: I'm starving.
       delaySeconds: 1.9
     editorPosition: {x: 520, y: 0}
-  - guid: 61e3268f-e06c-4227-90f9-33bb6408b6d7
+  - guid: bc33e142-df84-465e-95f6-2132e8c8c515
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 780, y: 0}
   edges:
-  - fromNodeGuid: e404feac-8541-425d-ad88-25a9c98996c4
+  - fromNodeGuid: cce09066-73f1-4a56-9323-124ccbd9298d
     fromOptionGuid: 
-    toNodeGuid: 86120909-687f-400a-bd94-3b08bd08364b
-  - fromNodeGuid: 86120909-687f-400a-bd94-3b08bd08364b
+    toNodeGuid: f7525a18-5fe1-4498-925f-1300bc6ecc0d
+  - fromNodeGuid: f7525a18-5fe1-4498-925f-1300bc6ecc0d
     fromOptionGuid: 
-    toNodeGuid: 30186665-f489-41ee-955b-13674c6dbd2a
-  - fromNodeGuid: 30186665-f489-41ee-955b-13674c6dbd2a
+    toNodeGuid: bd447793-f0b0-49c4-b996-09c896e0aa75
+  - fromNodeGuid: bd447793-f0b0-49c4-b996-09c896e0aa75
     fromOptionGuid: 
-    toNodeGuid: 61e3268f-e06c-4227-90f9-33bb6408b6d7
+    toNodeGuid: bc33e142-df84-465e-95f6-2132e8c8c515
   isOneShot: 0
   payload: '[liked meal]'

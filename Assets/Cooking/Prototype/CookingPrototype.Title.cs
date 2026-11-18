@@ -58,7 +58,7 @@ namespace Cooking.Prototype
 
             RectTransform panel = UIFactory.Rect(overlay.transform, "Menu");
             panel.anchorMin = panel.anchorMax = new Vector2(0.5f, 0.5f);
-            panel.sizeDelta = new Vector2(900f, 640f);
+            panel.sizeDelta = new Vector2(900f, 700f);
             VerticalLayoutGroup layout = UIFactory.Vertical(panel.gameObject, 18f, 0);
             layout.childForceExpandHeight = false;
             layout.childAlignment = TextAnchor.MiddleCenter;
@@ -81,6 +81,8 @@ namespace Cooking.Prototype
                 ingredientLabels = !ingredientLabels;
                 UIFactory.SetButtonText(labelsButton, LabelsCaption());
             }, null, 18);
+            RectTransform settingsRow = UIFactory.Row(panel, 44f);
+            UIFactory.Button(settingsRow, "Settings", () => OpenSettings(true), null, 20);
 #if !UNITY_WEBGL
             // A browser tab can't be quit from the game, so WebGL has no Quit.
             RectTransform quitRow = UIFactory.Row(panel, 48f);

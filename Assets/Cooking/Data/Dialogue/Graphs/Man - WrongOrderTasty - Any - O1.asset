@@ -13,30 +13,30 @@ MonoBehaviour:
   m_Name: Man - WrongOrderTasty - Any - O1
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: 83a62786-8977-495f-96be-155f2c3db865
+  - guid: 29c86926-6d09-4146-81c8-3ff04e7247a3
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: b46af964-9d77-48ae-bf03-e5722b5892f6
+  - guid: 67d61bd1-88f2-46f9-b7cc-da27bb82dfbf
     kind: 0
     line:
       text: It's... not quite what I asked for. It's fine.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: 4b39f48f-5282-49d8-b6d4-45f2e53c3f13
+  - guid: 59cc2c86-e19b-4ff5-b2bf-3a7440e4c60c
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 520, y: 0}
   edges:
-  - fromNodeGuid: 83a62786-8977-495f-96be-155f2c3db865
+  - fromNodeGuid: 29c86926-6d09-4146-81c8-3ff04e7247a3
     fromOptionGuid: 
-    toNodeGuid: b46af964-9d77-48ae-bf03-e5722b5892f6
-  - fromNodeGuid: b46af964-9d77-48ae-bf03-e5722b5892f6
+    toNodeGuid: 67d61bd1-88f2-46f9-b7cc-da27bb82dfbf
+  - fromNodeGuid: 67d61bd1-88f2-46f9-b7cc-da27bb82dfbf
     fromOptionGuid: 
-    toNodeGuid: 4b39f48f-5282-49d8-b6d4-45f2e53c3f13
+    toNodeGuid: 59cc2c86-e19b-4ff5-b2bf-3a7440e4c60c
   isOneShot: 0
   payload: 

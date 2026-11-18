@@ -13,39 +13,39 @@ MonoBehaviour:
   m_Name: Woman - Order - Familiar - O1
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: 37a39d19-ece8-4a31-87d7-01d34fb1768b
+  - guid: 5f7e2abd-8773-4c3a-8ca1-16bd077ea6fe
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 91de8f9e-1a31-4d54-a6b9-a5b4aecf880b
+  - guid: 06f5e221-9b75-4c9c-8bdb-11e954a458ec
     kind: 0
     line:
-      text: Hey. Get me that [liked dish], will ya?
+      text: Heya. Get me that [liked dish], will ya?
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: 7bba1b7d-72e2-4d6b-a49d-ffa0b9ea348e
+  - guid: 16e613ba-f7b5-492a-a852-2836996758c3
     kind: 0
     line:
       text: Please.
       delaySeconds: 2.4
     editorPosition: {x: 520, y: 0}
-  - guid: 5fa29694-61ac-4695-8f48-e30caa2c7ea1
+  - guid: 129d166e-4d7e-4f90-b8c6-03a7590087bf
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 780, y: 0}
   edges:
-  - fromNodeGuid: 37a39d19-ece8-4a31-87d7-01d34fb1768b
+  - fromNodeGuid: 5f7e2abd-8773-4c3a-8ca1-16bd077ea6fe
     fromOptionGuid: 
-    toNodeGuid: 91de8f9e-1a31-4d54-a6b9-a5b4aecf880b
-  - fromNodeGuid: 91de8f9e-1a31-4d54-a6b9-a5b4aecf880b
+    toNodeGuid: 06f5e221-9b75-4c9c-8bdb-11e954a458ec
+  - fromNodeGuid: 06f5e221-9b75-4c9c-8bdb-11e954a458ec
     fromOptionGuid: 
-    toNodeGuid: 7bba1b7d-72e2-4d6b-a49d-ffa0b9ea348e
-  - fromNodeGuid: 7bba1b7d-72e2-4d6b-a49d-ffa0b9ea348e
+    toNodeGuid: 16e613ba-f7b5-492a-a852-2836996758c3
+  - fromNodeGuid: 16e613ba-f7b5-492a-a852-2836996758c3
     fromOptionGuid: 
-    toNodeGuid: 5fa29694-61ac-4695-8f48-e30caa2c7ea1
+    toNodeGuid: 129d166e-4d7e-4f90-b8c6-03a7590087bf
   isOneShot: 0
   payload: '[liked meal]'

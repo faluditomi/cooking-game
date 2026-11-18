@@ -378,7 +378,7 @@ def reverb(x, sr, mix_amount=0.35):
 
 def ambience_loop(rng):
     """
-    The Bright Market at night: a busy sci-fi food street. Talk from the crowd and the stalls, hover
+    The Bright Market at night: a busy sci-fi food street, without voices. Hover
     traffic passing, a soft synth drone over the city, plates and cutlery, the odd till and a sizzle
     from the stall next door, a buzzing neon sign and a PA chime.
     """
@@ -395,28 +395,8 @@ def ambience_loop(rng):
             t = i / sr
             out[i] += math.sin(TAU * (f + detune) * t) * g * 0.2 * (0.75 + 0.25 * math.sin(TAU * wobble * t + f))
 
-    # Chatter comes and goes: a short exchange between two or three people passing by or at a
-    # stall, then a quiet stretch, then another somewhere else.
-    crowd = [0.0] * n
-    t = rng.uniform(0.5, 2.0)
-    while t < seconds - 2.0:
-        near = rng.random() < 0.25
-        gain = rng.uniform(0.5, 0.85) if near else rng.uniform(0.18, 0.4)
-        cutoff = 3200 if near else 1500
-        speakers = [rng.uniform(0.85, 1.2) for _ in range(rng.randint(1, 3))]
-        lines = rng.randint(2, 5)
-        at = t
-        for _ in range(lines):
-            phrase = voice_phrase(rng, sr)
-            # Each speaker sounds a little different.
-            pitch = rng.choice(speakers)
-            if pitch != 1.0:
-                phrase = [phrase[int(i * pitch)] for i in range(int(len(phrase) / pitch))]
-            place(crowd, scale(lowpass(phrase, cutoff, sr), gain), at, sr)
-            at += len(phrase) / sr + rng.uniform(0.15, 0.6)
-        # Then a gap before the next bit of talk.
-        t = at + rng.uniform(2.0, 5.5)
-    out = mix(out, scale(crowd, 2.5))
+    # No voices: the crowd is in the clinks, the traffic and the stalls (the team found the
+    # synthesized talk distracting).
 
     # Hover traffic going past: an engine hum that swells, falls in pitch, and fades.
     t = rng.uniform(0.5, 3.0)

@@ -13,57 +13,57 @@ MonoBehaviour:
   m_Name: Woman - Musing - Friendly - O3
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: 364dcff0-5ae5-466d-a772-256bb00de8c2
+  - guid: 2114acae-6413-4c82-a81f-2aa017ee5856
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: c7a5269c-ef2c-4e9d-9a26-0b37addfccaa
+  - guid: 4fd100ae-d39f-4500-9e8b-c0e2b5f97d40
     kind: 0
     line:
       text: Get this, Pot Boy!
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: bd5ce53d-d5e2-4330-8213-bfda898d18bb
+  - guid: 5f30193a-9ffc-45cf-b092-c675df0ffa6c
     kind: 0
     line:
       text: This blockhead just secured some tix out of here.
       delaySeconds: 1.6
     editorPosition: {x: 520, y: 0}
-  - guid: ae4dafde-217a-4a3a-b7b8-392411cb7fd0
+  - guid: bfac4502-6a9a-475a-90c3-d977bb9d6908
     kind: 0
     line:
       text: That's right, few weeks time, imma be clean out. Looking for someone I last seen many many lonely birthdays ago. Tyna cook for them.
       delaySeconds: 2.8
     editorPosition: {x: 780, y: 0}
-  - guid: a0a735e3-84a7-4758-90be-b869d234e533
+  - guid: bf9e5500-129b-47bb-822c-2d2d5da2719c
     kind: 0
     line:
       text: Fuckin' terrifying...
       delaySeconds: 5.7
     editorPosition: {x: 1040, y: 0}
-  - guid: 7b71f077-d589-4037-83a9-03d31ca06130
+  - guid: 455d2a02-2b13-456e-8eef-1ac1d6b1cc17
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 1300, y: 0}
   edges:
-  - fromNodeGuid: 364dcff0-5ae5-466d-a772-256bb00de8c2
+  - fromNodeGuid: 2114acae-6413-4c82-a81f-2aa017ee5856
     fromOptionGuid: 
-    toNodeGuid: c7a5269c-ef2c-4e9d-9a26-0b37addfccaa
-  - fromNodeGuid: c7a5269c-ef2c-4e9d-9a26-0b37addfccaa
+    toNodeGuid: 4fd100ae-d39f-4500-9e8b-c0e2b5f97d40
+  - fromNodeGuid: 4fd100ae-d39f-4500-9e8b-c0e2b5f97d40
     fromOptionGuid: 
-    toNodeGuid: bd5ce53d-d5e2-4330-8213-bfda898d18bb
-  - fromNodeGuid: bd5ce53d-d5e2-4330-8213-bfda898d18bb
+    toNodeGuid: 5f30193a-9ffc-45cf-b092-c675df0ffa6c
+  - fromNodeGuid: 5f30193a-9ffc-45cf-b092-c675df0ffa6c
     fromOptionGuid: 
-    toNodeGuid: ae4dafde-217a-4a3a-b7b8-392411cb7fd0
-  - fromNodeGuid: ae4dafde-217a-4a3a-b7b8-392411cb7fd0
+    toNodeGuid: bfac4502-6a9a-475a-90c3-d977bb9d6908
+  - fromNodeGuid: bfac4502-6a9a-475a-90c3-d977bb9d6908
     fromOptionGuid: 
-    toNodeGuid: a0a735e3-84a7-4758-90be-b869d234e533
-  - fromNodeGuid: a0a735e3-84a7-4758-90be-b869d234e533
+    toNodeGuid: bf9e5500-129b-47bb-822c-2d2d5da2719c
+  - fromNodeGuid: bf9e5500-129b-47bb-822c-2d2d5da2719c
     fromOptionGuid: 
-    toNodeGuid: 7b71f077-d589-4037-83a9-03d31ca06130
+    toNodeGuid: 455d2a02-2b13-456e-8eef-1ac1d6b1cc17
   isOneShot: 0
   payload: 

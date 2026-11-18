@@ -134,6 +134,8 @@ namespace Cooking.Prototype
         private StationView heldStation;
         private int shakeStrokes;
         private RectTransform ghost;
+        /// <summary>The pot or pan in hand (its picture and bar), so a shake shows straight away.</summary>
+        private Cookware liftedCookware;
 
         private void CreateKitchenState()
         {
@@ -301,6 +303,7 @@ namespace Cooking.Prototype
             Cookware lifted = BuildCookware(ghost, view.Station);
             FillCookware(lifted, view.Station);
             lifted.Bar.Set(view.Station.Progress, view.Station.IsCooking);
+            liftedCookware = lifted;
 
             if(view.Station == wok) shakeGesture.Begin(CanvasPoint(screen));
             RefreshAll();
@@ -315,7 +318,7 @@ namespace Cooking.Prototype
 
             Play(sounds.pickup, 0.6f);
             CreateGhost(screen, 150f, 90f);
-            AddPile(ghost, portion.ingredient.Icon, Mathf.Min(portion.quantity, 3), 52f, new Vector2(0.5f, 0.62f));
+            AddPile(ghost, PrepSprites.For(portion.ingredient, portion.prep), Mathf.Min(portion.quantity, 3), 52f, new Vector2(0.5f, 0.62f));
             // Its name above it while it's held (always, whatever the pantry labels are set to).
             Text label = UIFactory.Label(ghost, IngredientLabel(portion.ingredient, portion.quantity, portion.prep), 14, TextAnchor.LowerCenter, FontStyle.Bold);
             UIFactory.Place(label.rectTransform, -0.4f, 0.95f, 1.4f, 1.3f);
@@ -343,7 +346,13 @@ namespace Cooking.Prototype
         private void UpdateHeld()
         {
             UpdateDeliveryDots();
-            if(held == Held.None) return;
+
+            if(held == Held.None)
+            {
+                // Let go: the dotted preview goes.
+                if(hoverTarget != null) UpdateTastePreview(Vector2.zero);
+                return;
+            }
 
             Pointer pointer = Pointer.current;
             Vector2 position = pointer != null ? pointer.position.ReadValue() : Vector2.zero;
@@ -355,6 +364,7 @@ namespace Cooking.Prototype
             }
 
             MoveGhost(position);
+            UpdateTastePreview(position);
 
             if(held == Held.Station)
             {
@@ -638,7 +648,15 @@ namespace Cooking.Prototype
             if(++shakeStrokes < ShakeStrokes) return;
 
             shakeStrokes = 0;
-            if(wok.Settle()) Play(sounds.stir, 0.5f, 0.03f);
+            if(!wok.Settle()) return;
+
+            Play(sounds.stir, 0.5f, 0.03f);
+            // The pan in hand shows it at once: the bar back at the start of the orange, the food browner.
+            if(liftedCookware != null)
+            {
+                liftedCookware.Bar.Set(wok.Progress, wok.IsCooking);
+                FillCookware(liftedCookware, wok);
+            }
         }
 
         private void AddToPlate(Plate target, IngredientPortion portion)
@@ -891,6 +909,7 @@ namespace Cooking.Prototype
         {
             if(ghost != null) Destroy(ghost.gameObject);
             ghost = null;
+            liftedCookware = null;
         }
 
         /// <summary>The delivery spot's dotted outline: pulses green while a plate with food is in hand.</summary>
@@ -970,7 +989,7 @@ namespace Cooking.Prototype
             List<Sprite> pieces = new List<Sprite>();
             foreach(IngredientPortion portion in station.Contents)
             {
-                for(int i = 0; i < portion.quantity && pieces.Count < 12; i++) pieces.Add(portion.ingredient.Icon);
+                for(int i = 0; i < portion.quantity && pieces.Count < 12; i++) pieces.Add(PrepSprites.For(portion.ingredient, portion.prep));
             }
 
             AddHeap(cookware.Inside, pieces, StageTint(station.CurrentStage), 0.36f);
@@ -1081,24 +1100,32 @@ namespace Cooking.Prototype
             view.Pot = BuildCookware(potArea, station);
 
             // A scrap of paper, taped on at the bottom right.
-            Image paper = UIFactory.Panel(view.Rect, "Label", new Color(0.93f, 0.9f, 0.8f, 1f));
-            paper.raycastTarget = false;
-            RectTransform paperRect = paper.rectTransform;
+            RectTransform paperRect = PaperNote(view.Rect, label, 18, station == wok ? 4f : -5f);
             paperRect.anchorMin = paperRect.anchorMax = new Vector2(1f, 0f);
             paperRect.pivot = new Vector2(1f, 0f);
             paperRect.sizeDelta = new Vector2(66f, 30f);
             paperRect.anchoredPosition = new Vector2(-6f, 8f);
-            paperRect.localRotation = Quaternion.Euler(0f, 0f, station == wok ? 4f : -5f);
-            Text written = UIFactory.Label(paperRect, label, 18, TextAnchor.MiddleCenter, FontStyle.Italic, new Color(0.15f, 0.13f, 0.12f, 1f));
+
+            view.LastStage = CookingStation.Stage.Raw;
+            return view;
+        }
+
+        /// <summary>A scrap of paper with a word written on it and a strip of tape on top (the stove and pantry labels). Size and place it after.</summary>
+        private static RectTransform PaperNote(Transform parent, string text, int fontSize, float tilt)
+        {
+            Image paper = UIFactory.Panel(parent, "Label", new Color(0.93f, 0.9f, 0.8f, 1f));
+            paper.raycastTarget = false;
+            RectTransform paperRect = paper.rectTransform;
+            paperRect.localRotation = Quaternion.Euler(0f, 0f, tilt);
+            Text written = UIFactory.Label(paperRect, text, fontSize, TextAnchor.MiddleCenter, FontStyle.Italic, new Color(0.15f, 0.13f, 0.12f, 1f));
+            written.raycastTarget = false;
             UIFactory.Stretch(written.rectTransform);
             Image tape = UIFactory.Panel(paperRect, "Tape", new Color(0.75f, 0.75f, 0.72f, 0.6f));
             tape.raycastTarget = false;
             tape.rectTransform.anchorMin = tape.rectTransform.anchorMax = new Vector2(0.5f, 1f);
             tape.rectTransform.sizeDelta = new Vector2(34f, 11f);
             tape.rectTransform.localRotation = Quaternion.Euler(0f, 0f, -8f);
-
-            view.LastStage = CookingStation.Stage.Raw;
-            return view;
+            return paperRect;
         }
 
         /// <summary>The stack of clean plates: just plates, outlined and shaded so they read as plates.</summary>
@@ -1170,13 +1197,8 @@ namespace Cooking.Prototype
             UpdateStationView(wokView);
             UpdateStationView(potView);
 
-            plateRadar.ClearProfiles();
-            // The order only when it's a recipe you know (on the menu).
-            if(orderIn && orderKnown) plateRadar.AddProfile(orderProfile, new Color(0.85f, 0.85f, 0.85f, 0.7f), false);
-            if(livePreview && focusPlate != null && focusPlate.Items.Count > 0)
-            {
-                plateRadar.AddProfile(FlavourCalculator.Calculate(focusPlate.Items, rules), UIFactory.Accent, true);
-            }
+            // The order radar as a cooking guide (CookingPrototype.Taste.cs).
+            RefreshTasteGuide();
         }
 
         private void RebuildDeskItem(DeskItem item)
@@ -1191,7 +1213,7 @@ namespace Cooking.Prototype
             }
             else if(item.Loose != null)
             {
-                AddPile(item.Rect, item.Loose.ingredient.Icon, Mathf.Min(item.Loose.quantity, 3), item.Size * 0.62f, new Vector2(0.5f, 0.55f));
+                AddPile(item.Rect, PrepSprites.For(item.Loose.ingredient, item.Loose.prep), Mathf.Min(item.Loose.quantity, 3), item.Size * 0.62f, new Vector2(0.5f, 0.55f));
 
                 if(ingredientLabels)
                 {
@@ -1216,13 +1238,7 @@ namespace Cooking.Prototype
             pantryPiles.Clear();
             List<Inventory.Entry> entries = inventory.Entries();
 
-            if(entries.Count == 0)
-            {
-                Text empty = UIFactory.Label(pantryContent, "<color=#a6a199>Empty. Ingredients come from the Shop on the tablet in the morning.</color>", 14);
-                UIFactory.Size(empty, 60f, 0f);
-                return;
-            }
-
+            // The three groups are always there, labelled like the stoves, even when one is empty.
             AddPantryGroup("RAW", entries.FindAll(e => !e.Ingredient.IsSeasoning && e.Prep == PrepSteps.None));
             AddPantryGroup("PREPPED", entries.FindAll(e => !e.Ingredient.IsSeasoning && e.Prep != PrepSteps.None));
             AddPantryGroup("SEASONING", entries.FindAll(e => e.Ingredient.IsSeasoning));
@@ -1230,15 +1246,19 @@ namespace Cooking.Prototype
 
         private void AddPantryGroup(string title, List<Inventory.Entry> entries)
         {
-            if(entries.Count == 0) return;
+            // A taped paper label, like the ones on the stoves.
+            RectTransform headerRow = UIFactory.Rect(pantryContent, title);
+            UIFactory.Size(headerRow, 34f, 0f);
+            RectTransform note = PaperNote(headerRow, title.Substring(0, 1) + title.Substring(1).ToLowerInvariant(), 16, title.Length % 2 == 0 ? -3f : 3f);
+            note.anchorMin = note.anchorMax = new Vector2(0f, 0.5f);
+            note.pivot = new Vector2(0f, 0.5f);
+            note.sizeDelta = new Vector2(16f + title.Length * 10f, 26f);
+            note.anchoredPosition = new Vector2(6f, 0f);
 
-            Text header = Header(pantryContent, title);
-            UIFactory.Size(header, 16f, 0f);
-
-            const int columns = 3;
+            const int columns = 4;
             RectTransform grid = UIFactory.Rect(pantryContent, "Piles");
             GridLayoutGroup layout = grid.gameObject.AddComponent<GridLayoutGroup>();
-            layout.cellSize = new Vector2(136f, ingredientLabels ? 70f : 56f);
+            layout.cellSize = new Vector2(104f, ingredientLabels ? 64f : 50f);
             layout.spacing = new Vector2(4f, 2f);
             layout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
             layout.constraintCount = columns;
@@ -1254,11 +1274,11 @@ namespace Cooking.Prototype
                 if(entry.Prep == PrepSteps.None) pantryPiles[entry.Ingredient] = cell.rectTransform;
 
                 // Each piece shown, up to a small heap.
-                AddPile(cell.rectTransform, entry.Ingredient.Icon, Mathf.Min(entry.Quantity, 4), 40f, new Vector2(0.5f, ingredientLabels ? 0.62f : 0.5f));
+                AddPile(cell.rectTransform, PrepSprites.For(entry.Ingredient, entry.Prep), Mathf.Min(entry.Quantity, 4), 34f, new Vector2(0.5f, ingredientLabels ? 0.62f : 0.5f));
 
                 if(ingredientLabels)
                 {
-                    Text label = UIFactory.Label(cell.rectTransform, IngredientLabel(entry.Ingredient, entry.Quantity, entry.Prep), 12, TextAnchor.LowerCenter);
+                    Text label = UIFactory.Label(cell.rectTransform, IngredientLabel(entry.Ingredient, entry.Quantity, entry.Prep), 11, TextAnchor.LowerCenter);
                     UIFactory.Place(label.rectTransform, 0f, 0f, 1f, 0.32f);
                     UIFactory.FitText(label);
                 }

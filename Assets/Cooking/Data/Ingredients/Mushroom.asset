@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Mushroom
   m_EditorClassIdentifier: Cooking.Runtime::Cooking.IngredientDefinition
   displayName: Mushroom
-  icon: {fileID: -4902608913318666287, guid: b12f911fce944f047aede9f7db6eac9f, type: 3}
+  icon: {fileID: -8596248820129179696, guid: c70893728f3409441a657e5ee454e834, type: 3}
   price: 3
   bulk: 1
   flavour:

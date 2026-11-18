@@ -38,8 +38,10 @@ namespace Cooking.Prototype
         public float Tip;
 
         public bool IsPaid => Payment > 0f;
-        /// <summary>Not the order, but just as tasty: it lands in the same desirable flavour zone as the order did.</summary>
+        /// <summary>Not the order, but tasty: it lands in one of the basic desirable flavour zones. Paid in full, no tip.</summary>
         public bool SameZone;
+        /// <summary>It lands in the customer's own favourite flavour (their secret desire zone): they tip.</summary>
+        public bool Favourite;
         /// <summary>Paid in full only because they don't know good food from bad yet (see <see cref="DishJudge.PayInFull"/>).</summary>
         public bool PaidAnyway;
 
@@ -48,10 +50,15 @@ namespace Cooking.Prototype
     }
 
     /// <summary>
-    /// The payment rules. A dish that hits the customer's secret desire is a dream meal (paid and
-    /// tipped). Otherwise it's judged on how close it is to the order (<see cref="DishSimilarity"/>):
-    /// the exact recipe pays full price, very close and close enough pay part of it, and anything
-    /// further away isn't paid for.
+    /// The payment rules (design doc, demo changes):
+    /// <list type="bullet">
+    /// <item>Their dream meal (deep in their favourite flavour, with what it needs): paid and tipped generously.</item>
+    /// <item>The exact order: full price, plus a tip if it's also in their favourite flavour.</item>
+    /// <item>Not the order, but in their favourite flavour: full price and a tip.</item>
+    /// <item>Not the order, but in a basic tasty zone or tasting close to the order: full price, no tip.</item>
+    /// <item>Otherwise, how close it is to the order (<see cref="DishSimilarity"/>): very close and close
+    /// enough pay part of the price, anything further isn't paid for.</item>
+    /// </list>
     /// </summary>
     public static class DishJudge
     {
@@ -70,19 +77,29 @@ namespace Cooking.Prototype
             public float CloseEnoughPay;
             /// <summary>Tip for a dream meal, as a share of the price.</summary>
             public float DreamTip;
-            /// <summary>Tip for a dish that isn't the order but lands in the same flavour zone, as a share of the price.</summary>
-            public float SameZoneTip;
+            /// <summary>Tip for a dish in their favourite flavour, as a share of the price.</summary>
+            public float FavouriteTip;
+            /// <summary>Zone score (0..1) that counts as "in" a tasty zone or their favourite. Below 1 is forgiving: near the edge still counts.</summary>
+            public float ZoneAt;
+            /// <summary>Score against their favourite that, with what it needs, makes it their dream meal.</summary>
+            public float DreamAt;
+            /// <summary>Flavour similarity to the order (0..1) at which a different dish still tastes like what they wanted: liked and paid in full.</summary>
+            public float LikeFlavourAt;
 
             public static Settings Default => new Settings
             {
-                Margin = 1.6f,
+                // 50% more than the old 1.6 for a correct order.
+                Margin = 2.4f,
                 Similarity = DishSimilarity.Settings.Default,
-                VeryCloseAt = 0.8f,
+                VeryCloseAt = 0.7f,
                 VeryClosePay = 0.8f,
-                CloseEnoughAt = 0.55f,
+                CloseEnoughAt = 0.45f,
                 CloseEnoughPay = 0.6f,
                 DreamTip = 1f,
-                SameZoneTip = 0.2f,
+                FavouriteTip = 0.3f,
+                ZoneAt = 0.75f,
+                DreamAt = 0.85f,
+                LikeFlavourAt = 0.5f,
             };
         }
 
@@ -116,9 +133,12 @@ namespace Cooking.Prototype
 
             if(!HasFood(dish)) return result;
 
+            result.Favourite = result.DesireScore >= settings.ZoneAt && WellCooked(dish);
+
             // Their dream meal wins over anything they'd otherwise refuse.
-            if(result.DesireScore >= 1f && HasAll(dish, customer.dreamNeeds))
+            if(result.DesireScore >= settings.DreamAt && HasAll(dish, customer.dreamNeeds))
             {
+                result.Favourite = true;
                 result.Verdict = Verdict.DreamMeal;
                 result.PayShare = 1f;
                 result.Tip = result.Price * settings.DreamTip;
@@ -136,17 +156,21 @@ namespace Cooking.Prototype
             {
                 result.Verdict = Verdict.Ordered;
                 result.PayShare = 1f;
+                if(result.Favourite) result.Tip = result.Price * settings.FavouriteTip;
             }
-            else if(InSameZone(result, order, zones, falloff) && WellCooked(dish))
+            else if(result.Favourite)
             {
-                // Design doc: a dish they didn't order is liked if its flavour falls in the same
-                // desirable zone their order did. A different dish that's just as tasty is paid in
-                // full and tipped; a near miss of the order is liked and paid as very close.
-                bool different = result.Similarity.Combined < settings.CloseEnoughAt;
+                // Not what they asked for, but their favourite kind of taste: paid in full, and tipped.
+                result.Verdict = Verdict.VeryClose;
+                result.PayShare = 1f;
+                result.Tip = result.Price * settings.FavouriteTip;
+            }
+            else if((InTastyZone(result, settings) || (order != null && result.Similarity.Flavour >= settings.LikeFlavourAt)) && WellCooked(dish))
+            {
+                // Not the order, but tasty (any basic desirable zone, or close to how the order tastes): paid in full, no tip.
                 result.Verdict = Verdict.VeryClose;
                 result.SameZone = true;
-                result.PayShare = different ? 1f : settings.VeryClosePay;
-                if(different) result.Tip = result.Price * settings.SameZoneTip;
+                result.PayShare = 1f;
             }
             else if(result.Similarity.Combined >= settings.VeryCloseAt)
             {
@@ -188,11 +212,15 @@ namespace Cooking.Prototype
             return true;
         }
 
-        private static bool InSameZone(JudgeResult result, RecipeDefinition order, IReadOnlyList<FlavourZone> zones, float falloff)
+        private static bool InTastyZone(JudgeResult result, Settings settings)
         {
-            if(order == null || zones == null || result.BestZone.Zone == null || result.BestZone.Score < 1f) return false;
-            FlavourZoneMatch ordered = FlavourEvaluator.FindBestZone(result.Ordered, zones, falloff);
-            return ordered.Zone == result.BestZone.Zone && ordered.Score >= 1f;
+            return result.BestZone.Zone != null && result.BestZone.Score >= settings.ZoneAt;
+        }
+
+        /// <summary>A flavour inside one of the basic tasty zones (forgivingly: near the edge counts).</summary>
+        public static bool IsTasty(JudgeResult result)
+        {
+            return result.BestZone.Zone != null && result.BestZone.Score >= Settings.Default.ZoneAt;
         }
 
         private static bool HasFood(IReadOnlyList<IngredientPortion> dish)

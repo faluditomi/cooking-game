@@ -13,21 +13,21 @@ MonoBehaviour:
   m_Name: Woman - CorrectOrder - Stranger - O1
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: 62cfdd21-f2b1-4220-a15e-3eaae38c6e4f
+  - guid: de85d350-6929-45fb-9971-7a8029c7a8c6
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 372f5e3b-161e-4f04-aba0-1e314999dbce
+  - guid: 80fe69e4-b8ad-4cbd-93e9-c1c1ae54a451
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 260, y: 0}
   edges:
-  - fromNodeGuid: 62cfdd21-f2b1-4220-a15e-3eaae38c6e4f
+  - fromNodeGuid: de85d350-6929-45fb-9971-7a8029c7a8c6
     fromOptionGuid: 
-    toNodeGuid: 372f5e3b-161e-4f04-aba0-1e314999dbce
+    toNodeGuid: 80fe69e4-b8ad-4cbd-93e9-c1c1ae54a451
   isOneShot: 0
   payload: 

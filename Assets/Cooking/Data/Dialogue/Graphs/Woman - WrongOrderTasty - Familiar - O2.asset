@@ -13,39 +13,39 @@ MonoBehaviour:
   m_Name: Woman - WrongOrderTasty - Familiar - O2
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: 410c2903-db06-407e-b0f1-7a0acd76c265
+  - guid: 9e0548fb-34c5-4ce7-871d-70f008a5298f
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: bcd579d6-de67-43e6-854b-85496c217764
+  - guid: 7e320228-f51b-4784-bdf4-9bba8ca0fb22
     kind: 0
     line:
       text: Mmmm, damn!
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: b75889c5-37d0-49a2-9478-2d339d54490b
+  - guid: 5c67db87-e9ef-4f28-a69c-246939538b95
     kind: 0
     line:
       text: The fuck else are you hiding from me?
       delaySeconds: 1.4
     editorPosition: {x: 520, y: 0}
-  - guid: 10e12d28-f420-4dc9-9fd3-2d321f96c772
+  - guid: efb5cfb0-94c5-4347-a55c-67da01902282
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 780, y: 0}
   edges:
-  - fromNodeGuid: 410c2903-db06-407e-b0f1-7a0acd76c265
+  - fromNodeGuid: 9e0548fb-34c5-4ce7-871d-70f008a5298f
     fromOptionGuid: 
-    toNodeGuid: bcd579d6-de67-43e6-854b-85496c217764
-  - fromNodeGuid: bcd579d6-de67-43e6-854b-85496c217764
+    toNodeGuid: 7e320228-f51b-4784-bdf4-9bba8ca0fb22
+  - fromNodeGuid: 7e320228-f51b-4784-bdf4-9bba8ca0fb22
     fromOptionGuid: 
-    toNodeGuid: b75889c5-37d0-49a2-9478-2d339d54490b
-  - fromNodeGuid: b75889c5-37d0-49a2-9478-2d339d54490b
+    toNodeGuid: 5c67db87-e9ef-4f28-a69c-246939538b95
+  - fromNodeGuid: 5c67db87-e9ef-4f28-a69c-246939538b95
     fromOptionGuid: 
-    toNodeGuid: 10e12d28-f420-4dc9-9fd3-2d321f96c772
+    toNodeGuid: efb5cfb0-94c5-4347-a55c-67da01902282
   isOneShot: 0
   payload: 

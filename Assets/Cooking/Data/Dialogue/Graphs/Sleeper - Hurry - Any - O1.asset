@@ -13,30 +13,30 @@ MonoBehaviour:
   m_Name: Sleeper - Hurry - Any - O1
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: ac48aaca-e3e9-4174-af87-55415fadf9a0
+  - guid: 42f5e96f-6ac0-4591-87f7-75f781f86fd3
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 8de91bb2-9a08-460f-be34-4ac3e35aa44e
+  - guid: abe4ddf4-5ec5-4013-b28c-85ca5400e232
     kind: 0
     line:
       text: Is it supposed to take this long? I don't know how food works.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: a5fbe5d4-30cf-4bc1-931f-5454f47339b3
+  - guid: 341327bd-c852-421e-931a-d82e501b980a
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 520, y: 0}
   edges:
-  - fromNodeGuid: ac48aaca-e3e9-4174-af87-55415fadf9a0
+  - fromNodeGuid: 42f5e96f-6ac0-4591-87f7-75f781f86fd3
     fromOptionGuid: 
-    toNodeGuid: 8de91bb2-9a08-460f-be34-4ac3e35aa44e
-  - fromNodeGuid: 8de91bb2-9a08-460f-be34-4ac3e35aa44e
+    toNodeGuid: abe4ddf4-5ec5-4013-b28c-85ca5400e232
+  - fromNodeGuid: abe4ddf4-5ec5-4013-b28c-85ca5400e232
     fromOptionGuid: 
-    toNodeGuid: a5fbe5d4-30cf-4bc1-931f-5454f47339b3
+    toNodeGuid: 341327bd-c852-421e-931a-d82e501b980a
   isOneShot: 0
   payload: 

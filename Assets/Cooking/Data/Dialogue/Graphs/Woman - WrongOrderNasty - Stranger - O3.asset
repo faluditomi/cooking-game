@@ -13,30 +13,30 @@ MonoBehaviour:
   m_Name: Woman - WrongOrderNasty - Stranger - O3
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: d9c133ab-2005-40d8-ab3e-462fe83be5f4
+  - guid: a17c5424-6821-430d-9e07-c4cab26a6370
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 5e19f5cc-56fe-45e6-82df-784cd729d557
+  - guid: 391430be-7e4b-4a67-8841-99e627c573f8
     kind: 0
     line:
       text: Thanks, I guess I'll go hungry today...
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: 75f15335-b63a-402f-8979-fb98970ea7b9
+  - guid: 68adfdab-c75c-4525-a6d6-a92979e11b27
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 520, y: 0}
   edges:
-  - fromNodeGuid: d9c133ab-2005-40d8-ab3e-462fe83be5f4
+  - fromNodeGuid: a17c5424-6821-430d-9e07-c4cab26a6370
     fromOptionGuid: 
-    toNodeGuid: 5e19f5cc-56fe-45e6-82df-784cd729d557
-  - fromNodeGuid: 5e19f5cc-56fe-45e6-82df-784cd729d557
+    toNodeGuid: 391430be-7e4b-4a67-8841-99e627c573f8
+  - fromNodeGuid: 391430be-7e4b-4a67-8841-99e627c573f8
     fromOptionGuid: 
-    toNodeGuid: 75f15335-b63a-402f-8979-fb98970ea7b9
+    toNodeGuid: 68adfdab-c75c-4525-a6d6-a92979e11b27
   isOneShot: 0
   payload: 

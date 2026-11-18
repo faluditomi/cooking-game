@@ -64,7 +64,7 @@ namespace Cooking.Prototype
                 return;
             }
 
-            // Someone who'd order it comes first: the Man, in the design doc's cast.
+            // Someone who'd order it comes first: Petor.
             tutorialCustomer = customers.Find(c => c != null && c.orders != null && c.orders.Contains(tutorialRecipe))
                                ?? customers.Find(c => c != null);
             tutorialOrdered = false;
@@ -245,7 +245,8 @@ namespace Cooking.Prototype
                     next = true;
                     break;
                 case TutorialStep.Bundle:
-                    text = "This is the <b>Shop</b> on your tablet. Bundles add everything one dish needs.\n\nClick the <b>" + dish + "</b> bundle.";
+                    text = "Mornings start at the market's <b>grocer</b>. Click what's on the shelves to put it in your basket; click it in the basket to put it back. "
+                           + "Bundles add everything one dish needs.\n\nClick the <b>" + dish + "</b> bundle.";
                     break;
                 case TutorialStep.StartDay:
                     text = "Nothing is paid until you press it, and on real days whatever you buy has to cover everyone who comes.\n\n"
@@ -256,7 +257,7 @@ namespace Cooking.Prototype
                     break;
                 case TutorialStep.Order:
                     text = who + " wants <b>" + dish + "</b>. What they say is on the left; the order is on the tablet: "
-                           + "each ingredient, how it's prepped, and whether you have it ready.\n\nThe <b>Menu</b> tab has the full steps.";
+                           + "each ingredient, how it's prepped, and whether you have it ready.\n\nThe <b>Menu</b> tab has every recipe and its flavour.";
                     next = true;
                     break;
                 case TutorialStep.BoardPotato:
@@ -280,13 +281,13 @@ namespace Cooking.Prototype
                     text = "Drag the plate onto the <b>food delivery</b> spot to serve it.";
                     break;
                 case TutorialStep.Result:
-                    text = "This is how it went: their reaction, what they paid, and the dish's flavour.\n\n"
+                    text = "This is how it went: what they ordered and got, the receipt, and the dish's flavour next to the order's (grey).\n\n"
                            + "A dish that isn't on the menu can be named and saved here. Press <b>Continue</b>.";
                     break;
                 default:
                     text = "That's the loop! On real days every regular comes once, a timer runs, and the rent is due at the end of the cycle.\n\n"
                            + "The pan works like the pot, but you lift and shake it instead of stirring. Rice has to be boiled before it's fried: pour the pot into the pan. The regulars have favourites, and secret cravings: "
-                           + "listen to them and experiment.\n\nCycle 1 starts fresh: plan the shopping for everyone.";
+                           + "listen to them and experiment. The <b>Flavour Profiles</b> tab shows the tasty zones.\n\nCycle 1 starts fresh: plan the shopping for everyone.";
                     next = true;
                     break;
             }

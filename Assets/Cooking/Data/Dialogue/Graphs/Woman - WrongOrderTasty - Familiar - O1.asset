@@ -13,39 +13,39 @@ MonoBehaviour:
   m_Name: Woman - WrongOrderTasty - Familiar - O1
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: 6c99dfb5-bf99-4772-9d73-49fe22b09a74
+  - guid: 2e373284-b772-479a-8676-44a393bc2980
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: ac433b32-6f35-4f94-ab24-4a2bf3cb8827
+  - guid: 4190d742-2668-46d5-89ba-9282c67c4959
     kind: 0
     line:
       text: Alright! Pot Boy got skills.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: 5510577e-085f-4684-a946-7466b7d449ab
+  - guid: 03a3dd92-2f5a-4a4b-b959-44f7e0e67342
     kind: 0
     line:
       text: Why you tryna hide these recipes from me, ey?
       delaySeconds: 2
     editorPosition: {x: 520, y: 0}
-  - guid: aa99256f-27f5-44ee-a28c-4d2f6d90ccd7
+  - guid: 10cd1fd0-ab21-4e12-9d28-f69ac49ccebd
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 780, y: 0}
   edges:
-  - fromNodeGuid: 6c99dfb5-bf99-4772-9d73-49fe22b09a74
+  - fromNodeGuid: 2e373284-b772-479a-8676-44a393bc2980
     fromOptionGuid: 
-    toNodeGuid: ac433b32-6f35-4f94-ab24-4a2bf3cb8827
-  - fromNodeGuid: ac433b32-6f35-4f94-ab24-4a2bf3cb8827
+    toNodeGuid: 4190d742-2668-46d5-89ba-9282c67c4959
+  - fromNodeGuid: 4190d742-2668-46d5-89ba-9282c67c4959
     fromOptionGuid: 
-    toNodeGuid: 5510577e-085f-4684-a946-7466b7d449ab
-  - fromNodeGuid: 5510577e-085f-4684-a946-7466b7d449ab
+    toNodeGuid: 03a3dd92-2f5a-4a4b-b959-44f7e0e67342
+  - fromNodeGuid: 03a3dd92-2f5a-4a4b-b959-44f7e0e67342
     fromOptionGuid: 
-    toNodeGuid: aa99256f-27f5-44ee-a28c-4d2f6d90ccd7
+    toNodeGuid: 10cd1fd0-ab21-4e12-9d28-f69ac49ccebd
   isOneShot: 0
   payload: 

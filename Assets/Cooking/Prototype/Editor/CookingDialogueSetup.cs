@@ -15,11 +15,12 @@ namespace Cooking.Prototype.EditorTools
     /// safe; rerunning only adds what's missing.
     /// </summary>
     /// <remarks>
-    /// The Woman's lines are from the Cooking Game Miro board (Stranger / Familiar / Friendly, plus the
-    /// dream order scene), as written. Order graphs carry a payload: a dish name, or a [liked meal] /
-    /// [dream dish] token. [name of her lover] is left in the text until the board names her. The Man
-    /// has the board's one MSG line; he and the others otherwise keep placeholders from the design doc.
-    /// Entries with state None play at any stage.
+    /// Hera's and the Sleeper's lines are from the Cooking Game Miro board (Stranger / Familiar /
+    /// Friendly, plus Hera's dream order scene), as written; her MSBeef order names the MSBeef noodles
+    /// from the Notion menu. Order graphs carry a payload: a dish name, or a [liked meal] /
+    /// [dream dish] token. Petor's column on the board is still empty, so he keeps the design doc
+    /// placeholders (and the board's one MSG line). Entries with state None play at any stage.
+    /// <see cref="RebuildDialogue"/> starts over from this text; <see cref="BuildDialogue"/> only adds what's missing.
     /// </remarks>
     public static class CookingDialogueSetup
     {
@@ -73,22 +74,21 @@ namespace Cooking.Prototype.EditorTools
             const DialogueEventType Nasty = DialogueEventType.WrongOrderNasty;
             const DialogueEventType Dream = DialogueEventType.DreamOrder;
 
-            const string MSBeef = "MSBeef fried rice";
+            const string MSBeef = "MSBeef noodles";
             const string Liked = "[liked meal]";
             const string DreamDish = "[dream dish]";
 
             DialogueNpcId woman = DialogueNpcId.Woman;
             DialogueNpcId man = DialogueNpcId.Man;
             DialogueNpcId sleeper = DialogueNpcId.Sleeper;
-            DialogueNpcId eyesider = DialogueNpcId.Eyesider;
 
             Builder b = new Builder();
 
-            // ---------------------------------------------------------------- The Woman (Miro board)
+            // ---------------------------------------------------------------- Hera (Miro board)
 
             // Stranger
             b.Add(woman, Order, Stranger, MSBeef, false,
-                "Whip me up an MSBeef rice real quick!",
+                "Whip me up some MSBeef noodles real quick!",
                 "And none of that beef shit, you hear me? I only eat Real Beef™!",
                 "Fuck knows what they put in those animals...");
             b.Add(woman, Order, Stranger, Liked, false, "[liked meal]. Get on it!", "I'm starving.");
@@ -110,9 +110,9 @@ namespace Cooking.Prototype.EditorTools
             b.Add(woman, Nasty, Stranger, "Thanks, I guess I'll go hungry today...");
 
             // Familiar
-            b.Add(woman, Order, Familiar, Liked, false, "Hey. Get me that [liked dish], will ya?", "Please.");
+            b.Add(woman, Order, Familiar, Liked, false, "Heya. Get me that [liked dish], will ya?", "Please.");
             b.Add(woman, Order, Familiar, MSBeef, false,
-                "Craving an MSBeef fried rice, and no funky stuff.",
+                "Craving some MSBeef noodles, and no funky stuff.",
                 "Don't take it the wrong way, Pot Boy. Not many chefs know their way around that beef animal.",
                 "Not tryna start my cycle with a fucked up stomach.");
             b.Add(woman, Musing, Familiar,
@@ -150,11 +150,11 @@ namespace Cooking.Prototype.EditorTools
                 "This... This is...",
                 "It can't be.",
                 "I know this soup, I used to make it over and over again for...",
-                "Ohh, [name of her lover], where might you be be now. Why did you have to leave it all behind... Leave me behind...",
+                "Ohh, Jessa, where might you be be now. Why did you have to leave it all behind... Leave me behind...",
                 "Pot Boy, who the fuck are you? Why do you know my recipe?",
                 "The balance of sweet and sour, the thickness of the broth, and the beef!?",
                 "The beef is tender, just the way she liked it. Just the way she always was.",
-                "[name of her lover] is my partner. Or, was my partner. Once the Flux events started she wanted nothing more to do with this place and left.",
+                "Jessa is my partner. Or, was my partner. Once the Flux events started she wanted nothing more to do with this place and left.",
                 "More like I let her go, the bonehead that I am.",
                 "She was smart to leave and I was too caught up in the sour to see the sweetness slip away. Been caught up ever since.",
                 "I have to go now.",
@@ -170,11 +170,11 @@ namespace Cooking.Prototype.EditorTools
                 "Anyways... Your soup made me realise some things I should have realised a long time ago.",
                 "All those cycles ago, I fucked up majorly.",
                 "I shouldn't have let her leave on her own, and though I might have fucked it permanently, I have to try and make things right.",
-                "I have to make [name of her lover] her favourite soup once more.",
+                "I have to make Jessa her favourite soup once more.",
                 "What I'm trying to say is thank you, I owe you one.",
                 "But don't expect no tips from me. Especially now that I have to buy my way off this piece of metal.");
             b.Add(woman, Musing, Friendly,
-                "Catch this, I got a lead on [name of her lover].",
+                "Catch this, I got a lead on Jessa.",
                 "She hitched a ride on a cargo run that still comes around today. It's coming out of an agriculture sector not far from here.",
                 "Dunno where she headed from there, but hey, it's a start.",
                 "Maybe I'll even see how your precious potatoes are created.",
@@ -204,7 +204,7 @@ namespace Cooking.Prototype.EditorTools
             b.Add(woman, Nasty, Friendly, "No, not evil Pot Boy again...", "Now that I look at you, you do look about as bad today as this meal.");
             b.Add(woman, Nasty, Friendly, "You know, I'm not disappointed, just fucking mad.");
 
-            // ---------------------------------------------------------------- The Man (placeholders + the board's MSG line)
+            // ---------------------------------------------------------------- Petor (placeholders + the board's MSG line; his Miro column is empty)
 
             b.Add(man, Order, Stranger, "The food on this station... Don't get me started.");
             b.Add(man, Order, Familiar,
@@ -219,27 +219,94 @@ namespace Cooking.Prototype.EditorTools
             b.Add(man, Nasty, Any, "Don't even get me started on the synthetic chicken.");
             b.Add(man, Dream, Any, null, true, "Simple. Tasty. Nobody got hurt making it.", "Could I... could I make this for the kids?");
 
-            // ---------------------------------------------------------------- The Sleeper (placeholders; the board's template is empty)
+            // ---------------------------------------------------------------- The Sleeper (Miro board)
 
-            b.Add(sleeper, Order, Stranger, "Is that a thing people eat?");
-            b.Add(sleeper, Order, Familiar,
-                "This place feels like home. I've never been here.",
-                "I remember heat. A kitchen that made your eyes water.");
-            b.Add(sleeper, Order, Friendly, "I found her. She cooks like you do. Hotter, actually.");
+            // Stranger: every order is scripted, one after the other, then soup on the rock.
+            b.Add(sleeper, Order, Stranger, "Potato", true, "Umm... Hi.", "Is this where people pay for their sustenance?", "I'd like a uuh...", "Potato.");
+            b.Add(sleeper, Order, Stranger, "Peeled potato", true, "Hi.", "One peeled potato, please.");
+            b.Add(sleeper, Order, Stranger, "MSG2 cube", true, "Hi, again.", "I'll take an MSG2 cube, please.");
+            b.Add(sleeper, Order, Stranger, "Soup on the rock", true,
+                "Hey, man.", "Wait... You had a menu all this time??", "Ohh, no, that's tough.", "I'll uuh.. take a soup on the rock, please.");
+            b.Add(sleeper, Order, Stranger, "Soup on the rock", false, "Hey, man.", "Hmm... I'll go for the...", "Maybe... Nah.", "Soup on the rock, please.");
+            b.Add(sleeper, Musing, Stranger, null, true, "You're not selling Stabilizer, right?", "Right.");
+            b.Add(sleeper, Musing, Stranger, "Still not selling Stabilizer, I assume?", "Yeah...");
+            b.Add(sleeper, Hurry, Stranger, "Hmm...");
+            b.Add(sleeper, Hurry, Stranger, "Is that really how you're supposed to use that thing?");
+            b.Add(sleeper, Hurry, Stranger, "Need any help?");
+            b.Add(sleeper, Correct, Stranger, "Exactly how I imagined it would be.", "Thanks.");
+            b.Add(sleeper, Correct, Stranger, "Mmm... Good.", "Yeah...");
+            b.Add(sleeper, Correct, Stranger, "Food. In my mouth.", "It was meant to be.");
+            b.Add(sleeper, Tasty, Stranger, "Wow...", "That kinda tastes, man.", "Is this why people come here?", "Ohh... I'll be back!");
+            // They don't know bad food yet: the board gives them the same lines as a correct order.
+            b.Add(sleeper, Nasty, Stranger, "Exactly how I imagined it would be.", "Thanks.");
+            b.Add(sleeper, Nasty, Stranger, "Mmm... Good.", "Yeah...");
+            b.Add(sleeper, Nasty, Stranger, "Food. In my mouth.", "It was meant to be.");
+
+            // Familiar
+            b.Add(sleeper, Order, Familiar, Liked, false,
+                "Hey, man.", "Can I please get the [liked meal]?", "Or whatever else you may cook up.", "I want your tastiest tastes, all in my mouth.");
+            b.Add(sleeper, Musing, Familiar,
+                "And when did you get here, man?",
+                "To Erlin's Eye, that is.",
+                "Does it get any easier?",
+                "I've been here a few days now, and still just as clueless as when I got here.",
+                "It's strange, this place feels like home, yet I recognise nothing at all.",
+                "But, at least I know you now, man, and this stall gives me refuge.");
+            b.Add(sleeper, Musing, Familiar,
+                "Man, I've been here a while now, and still, I don't know why.",
+                "I've had these faint memories, dreams tugging at me, drawing me here.",
+                "I hoped once I got here, I'd understand why but... Nothing.",
+                "I got nothing.");
+            b.Add(sleeper, Musing, Familiar,
+                "Have you ever though about making a Sleeper Menu?",
+                "You know... Food meant for Sleepers?",
+                "These tongues don't taste much, but a lot of your dishes... Ohh, they taste plenty!",
+                "And, of course, the MSG cubes.",
+                "Ahhh, the MSG cubes!");
+            b.Add(sleeper, Musing, Familiar,
+                "Get this, I walked past the seaweed noodle forge the other day. Seaweed noodle sweatshop, more like.",
+                "Anyhow, I was walking, lost in thought, and when I got to the entrance, I instinctively turned in.",
+                "Reached for the door terminal and everything.",
+                "I was dumbfounded in front of that door. It was the strangest feeling.",
+                "The smell of seaweed... It was familiar. Like it was always there, enveloping me.");
+            b.Add(sleeper, Musing, Familiar,
+                "A woman passed me by on the street recently.",
+                "She was holding steaming hot plate of noodles, reeking of chili, and I could have sworn I knew her.",
+                "I got the urge to run up and give her a hug, but as I was going to say hi, I forgot her name, then her face.",
+                "She never was who I thought she was. I also don't even know who I thought she was in the first place.",
+                "This synthetic mind will be the death of me...");
+
+            // Friendly
+            b.Add(sleeper, Musing, Friendly, null, true,
+                "Don't think I ever told you the reason I came to your stall the day I got here.",
+                "You were basically my first stop, and only because I saw someone walking away from here with a weird, steaming plate of stuff -- and a big smile.",
+                "I knew what it was, the smile, that is. Yet, it felt alien.",
+                "Like something you read about, but never see in real life. You know, like books.",
+                "And sometimes I think about what would have happened if I don't find your stall that day...",
+                "Anyways, I did, and I got my fair share of smiles too.",
+                "Your stall has a charm, like no other.");
+
+            // The board has nothing yet for these: placeholders, at any stage.
             b.Add(sleeper, Hurry, Any, "Is it supposed to take this long? I don't know how food works.");
             b.Add(sleeper, Correct, Any, "Wow! That kinda tastes.", "So that's why people stuff their face?");
             b.Add(sleeper, Tasty, Any, "Is it supposed to be like this? I honestly can't tell.");
             b.Add(sleeper, Nasty, Any, "Uhh... thanks?");
             b.Add(sleeper, Dream, Any, null, true, "That burn...", "I remember a kitchen. Someone's hands.", "I have to go. I know where she is.");
 
-            // ---------------------------------------------------------------- Generic Eyesiders: they give nothing.
-
-            b.Add(eyesider, Correct, Any, "...");
-            b.Add(eyesider, Tasty, Any, "Mm.");
-            b.Add(eyesider, Nasty, Any, "Tch.");
-            b.Add(eyesider, Dream, Any, null, true, "...huh.");
-
             return b.Specs;
+        }
+
+        /// <summary>Deletes every graph and the catalog, then builds them again from <see cref="Content"/> (after the board changed).</summary>
+        [MenuItem("Custom Tools/Cooking Prototype/Rebuild Dialogue From Scratch")]
+        public static void RebuildDialogue()
+        {
+            if(AssetDatabase.IsValidFolder(GraphFolder))
+            {
+                foreach(string guid in AssetDatabase.FindAssets("t:DialogueGraph", new[] { GraphFolder })) AssetDatabase.DeleteAsset(AssetDatabase.GUIDToAssetPath(guid));
+            }
+
+            AssetDatabase.DeleteAsset(CatalogPath);
+            BuildDialogue();
         }
 
         [MenuItem("Custom Tools/Cooking Prototype/Build Dialogue")]
@@ -286,7 +353,6 @@ namespace Cooking.Prototype.EditorTools
             graph = ScriptableObject.CreateInstance<DialogueGraph>();
             graph.isOneShot = spec.OneShot;
             graph.payload = spec.Payload ?? "";
-            AssetDatabase.CreateAsset(graph, path);
 
             // Entry → Line → Line ... → End, laid out left to right like the graph editor's layout.
             DialogueNodeData previous = graph.AddNode(DialogueNodeKind.Entry);
@@ -307,7 +373,11 @@ namespace Cooking.Prototype.EditorTools
             end.editorPosition = new Vector2(260f * (spec.Lines.Length + 1), 0f);
             graph.Connect(previous.guid, end.guid);
 
+            // Written to disk only once it's complete (creating it first and filling it after could
+            // leave an empty graph on disk when the path was just freed by a rebuild).
+            AssetDatabase.CreateAsset(graph, path);
             EditorUtility.SetDirty(graph);
+            AssetDatabase.SaveAssetIfDirty(graph);
             created++;
             return graph;
         }
@@ -367,10 +437,9 @@ namespace Cooking.Prototype.EditorTools
         {
             switch(customerName)
             {
-                case "The Woman": return DialogueNpcId.Woman;
-                case "The Man": return DialogueNpcId.Man;
-                case "The Sleeper": return DialogueNpcId.Sleeper;
-                case "Eyesider": return DialogueNpcId.Eyesider;
+                case "Hera": return DialogueNpcId.Woman;
+                case "Petor": return DialogueNpcId.Man;
+                case "Sleeper": return DialogueNpcId.Sleeper;
                 default: return DialogueNpcId.None;
             }
         }

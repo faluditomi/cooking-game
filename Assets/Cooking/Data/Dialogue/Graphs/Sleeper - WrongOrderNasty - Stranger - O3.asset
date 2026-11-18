@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Sleeper - WrongOrderNasty - Stranger - O3
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: 38c68cc7-d298-4d2d-a7a2-230228a01a59
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: a7c07b56-cfc1-48cb-aa4f-05488630a492
+    kind: 0
+    line:
+      text: Food. In my mouth.
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: d3ccdab6-5bbe-4cf7-bcb4-965883d000da
+    kind: 0
+    line:
+      text: It was meant to be.
+      delaySeconds: 1.6
+    editorPosition: {x: 520, y: 0}
+  - guid: d8702631-9ddd-4a88-a315-7e87afc7c2c6
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 780, y: 0}
+  edges:
+  - fromNodeGuid: 38c68cc7-d298-4d2d-a7a2-230228a01a59
+    fromOptionGuid: 
+    toNodeGuid: a7c07b56-cfc1-48cb-aa4f-05488630a492
+  - fromNodeGuid: a7c07b56-cfc1-48cb-aa4f-05488630a492
+    fromOptionGuid: 
+    toNodeGuid: d3ccdab6-5bbe-4cf7-bcb4-965883d000da
+  - fromNodeGuid: d3ccdab6-5bbe-4cf7-bcb4-965883d000da
+    fromOptionGuid: 
+    toNodeGuid: d8702631-9ddd-4a88-a315-7e87afc7c2c6
+  isOneShot: 0
+  payload: 

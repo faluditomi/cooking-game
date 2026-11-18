@@ -1,0 +1,69 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Sleeper - Musing - Familiar - O2
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: 98b8031a-15f1-4a80-8023-1abe6a051517
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: 984d5078-c5e1-447a-8604-38c9d1a9cc5f
+    kind: 0
+    line:
+      text: Man, I've been here a while now, and still, I don't know why.
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: 1e13ff54-8a49-4a45-bc8a-d4bd10aa4fac
+    kind: 0
+    line:
+      text: I've had these faint memories, dreams tugging at me, drawing me here.
+      delaySeconds: 3.2
+    editorPosition: {x: 520, y: 0}
+  - guid: 6935b1d5-ec58-4a24-b083-4b80d7d1dace
+    kind: 0
+    line:
+      text: I hoped once I got here, I'd understand why but... Nothing.
+      delaySeconds: 3.5
+    editorPosition: {x: 780, y: 0}
+  - guid: 105e4370-9a0a-4618-892e-7a03f0b5d584
+    kind: 0
+    line:
+      text: I got nothing.
+      delaySeconds: 3.1
+    editorPosition: {x: 1040, y: 0}
+  - guid: c26148d3-bb18-4144-bf55-2bcbdb63322c
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 1300, y: 0}
+  edges:
+  - fromNodeGuid: 98b8031a-15f1-4a80-8023-1abe6a051517
+    fromOptionGuid: 
+    toNodeGuid: 984d5078-c5e1-447a-8604-38c9d1a9cc5f
+  - fromNodeGuid: 984d5078-c5e1-447a-8604-38c9d1a9cc5f
+    fromOptionGuid: 
+    toNodeGuid: 1e13ff54-8a49-4a45-bc8a-d4bd10aa4fac
+  - fromNodeGuid: 1e13ff54-8a49-4a45-bc8a-d4bd10aa4fac
+    fromOptionGuid: 
+    toNodeGuid: 6935b1d5-ec58-4a24-b083-4b80d7d1dace
+  - fromNodeGuid: 6935b1d5-ec58-4a24-b083-4b80d7d1dace
+    fromOptionGuid: 
+    toNodeGuid: 105e4370-9a0a-4618-892e-7a03f0b5d584
+  - fromNodeGuid: 105e4370-9a0a-4618-892e-7a03f0b5d584
+    fromOptionGuid: 
+    toNodeGuid: c26148d3-bb18-4144-bf55-2bcbdb63322c
+  isOneShot: 0
+  payload: 

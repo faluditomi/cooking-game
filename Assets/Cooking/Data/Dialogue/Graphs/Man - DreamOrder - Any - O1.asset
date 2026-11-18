@@ -13,39 +13,39 @@ MonoBehaviour:
   m_Name: Man - DreamOrder - Any - O1
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: 861b1ed9-c96d-446e-b10f-fb5e7036f04e
+  - guid: 3f75c599-efa6-46d3-a22c-b247beb8c0c4
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: b21653f2-0173-43aa-a1f1-628f1f031ef4
+  - guid: 56403e7b-dcbb-4c53-beff-3301db04b054
     kind: 0
     line:
       text: Simple. Tasty. Nobody got hurt making it.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: 5fd1e162-2c8b-4007-99b5-663a8f3fa1df
+  - guid: cdf9b0c0-3de7-4dac-91d6-3527b90a2263
     kind: 0
     line:
       text: Could I... could I make this for the kids?
       delaySeconds: 2.5
     editorPosition: {x: 520, y: 0}
-  - guid: bca679e4-603e-43ee-9793-345a534ed360
+  - guid: 4a849fcc-37c9-41b3-87f3-d290b30233ce
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 780, y: 0}
   edges:
-  - fromNodeGuid: 861b1ed9-c96d-446e-b10f-fb5e7036f04e
+  - fromNodeGuid: 3f75c599-efa6-46d3-a22c-b247beb8c0c4
     fromOptionGuid: 
-    toNodeGuid: b21653f2-0173-43aa-a1f1-628f1f031ef4
-  - fromNodeGuid: b21653f2-0173-43aa-a1f1-628f1f031ef4
+    toNodeGuid: 56403e7b-dcbb-4c53-beff-3301db04b054
+  - fromNodeGuid: 56403e7b-dcbb-4c53-beff-3301db04b054
     fromOptionGuid: 
-    toNodeGuid: 5fd1e162-2c8b-4007-99b5-663a8f3fa1df
-  - fromNodeGuid: 5fd1e162-2c8b-4007-99b5-663a8f3fa1df
+    toNodeGuid: cdf9b0c0-3de7-4dac-91d6-3527b90a2263
+  - fromNodeGuid: cdf9b0c0-3de7-4dac-91d6-3527b90a2263
     fromOptionGuid: 
-    toNodeGuid: bca679e4-603e-43ee-9793-345a534ed360
+    toNodeGuid: 4a849fcc-37c9-41b3-87f3-d290b30233ce
   isOneShot: 1
   payload: 

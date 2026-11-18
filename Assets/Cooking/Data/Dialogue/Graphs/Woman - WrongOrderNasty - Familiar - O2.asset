@@ -13,39 +13,39 @@ MonoBehaviour:
   m_Name: Woman - WrongOrderNasty - Familiar - O2
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: f0a9e589-bc53-4812-ac24-38c0f0851add
+  - guid: ccbf362b-ce52-4c77-91b2-f1901a966f25
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: b733245d-9221-42ce-ae5d-63c5b177c17d
+  - guid: 9340e456-ed74-4aee-a66f-4919d4e7bc5c
     kind: 0
     line:
       text: You and me will pretend this never happened.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: 88cb35ae-9a4c-4c74-8839-83a3252fe8e9
+  - guid: 937928cb-375a-4b9d-aba2-723c948cf44a
     kind: 0
     line:
       text: I'll giving you another chance.
       delaySeconds: 2.6
     editorPosition: {x: 520, y: 0}
-  - guid: 8da287de-6d50-440c-bc53-3c32ee21f2f7
+  - guid: d45a837c-7f41-4f2f-ad49-d8b47574f44a
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 780, y: 0}
   edges:
-  - fromNodeGuid: f0a9e589-bc53-4812-ac24-38c0f0851add
+  - fromNodeGuid: ccbf362b-ce52-4c77-91b2-f1901a966f25
     fromOptionGuid: 
-    toNodeGuid: b733245d-9221-42ce-ae5d-63c5b177c17d
-  - fromNodeGuid: b733245d-9221-42ce-ae5d-63c5b177c17d
+    toNodeGuid: 9340e456-ed74-4aee-a66f-4919d4e7bc5c
+  - fromNodeGuid: 9340e456-ed74-4aee-a66f-4919d4e7bc5c
     fromOptionGuid: 
-    toNodeGuid: 88cb35ae-9a4c-4c74-8839-83a3252fe8e9
-  - fromNodeGuid: 88cb35ae-9a4c-4c74-8839-83a3252fe8e9
+    toNodeGuid: 937928cb-375a-4b9d-aba2-723c948cf44a
+  - fromNodeGuid: 937928cb-375a-4b9d-aba2-723c948cf44a
     fromOptionGuid: 
-    toNodeGuid: 8da287de-6d50-440c-bc53-3c32ee21f2f7
+    toNodeGuid: d45a837c-7f41-4f2f-ad49-d8b47574f44a
   isOneShot: 0
   payload: 

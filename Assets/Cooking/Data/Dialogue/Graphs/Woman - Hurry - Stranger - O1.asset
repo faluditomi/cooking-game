@@ -13,30 +13,30 @@ MonoBehaviour:
   m_Name: Woman - Hurry - Stranger - O1
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: de8b17a1-6397-4915-92e9-0d39176a3114
+  - guid: 321885a8-c8b2-4293-b8b9-37135091cd63
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: b9d5786f-daf5-46fd-9712-4454ce241734
+  - guid: 75dae235-1192-4fb1-ad44-77572862ae35
     kind: 0
     line:
       text: I really ain't got all day, Pot Boy.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: bb50657e-1b72-466b-bb02-c6ceebab9cd6
+  - guid: d382e518-7298-4f50-bfd4-946896aa9937
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 520, y: 0}
   edges:
-  - fromNodeGuid: de8b17a1-6397-4915-92e9-0d39176a3114
+  - fromNodeGuid: 321885a8-c8b2-4293-b8b9-37135091cd63
     fromOptionGuid: 
-    toNodeGuid: b9d5786f-daf5-46fd-9712-4454ce241734
-  - fromNodeGuid: b9d5786f-daf5-46fd-9712-4454ce241734
+    toNodeGuid: 75dae235-1192-4fb1-ad44-77572862ae35
+  - fromNodeGuid: 75dae235-1192-4fb1-ad44-77572862ae35
     fromOptionGuid: 
-    toNodeGuid: bb50657e-1b72-466b-bb02-c6ceebab9cd6
+    toNodeGuid: d382e518-7298-4f50-bfd4-946896aa9937
   isOneShot: 0
   payload: 

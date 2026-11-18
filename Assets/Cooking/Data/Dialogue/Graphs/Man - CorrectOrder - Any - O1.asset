@@ -13,30 +13,30 @@ MonoBehaviour:
   m_Name: Man - CorrectOrder - Any - O1
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: d98dc5e0-a295-4be5-b5d6-f883d1e18fb2
+  - guid: c6bb5461-5714-44d9-b950-06ebd153a986
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 77276ed6-ce7d-49e3-8235-13305a657247
+  - guid: 0ff3136f-792f-4490-be29-f7c47d2f44d8
     kind: 0
     line:
       text: That's... decent. Thank you.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: 2dd56a37-b66d-48ff-9efc-2ad1af608570
+  - guid: be85ecf2-f5fd-4179-bf8d-299e2304a7dc
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 520, y: 0}
   edges:
-  - fromNodeGuid: d98dc5e0-a295-4be5-b5d6-f883d1e18fb2
+  - fromNodeGuid: c6bb5461-5714-44d9-b950-06ebd153a986
     fromOptionGuid: 
-    toNodeGuid: 77276ed6-ce7d-49e3-8235-13305a657247
-  - fromNodeGuid: 77276ed6-ce7d-49e3-8235-13305a657247
+    toNodeGuid: 0ff3136f-792f-4490-be29-f7c47d2f44d8
+  - fromNodeGuid: 0ff3136f-792f-4490-be29-f7c47d2f44d8
     fromOptionGuid: 
-    toNodeGuid: 2dd56a37-b66d-48ff-9efc-2ad1af608570
+    toNodeGuid: be85ecf2-f5fd-4179-bf8d-299e2304a7dc
   isOneShot: 0
   payload: 

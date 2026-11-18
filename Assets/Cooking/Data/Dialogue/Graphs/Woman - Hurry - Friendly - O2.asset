@@ -13,30 +13,30 @@ MonoBehaviour:
   m_Name: Woman - Hurry - Friendly - O2
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: a40722ec-27ae-4fb5-985d-0efddd208edd
+  - guid: 27f33941-3ebb-4019-9b75-b188165ff7dd
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: faaa733a-964a-40f1-9bc5-eb83657b603b
+  - guid: 28ee3201-0ab3-451e-ab9c-b08634abb865
     kind: 0
     line:
       text: You know, if the grub wasn't this good, I wouldn't put up with this, Pot Boy.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: bd6f0eaf-6acb-4985-89e2-9aa6bec3163b
+  - guid: 42973a81-9608-4ec5-b333-c5497fe74e79
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 520, y: 0}
   edges:
-  - fromNodeGuid: a40722ec-27ae-4fb5-985d-0efddd208edd
+  - fromNodeGuid: 27f33941-3ebb-4019-9b75-b188165ff7dd
     fromOptionGuid: 
-    toNodeGuid: faaa733a-964a-40f1-9bc5-eb83657b603b
-  - fromNodeGuid: faaa733a-964a-40f1-9bc5-eb83657b603b
+    toNodeGuid: 28ee3201-0ab3-451e-ab9c-b08634abb865
+  - fromNodeGuid: 28ee3201-0ab3-451e-ab9c-b08634abb865
     fromOptionGuid: 
-    toNodeGuid: bd6f0eaf-6acb-4985-89e2-9aa6bec3163b
+    toNodeGuid: 42973a81-9608-4ec5-b333-c5497fe74e79
   isOneShot: 0
   payload: 

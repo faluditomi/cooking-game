@@ -13,30 +13,30 @@ MonoBehaviour:
   m_Name: Sleeper - WrongOrderTasty - Any - O1
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: e5f833fd-6c5f-480a-85d5-4543c8113fa0
+  - guid: fa1a1f03-79a4-400f-be11-0fe361562eb4
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 03c9dcb4-5ea8-4376-8f4c-47ad8e26c505
+  - guid: aed7168d-c8b4-4c89-addc-f0bf8866485f
     kind: 0
     line:
       text: Is it supposed to be like this? I honestly can't tell.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: acd7f4ee-07a3-4fa5-9642-eebb65407024
+  - guid: bb6b921f-2251-471b-b83e-99dac3be5b81
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 520, y: 0}
   edges:
-  - fromNodeGuid: e5f833fd-6c5f-480a-85d5-4543c8113fa0
+  - fromNodeGuid: fa1a1f03-79a4-400f-be11-0fe361562eb4
     fromOptionGuid: 
-    toNodeGuid: 03c9dcb4-5ea8-4376-8f4c-47ad8e26c505
-  - fromNodeGuid: 03c9dcb4-5ea8-4376-8f4c-47ad8e26c505
+    toNodeGuid: aed7168d-c8b4-4c89-addc-f0bf8866485f
+  - fromNodeGuid: aed7168d-c8b4-4c89-addc-f0bf8866485f
     fromOptionGuid: 
-    toNodeGuid: acd7f4ee-07a3-4fa5-9642-eebb65407024
+    toNodeGuid: bb6b921f-2251-471b-b83e-99dac3be5b81
   isOneShot: 0
   payload: 

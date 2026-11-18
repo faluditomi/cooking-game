@@ -13,39 +13,39 @@ MonoBehaviour:
   m_Name: Woman - Order - Stranger - O3
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: 141edd1a-bc92-4925-b47d-8812187d2830
+  - guid: 20c9f04d-4862-48d2-a58f-1f17bab84aab
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 615d1b2e-b0a3-4d33-bccb-f21d17c6e930
+  - guid: 8555626e-d810-474a-9a30-ea0995bcdfc3
     kind: 0
     line:
       text: Need that [liked meal], Pot Boy.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: bc53ac23-1c6f-49bd-a8c7-e5fadbb262c9
+  - guid: 37540ff1-d33d-434e-9594-7f4cc4e0d77f
     kind: 0
     line:
       text: And try getting it done this cycle, ey?
       delaySeconds: 2.1
     editorPosition: {x: 520, y: 0}
-  - guid: 9e01d674-12f7-4a27-875a-4b08ee30d99a
+  - guid: fa850c01-f86e-4300-9700-e0cdd71b82db
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 780, y: 0}
   edges:
-  - fromNodeGuid: 141edd1a-bc92-4925-b47d-8812187d2830
+  - fromNodeGuid: 20c9f04d-4862-48d2-a58f-1f17bab84aab
     fromOptionGuid: 
-    toNodeGuid: 615d1b2e-b0a3-4d33-bccb-f21d17c6e930
-  - fromNodeGuid: 615d1b2e-b0a3-4d33-bccb-f21d17c6e930
+    toNodeGuid: 8555626e-d810-474a-9a30-ea0995bcdfc3
+  - fromNodeGuid: 8555626e-d810-474a-9a30-ea0995bcdfc3
     fromOptionGuid: 
-    toNodeGuid: bc53ac23-1c6f-49bd-a8c7-e5fadbb262c9
-  - fromNodeGuid: bc53ac23-1c6f-49bd-a8c7-e5fadbb262c9
+    toNodeGuid: 37540ff1-d33d-434e-9594-7f4cc4e0d77f
+  - fromNodeGuid: 37540ff1-d33d-434e-9594-7f4cc4e0d77f
     fromOptionGuid: 
-    toNodeGuid: 9e01d674-12f7-4a27-875a-4b08ee30d99a
+    toNodeGuid: fa850c01-f86e-4300-9700-e0cdd71b82db
   isOneShot: 0
   payload: '[liked meal]'

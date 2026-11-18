@@ -26,7 +26,7 @@ namespace Cooking.Prototype.EditorTools
         };
 
         /// <summary>Recipes regulars can order that the player doesn't get in the book (meeting decision).</summary>
-        private static readonly string[] OffMenu = { "Boiled synthetic chicken", "Potato", "Peeled potato", "MSG2 cube" };
+        private static readonly string[] OffMenu = { "Potato", "Peeled potato", "MSG2 cube" };
 
         private const string CharacterArt = "Assets/Art Assets/Characters";
 
@@ -53,14 +53,15 @@ namespace Cooking.Prototype.EditorTools
             CookingPrototype prototype = root.AddComponent<CookingPrototype>();
             // Some recipes only NPCs know: they can order them, but they're not on the menu or in the book.
             List<RecipeDefinition> menu = new List<RecipeDefinition>(recipes.Values);
-            menu.RemoveAll(recipe => System.Array.IndexOf(OffMenu, recipe.DisplayName) >= 0);
-            prototype.Setup(LoadRules(), LoadZones(), LoadPantry(), menu, CreateCustomers(recipes));
+            List<RecipeDefinition> offMenu = menu.FindAll(recipe => System.Array.IndexOf(OffMenu, recipe.DisplayName) >= 0);
+            menu.RemoveAll(recipe => offMenu.Contains(recipe));
+            prototype.Setup(LoadRules(), LoadZones(), LoadPantry(), menu, CreateCustomers(recipes), offMenu);
             EditorUtility.SetDirty(prototype);
 
             EditorSceneManager.SaveScene(scene, ScenePath);
 
             // Dialogue graphs, catalog, director and the regulars' dialogue ids.
-            CookingDialogueSetup.BuildDialogue();
+            CookingDialogueSetup.RebuildDialogue();
 
             // The billboards and the rendered cookware.
             AssignMarketArt();
@@ -209,14 +210,15 @@ namespace Cooking.Prototype.EditorTools
 
             Dictionary<string, RecipeDefinition> recipes = new Dictionary<string, RecipeDefinition>();
 
-            Add(recipes, "MSBeef fried rice", Street, CookMethods.Fried,
-                new Item("Rice", 1), new Item("Real Beef", 1, Sliced), new Item("Onion", 1, Peeled | Sliced),
+            // The Notion menu (demo changes): "(cooked)" rice and noodles are boiled before they're fried.
+            Add(recipes, "MSBeef noodles", Street, CookMethods.Fried,
+                new Item("Seaweed Noodles", 1), new Item("Real Beef", 1, Sliced), new Item("Onion", 1, Peeled | Sliced),
                 new Item("MSG2 Cube", 3, Grated), new Item("Citric Acid", 1), new Item("Sugar", 2));
             Add(recipes, "Calorice", Street, CookMethods.Fried,
                 new Item("Rice", 2), new Item("Tofu", 3, Sliced), new Item("Mushroom", 1, Sliced), new Item("Pepper", 1), new Item("Salt", 1));
-            Add(recipes, "Hellchick noodles", Street, CookMethods.Fried,
-                new Item("Seaweed Noodles", 1), new Item("Synthetic Chicken", 1, Sliced), new Item("Onion", 2, Peeled | Sliced),
-                new Item("Chilli", 3, Grated), new Item("MSG2 Cube", 2, Grated), new Item("Sugar", 2));
+            Add(recipes, "Hellspawn fried rice", Street, CookMethods.Fried,
+                new Item("Rice", 1), new Item("Synthetic Chicken", 1, Sliced), new Item("Onion", 2, Peeled | Sliced),
+                new Item("Chilli", 3, Grated), new Item("Sugar", 2), new Item("Salt", 1));
             Add(recipes, "Mushroom soup", Street, CookMethods.Boiled,
                 new Item("Soup Cube", 1), new Item("Mushroom", 3, Sliced), new Item("Potato", 2, Peeled | Sliced), new Item("Salt", 2), new Item("Pepper", 1));
             Add(recipes, "Synthetic soup", Street, CookMethods.Boiled,
@@ -224,8 +226,6 @@ namespace Cooking.Prototype.EditorTools
                 new Item("MSG2 Cube", 1, Grated), new Item("Citric Acid", 2), new Item("Pepper", 1));
             Add(recipes, "Soup on the rock", Street, CookMethods.Boiled,
                 new Item("Soup Cube", 1), new Item("Potato", 1, Peeled), new Item("Salt", 2));
-            Add(recipes, "Boiled synthetic chicken", "Ordered by a confused sleeper", CookMethods.Boiled,
-                new Item("Synthetic Chicken", 1));
 
             // The Sleeper's first "meals" (Miro board): things they don't know aren't food. Served raw.
             const string Sleeper = "Ordered by a sleeper who doesn't know food yet";
@@ -249,8 +249,9 @@ namespace Cooking.Prototype.EditorTools
                 foreach(Item item in items)
                 {
                     // Everything goes into the same station, seasonings included.
-                    // Rice has to be boiled before it can be fried.
-                    CookMethods cooking = item.Name == "Rice" && (method & CookMethods.Fried) != 0 ? method | CookMethods.Boiled : method;
+                    // Rice and noodles have to be boiled ("cooked") before they can be fried.
+                    bool boilFirst = item.Name == "Rice" || item.Name == "Seaweed Noodles";
+                    CookMethods cooking = boilFirst && (method & CookMethods.Fried) != 0 ? method | CookMethods.Boiled : method;
                     portions.Add(new IngredientPortion(Ingredient(item.Name), item.Quantity, item.Prep, cooking));
                 }
 
@@ -289,15 +290,15 @@ namespace Cooking.Prototype.EditorTools
             // Each regular's secret desire: a flavour no menu recipe reaches, to be discovered.
             Dictionary<string, FlavourZone> desires = CookingDesireSetup.EnsureDesireZones();
 
+            // Notion demo changes: only these three, Hera, the Sleeper and Petor (left to right on Miro).
             return new List<Customer>
             {
                 new Customer
                 {
-                    name = "The Woman",
-                    // Miro board: she orders MSBeef fried rice (Real Beef™ only) and won't touch the beef
-                    // animal, except in her lost love's sweet and sour soup, which needs it.
-                    // Her initial liked meals, from the board.
-                    orders = new List<RecipeDefinition> { recipes["MSBeef fried rice"], recipes["Synthetic soup"], recipes["Calorice"] },
+                    name = "Hera",
+                    // Miro board: her initial liked meals are the MSBeef dish and Calorice. She won't
+                    // touch the beef animal, except in Jessa's sweet and sour soup, which needs it.
+                    orders = new List<RecipeDefinition> { recipes["MSBeef noodles"], recipes["Calorice"] },
                     secretDesire = desires["The Woman"],
                     dreamNeeds = new List<IngredientDefinition> { Ingredient("Beef") },
                     refuses = new List<IngredientDefinition> { Ingredient("Beef") },
@@ -311,7 +312,27 @@ namespace Cooking.Prototype.EditorTools
                 },
                 new Customer
                 {
-                    name = "The Man",
+                    name = "Sleeper",
+                    // Miro board: their initial liked list is empty; every Stranger order is scripted
+                    // in their dialogue. The first good-tasting dish makes them Familiar; as a Stranger
+                    // they don't know food, so they always pay. A secret spice fiend: the dream dish
+                    // has chilli, seaweed noodles and MSG2.
+                    orders = new List<RecipeDefinition>(),
+                    firstTasteReplacesLikes = true,
+                    alwaysPaysAsStranger = true,
+                    likedMealsToFamiliar = 1,
+                    portrait = Portrait("the_sleeper"),
+                    secretDesire = desires["The Sleeper"],
+                    dreamNeeds = new List<IngredientDefinition> { Ingredient("Chilli"), Ingredient("Seaweed Noodles"), Ingredient("MSG2 Cube") },
+                    orderLines = new List<string> { "Uum... I'd like a {0}?", "{0}, please." },
+                    likedLine = "Wow... That kinda tastes, man.",
+                    dislikedLine = "Mmm... Good. Yeah...",
+                    refusedLine = "Uhh... thanks?",
+                    dreamLine = "That burn... I remember a kitchen. Someone's hands. I have to go.",
+                },
+                new Customer
+                {
+                    name = "Petor",
                     orders = new List<RecipeDefinition> { recipes["Calorice"], recipes["Soup on the rock"] },
                     secretDesire = desires["The Man"],
                     refuses = new List<IngredientDefinition> { Ingredient("Synthetic Chicken") },
@@ -320,37 +341,7 @@ namespace Cooking.Prototype.EditorTools
                     dislikedLine = "Healthy, I suppose. Joyless.",
                     refusedLine = "Don't even get me started on the synthetic chicken.",
                     dreamLine = "Simple. Tasty. Nobody got hurt making it. Could I make this for the kids?",
-                },
-                new Customer
-                {
-                    name = "The Sleeper",
-                    // Miro board: their initial liked meals aren't on the menu and aren't really food.
-                    // The first thing that tastes good replaces them and makes them Familiar; as a
-                    // Stranger they don't know food, so they always pay.
-                    orders = new List<RecipeDefinition>
-                    {
-                        recipes["Potato"], recipes["Peeled potato"], recipes["MSG2 cube"], recipes["Boiled synthetic chicken"],
-                    },
-                    firstTasteReplacesLikes = true,
-                    alwaysPaysAsStranger = true,
-                    likedMealsToFamiliar = 1,
-                    portrait = Portrait("the_sleeper"),
-                    secretDesire = desires["The Sleeper"],
-                    orderLines = new List<string> { "Uum... I'd like a {0}?", "{0}. Is that a thing people eat?" },
-                    likedLine = "Wow! That kinda tastes. So that's why people stuff their face?",
-                    dislikedLine = "Uhh... thanks?",
-                    refusedLine = "Uhh... thanks?",
-                    dreamLine = "That burn... I remember a kitchen. Someone's hands. I have to go.",
-                },
-                new Customer
-                {
-                    name = "Eyesider",
-                    orders = new List<RecipeDefinition>(),
-                    orderLines = new List<string> { "{0}.", "{0}. Quick.", "Just the {0}." },
-                    likedLine = "...",
-                    dislikedLine = "Tch.",
-                    refusedLine = "Tch.",
-                    dreamLine = "...huh.",
+                    portrait = Portrait("petor"),
                 },
             };
         }

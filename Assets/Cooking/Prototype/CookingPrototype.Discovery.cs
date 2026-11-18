@@ -29,14 +29,14 @@ namespace Cooking.Prototype
 
         private void ShowNaming(RecipeDefinition dish)
         {
-            namingDish = dish != null && !IsOnMenu(dish) ? dish : null;
+            namingDish = dish != null && !IsOnMenu(dish) && !offMenu.Contains(dish) ? dish : null;
             namingRow.SetActive(namingDish != null);
             if(namingDish == null) return;
 
             bool dream = customer != null && Relationship(customer).DreamMeal == namingDish;
             namingHint.text = dream
-                ? "<color=#f28c33>Nobody has made this before. It's what " + customer.name + " was missing.</color> Name it to put it on the menu."
-                : "<color=#a6a199>This dish isn't on the menu. Name it to save it, or Continue and it stays \"" + namingDish.DisplayName + "\".</color>";
+                ? "<color=#f28c33>It's what " + customer.name + " was missing.</color> Name it to put it on the menu."
+                : "<color=#a6a199>Not on the menu. Name it to save it.</color>";
             namingField.text = namingDish.DisplayName == CustomerRelationship.Nameless ? "" : namingDish.DisplayName;
             namingField.interactable = true;
             saveDishButton.interactable = true;
@@ -59,12 +59,12 @@ namespace Cooking.Prototype
         private void RefreshHistorySave(HistoryEntry entry)
         {
             RecipeDefinition dish = entry != null ? entry.Dish : null;
-            bool show = dish != null && !IsOnMenu(dish);
+            bool show = dish != null && !IsOnMenu(dish) && !offMenu.Contains(dish);
             historySaveRow.SetActive(show);
             if(!show) return;
 
             if(historySaveField.isFocused) return;
-            historySaveHint.text = "<color=#a6a199>Not on the menu. Name it to save it as your own recipe, so they can order it by name.</color>";
+            historySaveHint.text = "<color=#a6a199>Not on the menu. Name it to save it, so they can order it by name.</color>";
             historySaveField.text = dish.DisplayName == CustomerRelationship.Nameless ? "" : dish.DisplayName;
         }
 
@@ -113,12 +113,12 @@ namespace Cooking.Prototype
 
         private void BuildNamingRow(RectTransform parent)
         {
-            namingRow = BuildNameGroup(parent, "Naming", 22, SaveDish, out namingHint, out namingField, out saveDishButton);
+            namingRow = BuildNameGroup(parent, "Naming", 14, SaveDish, out namingHint, out namingField, out saveDishButton);
         }
 
         private void BuildHistorySaveRow(RectTransform parent)
         {
-            historySaveRow = BuildNameGroup(parent, "Save From History", 18, SaveDishFromHistory, out historySaveHint, out historySaveField, out historySaveButton);
+            historySaveRow = BuildNameGroup(parent, "Save From History", 14, SaveDishFromHistory, out historySaveHint, out historySaveField, out historySaveButton);
         }
 
         /// <summary>A hint, a name field and a Save dish button.</summary>
@@ -129,7 +129,7 @@ namespace Cooking.Prototype
             VerticalLayoutGroup layout = UIFactory.Vertical(group.gameObject, 6f, 0);
             layout.childForceExpandHeight = false;
 
-            hint = UIFactory.Label(group, "", fontSize - 5);
+            hint = UIFactory.Label(group, "", fontSize - 2);
 
             RectTransform row = UIFactory.Row(group, fontSize * 2f + 4f);
             row.GetComponent<HorizontalLayoutGroup>().childForceExpandWidth = false;
@@ -143,7 +143,7 @@ namespace Cooking.Prototype
             Text text = UIFactory.Label(fieldBackground.transform, "", fontSize, TextAnchor.MiddleLeft);
             text.supportRichText = false;
             UIFactory.Stretch(text.rectTransform).offsetMin = new Vector2(12f, 0f);
-            Text placeholder = UIFactory.Label(fieldBackground.transform, "Name the dish (" + DishNameLimit + " letters)", fontSize, TextAnchor.MiddleLeft,
+            Text placeholder = UIFactory.Label(fieldBackground.transform, "Name the dish", fontSize, TextAnchor.MiddleLeft,
                 FontStyle.Italic, UIFactory.MutedText);
             UIFactory.Stretch(placeholder.rectTransform).offsetMin = new Vector2(12f, 0f);
             field.textComponent = text;
@@ -151,7 +151,7 @@ namespace Cooking.Prototype
             field.onSubmit.AddListener(_ => save());
 
             button = UIFactory.Button(row, "Save dish", save, new Color(0.25f, 0.4f, 0.25f, 1f), fontSize - 2);
-            UIFactory.Size(button, fontSize * 2f + 4f, 0f, fontSize * 7f, 0f);
+            UIFactory.Size(button, fontSize * 2f + 4f, 0f, fontSize * 6.5f, 0f);
 
             group.gameObject.SetActive(false);
             return group.gameObject;

@@ -13,75 +13,75 @@ MonoBehaviour:
   m_Name: Woman - Musing - Familiar - O1
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: 0d6c24a2-0a46-4521-9357-e91e92d0e335
+  - guid: b7685ac8-b249-4a27-ab9a-94b1dd2123c3
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 4ff45eb0-2f38-4f17-9dfe-65c0a571b727
+  - guid: 15302017-c624-46a8-bbfa-a8ba1cfd643f
     kind: 0
     line:
       text: Look at all these cowards roaming the market.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: 0227cef9-41b5-4679-99b4-e30db229ada6
+  - guid: a491e76e-f7ab-4f7c-8a0d-d81b788b7445
     kind: 0
     line:
       text: The Flux comes knocking a few times and they all scramble to leave everything behind.
       delaySeconds: 2.6
     editorPosition: {x: 520, y: 0}
-  - guid: 13300897-e573-4ec3-9619-ab97e6193dee
+  - guid: 95a17bc9-b650-4812-b253-3e507bd1c687
     kind: 0
     line:
       text: Taking all their fancy beef with them, leaving only us real ones behind.
       delaySeconds: 4
     editorPosition: {x: 780, y: 0}
-  - guid: c12137ae-ea7c-4749-93b5-9481d3a87c36
+  - guid: ec434a05-2d8a-4cf5-8258-680ddc51858f
     kind: 0
     line:
       text: Pathetic...
       delaySeconds: 3.6
     editorPosition: {x: 1040, y: 0}
-  - guid: 6f21ee15-25f7-4758-9ac0-f3dcddac1c09
+  - guid: fc745658-f018-418a-9dbe-3319ecef50d8
     kind: 0
     line:
       text: For real, though. You can barely scrape together some beef these days.
       delaySeconds: 1.4
     editorPosition: {x: 1300, y: 0}
-  - guid: f23d8b34-ec90-491c-940b-d644f48be81f
+  - guid: 9557a201-052d-4d96-a683-190ebc7edd88
     kind: 0
     line:
       text: Not like I'd want to anyway...
       delaySeconds: 3.5
     editorPosition: {x: 1560, y: 0}
-  - guid: c9f1071d-26bc-459d-baa8-1213b226a654
+  - guid: 535dc108-21d9-4672-b943-13df33740827
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 1820, y: 0}
   edges:
-  - fromNodeGuid: 0d6c24a2-0a46-4521-9357-e91e92d0e335
+  - fromNodeGuid: b7685ac8-b249-4a27-ab9a-94b1dd2123c3
     fromOptionGuid: 
-    toNodeGuid: 4ff45eb0-2f38-4f17-9dfe-65c0a571b727
-  - fromNodeGuid: 4ff45eb0-2f38-4f17-9dfe-65c0a571b727
+    toNodeGuid: 15302017-c624-46a8-bbfa-a8ba1cfd643f
+  - fromNodeGuid: 15302017-c624-46a8-bbfa-a8ba1cfd643f
     fromOptionGuid: 
-    toNodeGuid: 0227cef9-41b5-4679-99b4-e30db229ada6
-  - fromNodeGuid: 0227cef9-41b5-4679-99b4-e30db229ada6
+    toNodeGuid: a491e76e-f7ab-4f7c-8a0d-d81b788b7445
+  - fromNodeGuid: a491e76e-f7ab-4f7c-8a0d-d81b788b7445
     fromOptionGuid: 
-    toNodeGuid: 13300897-e573-4ec3-9619-ab97e6193dee
-  - fromNodeGuid: 13300897-e573-4ec3-9619-ab97e6193dee
+    toNodeGuid: 95a17bc9-b650-4812-b253-3e507bd1c687
+  - fromNodeGuid: 95a17bc9-b650-4812-b253-3e507bd1c687
     fromOptionGuid: 
-    toNodeGuid: c12137ae-ea7c-4749-93b5-9481d3a87c36
-  - fromNodeGuid: c12137ae-ea7c-4749-93b5-9481d3a87c36
+    toNodeGuid: ec434a05-2d8a-4cf5-8258-680ddc51858f
+  - fromNodeGuid: ec434a05-2d8a-4cf5-8258-680ddc51858f
     fromOptionGuid: 
-    toNodeGuid: 6f21ee15-25f7-4758-9ac0-f3dcddac1c09
-  - fromNodeGuid: 6f21ee15-25f7-4758-9ac0-f3dcddac1c09
+    toNodeGuid: fc745658-f018-418a-9dbe-3319ecef50d8
+  - fromNodeGuid: fc745658-f018-418a-9dbe-3319ecef50d8
     fromOptionGuid: 
-    toNodeGuid: f23d8b34-ec90-491c-940b-d644f48be81f
-  - fromNodeGuid: f23d8b34-ec90-491c-940b-d644f48be81f
+    toNodeGuid: 9557a201-052d-4d96-a683-190ebc7edd88
+  - fromNodeGuid: 9557a201-052d-4d96-a683-190ebc7edd88
     fromOptionGuid: 
-    toNodeGuid: c9f1071d-26bc-459d-baa8-1213b226a654
+    toNodeGuid: 535dc108-21d9-4672-b943-13df33740827
   isOneShot: 0
   payload: 

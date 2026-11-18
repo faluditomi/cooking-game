@@ -13,30 +13,30 @@ MonoBehaviour:
   m_Name: Man - Hurry - Any - O1
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: 8d2d4198-b300-4c43-ba9d-edca8a00da9e
+  - guid: 3ebd44d0-0742-4e22-a243-17c43e216307
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 48581a25-a6ce-435a-ae91-e8e1ff257b84
+  - guid: e1e97228-c856-413f-9596-2abfe62fab90
     kind: 0
     line:
       text: I really need to get back.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: 0146c318-975c-4638-86db-50cfe0e51dd3
+  - guid: 51a61b84-74c8-4de1-b830-8f974098c5f9
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 520, y: 0}
   edges:
-  - fromNodeGuid: 8d2d4198-b300-4c43-ba9d-edca8a00da9e
+  - fromNodeGuid: 3ebd44d0-0742-4e22-a243-17c43e216307
     fromOptionGuid: 
-    toNodeGuid: 48581a25-a6ce-435a-ae91-e8e1ff257b84
-  - fromNodeGuid: 48581a25-a6ce-435a-ae91-e8e1ff257b84
+    toNodeGuid: e1e97228-c856-413f-9596-2abfe62fab90
+  - fromNodeGuid: e1e97228-c856-413f-9596-2abfe62fab90
     fromOptionGuid: 
-    toNodeGuid: 0146c318-975c-4638-86db-50cfe0e51dd3
+    toNodeGuid: 51a61b84-74c8-4de1-b830-8f974098c5f9
   isOneShot: 0
   payload: 

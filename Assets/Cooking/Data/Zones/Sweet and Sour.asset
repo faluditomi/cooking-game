@@ -18,18 +18,18 @@ MonoBehaviour:
   min:
     savoury: 0
     salty: 0
-    sweet: 2
+    sweet: 3
     bitter: 0
-    sour: 2
+    sour: 3
     pain: 0
     nutrition: 0
     texture: 0
   max:
-    savoury: 8
-    salty: 5
-    sweet: 7
-    bitter: 3
-    sour: 7
-    pain: 4
-    nutrition: 10
-    texture: 10
+    savoury: 5
+    salty: 3
+    sweet: 6
+    bitter: 2
+    sour: 6
+    pain: 2.5
+    nutrition: 6
+    texture: 6

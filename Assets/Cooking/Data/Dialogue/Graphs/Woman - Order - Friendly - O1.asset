@@ -13,39 +13,39 @@ MonoBehaviour:
   m_Name: Woman - Order - Friendly - O1
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: 6ca02cef-4cec-43df-8997-6670d9e4c7f2
+  - guid: 756c3ff0-72c7-4781-9437-de8e9fbd4258
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: d9a9f5e6-b2b2-4e9e-8acb-d313adb29d55
+  - guid: 242c0268-afa1-4b99-b693-0ee0391eda32
     kind: 0
     line:
       text: Hey Pot Boy.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: b7d8e15c-79fd-4e6a-bb0a-376f3d11ac6c
+  - guid: 1586c7bc-41fe-46ff-adce-13415cf42c01
     kind: 0
     line:
       text: Get me that [dream dish], will ya?
       delaySeconds: 1.4
     editorPosition: {x: 520, y: 0}
-  - guid: 599de76e-f511-44d3-894b-54fb903efde6
+  - guid: 5da9d5c6-fc26-4c90-9892-50cbb7e4a285
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 780, y: 0}
   edges:
-  - fromNodeGuid: 6ca02cef-4cec-43df-8997-6670d9e4c7f2
+  - fromNodeGuid: 756c3ff0-72c7-4781-9437-de8e9fbd4258
     fromOptionGuid: 
-    toNodeGuid: d9a9f5e6-b2b2-4e9e-8acb-d313adb29d55
-  - fromNodeGuid: d9a9f5e6-b2b2-4e9e-8acb-d313adb29d55
+    toNodeGuid: 242c0268-afa1-4b99-b693-0ee0391eda32
+  - fromNodeGuid: 242c0268-afa1-4b99-b693-0ee0391eda32
     fromOptionGuid: 
-    toNodeGuid: b7d8e15c-79fd-4e6a-bb0a-376f3d11ac6c
-  - fromNodeGuid: b7d8e15c-79fd-4e6a-bb0a-376f3d11ac6c
+    toNodeGuid: 1586c7bc-41fe-46ff-adce-13415cf42c01
+  - fromNodeGuid: 1586c7bc-41fe-46ff-adce-13415cf42c01
     fromOptionGuid: 
-    toNodeGuid: 599de76e-f511-44d3-894b-54fb903efde6
+    toNodeGuid: 5da9d5c6-fc26-4c90-9892-50cbb7e4a285
   isOneShot: 0
   payload: '[dream dish]'

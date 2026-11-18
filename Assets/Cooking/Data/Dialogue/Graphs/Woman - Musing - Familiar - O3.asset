@@ -13,39 +13,39 @@ MonoBehaviour:
   m_Name: Woman - Musing - Familiar - O3
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: aa158fd6-d75d-4dd0-986e-11cd44b2cef4
+  - guid: 3be46c59-ac0c-40e7-bebe-3dbf6492d5d9
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 8724c4e5-f0e4-49e4-ab87-6062bbae38a5
+  - guid: da6cd6fb-1961-4c80-9630-998f080b428a
     kind: 0
     line:
       text: You know, I've been meaning to tell you. Even the sour notes hit right in your cooking.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: f84c6708-4377-4c5a-b868-27dbf3a7e45f
+  - guid: 4894930e-1016-45c6-9369-b453331eb437
     kind: 0
     line:
       text: That's hard to do, Pot Boy. You should be proud.
       delaySeconds: 4.1
     editorPosition: {x: 520, y: 0}
-  - guid: e1e3f2ec-412d-431a-ab15-aabdc0e45e3b
+  - guid: a9310910-c529-47ee-a233-14f25a5d6098
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 780, y: 0}
   edges:
-  - fromNodeGuid: aa158fd6-d75d-4dd0-986e-11cd44b2cef4
+  - fromNodeGuid: 3be46c59-ac0c-40e7-bebe-3dbf6492d5d9
     fromOptionGuid: 
-    toNodeGuid: 8724c4e5-f0e4-49e4-ab87-6062bbae38a5
-  - fromNodeGuid: 8724c4e5-f0e4-49e4-ab87-6062bbae38a5
+    toNodeGuid: da6cd6fb-1961-4c80-9630-998f080b428a
+  - fromNodeGuid: da6cd6fb-1961-4c80-9630-998f080b428a
     fromOptionGuid: 
-    toNodeGuid: f84c6708-4377-4c5a-b868-27dbf3a7e45f
-  - fromNodeGuid: f84c6708-4377-4c5a-b868-27dbf3a7e45f
+    toNodeGuid: 4894930e-1016-45c6-9369-b453331eb437
+  - fromNodeGuid: 4894930e-1016-45c6-9369-b453331eb437
     fromOptionGuid: 
-    toNodeGuid: e1e3f2ec-412d-431a-ab15-aabdc0e45e3b
+    toNodeGuid: a9310910-c529-47ee-a233-14f25a5d6098
   isOneShot: 0
   payload: 

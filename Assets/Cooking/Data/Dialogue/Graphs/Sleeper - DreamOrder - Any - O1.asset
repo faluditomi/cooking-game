@@ -13,48 +13,48 @@ MonoBehaviour:
   m_Name: Sleeper - DreamOrder - Any - O1
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: eb105629-7ba0-4968-ad25-58071e9a7c6b
+  - guid: c977743f-229e-4781-b7a2-9a1d7ddbae00
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 8a59be66-0f2f-4ec6-b430-737eb457d6b8
+  - guid: 0aaddaf6-3e30-4cb6-9635-b3a50dfedcfd
     kind: 0
     line:
       text: That burn...
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: c94d70b8-190a-417c-af37-eb4017324d90
+  - guid: 3fb9ef2b-8728-4443-af62-823d6a4ad17d
     kind: 0
     line:
       text: I remember a kitchen. Someone's hands.
       delaySeconds: 1.4
     editorPosition: {x: 520, y: 0}
-  - guid: 84aac9e5-e59b-4027-a8f6-972c80fdac59
+  - guid: cd42c4f5-4539-40d7-9c60-c5433575068d
     kind: 0
     line:
       text: I have to go. I know where she is.
       delaySeconds: 2.4
     editorPosition: {x: 780, y: 0}
-  - guid: fe400ae5-5896-4246-982e-3dbac6fb3f2d
+  - guid: 7be4e81b-b2b8-4cfe-b427-3d6db3feed54
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 1040, y: 0}
   edges:
-  - fromNodeGuid: eb105629-7ba0-4968-ad25-58071e9a7c6b
+  - fromNodeGuid: c977743f-229e-4781-b7a2-9a1d7ddbae00
     fromOptionGuid: 
-    toNodeGuid: 8a59be66-0f2f-4ec6-b430-737eb457d6b8
-  - fromNodeGuid: 8a59be66-0f2f-4ec6-b430-737eb457d6b8
+    toNodeGuid: 0aaddaf6-3e30-4cb6-9635-b3a50dfedcfd
+  - fromNodeGuid: 0aaddaf6-3e30-4cb6-9635-b3a50dfedcfd
     fromOptionGuid: 
-    toNodeGuid: c94d70b8-190a-417c-af37-eb4017324d90
-  - fromNodeGuid: c94d70b8-190a-417c-af37-eb4017324d90
+    toNodeGuid: 3fb9ef2b-8728-4443-af62-823d6a4ad17d
+  - fromNodeGuid: 3fb9ef2b-8728-4443-af62-823d6a4ad17d
     fromOptionGuid: 
-    toNodeGuid: 84aac9e5-e59b-4027-a8f6-972c80fdac59
-  - fromNodeGuid: 84aac9e5-e59b-4027-a8f6-972c80fdac59
+    toNodeGuid: cd42c4f5-4539-40d7-9c60-c5433575068d
+  - fromNodeGuid: cd42c4f5-4539-40d7-9c60-c5433575068d
     fromOptionGuid: 
-    toNodeGuid: fe400ae5-5896-4246-982e-3dbac6fb3f2d
+    toNodeGuid: 7be4e81b-b2b8-4cfe-b427-3d6db3feed54
   isOneShot: 1
   payload: 

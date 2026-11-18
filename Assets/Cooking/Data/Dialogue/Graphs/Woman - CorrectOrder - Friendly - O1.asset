@@ -13,39 +13,39 @@ MonoBehaviour:
   m_Name: Woman - CorrectOrder - Friendly - O1
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: 0721c6c5-2baa-4ff9-bdec-16653af015f6
+  - guid: ce001fab-ec72-42e4-83cf-0058628bb0f1
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 130d864b-b0bc-4823-ba3e-f78ef101b7e2
+  - guid: 44547289-e790-4727-940b-67047142a939
     kind: 0
     line:
       text: Ohh yeah, That's the stuff.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: b1ff5957-f0d1-4731-ac97-5f772f1e2668
+  - guid: 84f27e49-6933-4b9f-8273-7db2c49cb6de
     kind: 0
     line:
       text: Have a good one Pot Boy, I'll see you 'round.
       delaySeconds: 2
     editorPosition: {x: 520, y: 0}
-  - guid: cb0206c9-7b2c-404e-b3b8-a6bb7c6560e4
+  - guid: d1f9f12f-6fbc-4c43-bea0-97d5e1d0f702
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 780, y: 0}
   edges:
-  - fromNodeGuid: 0721c6c5-2baa-4ff9-bdec-16653af015f6
+  - fromNodeGuid: ce001fab-ec72-42e4-83cf-0058628bb0f1
     fromOptionGuid: 
-    toNodeGuid: 130d864b-b0bc-4823-ba3e-f78ef101b7e2
-  - fromNodeGuid: 130d864b-b0bc-4823-ba3e-f78ef101b7e2
+    toNodeGuid: 44547289-e790-4727-940b-67047142a939
+  - fromNodeGuid: 44547289-e790-4727-940b-67047142a939
     fromOptionGuid: 
-    toNodeGuid: b1ff5957-f0d1-4731-ac97-5f772f1e2668
-  - fromNodeGuid: b1ff5957-f0d1-4731-ac97-5f772f1e2668
+    toNodeGuid: 84f27e49-6933-4b9f-8273-7db2c49cb6de
+  - fromNodeGuid: 84f27e49-6933-4b9f-8273-7db2c49cb6de
     fromOptionGuid: 
-    toNodeGuid: cb0206c9-7b2c-404e-b3b8-a6bb7c6560e4
+    toNodeGuid: d1f9f12f-6fbc-4c43-bea0-97d5e1d0f702
   isOneShot: 0
   payload: 
