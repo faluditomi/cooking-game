@@ -583,17 +583,8 @@ namespace Cooking.Prototype
                 return;
             }
 
-            // Over the pantry: everything goes back on its piles, and the pot or pan is empty again.
-            if(Over(pantryRect, screen) && !view.Station.IsEmpty)
-            {
-                foreach(IngredientPortion portion in view.Station.Empty())
-                {
-                    if(portion.IsRaw) inventory.Add(portion.ingredient, portion.prep, portion.quantity);
-                }
-
-                LogCooking(view.Station.Name, "Emptied it back into the pantry.");
-                view.Cost = 0f;
-            }
+            // Anywhere else (the pantry included) it just goes back on its stove, still cooking:
+            // nothing in it is lost by letting go in the wrong place.
         }
 
         /// <summary>Everything in <paramref name="from"/>, cooked as it is now, into <paramref name="to"/>.</summary>

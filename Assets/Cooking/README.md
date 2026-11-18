@@ -76,7 +76,10 @@ customer/judging system, not here.
 All values are **placeholders** tuned so the Notion recipes behave sensibly:
 
 Zones are shapes on the radar, and a dish is judged by where its **dot** lands (see "Dishes as
-dots" below). The four tasty zones are fitted around the menu, one dish family each:
+dots" below). The first four tasty zones are fitted around the menu, one dish family each; six more
+fill the gaps in the chart, placed where random proper dishes (3 to 5 pantry ingredients, boiled or
+fried) were landing outside every zone, so more of what the player invents can be tasty. With all
+ten, about 5 in 6 such dishes land in a zone (half did with four), and almost none in two:
 
 | Zone | Where on the chart | Menu dishes in it |
 |---|---|---|
@@ -84,6 +87,12 @@ dots" below). The four tasty zones are fitted around the menu, one dish family e
 | Hearty Broth | inner band on the same side | Mushroom soup, Synthetic soup |
 | Fire Bowl | towards pain | Hellspawn fried rice |
 | Briny Broth | towards salty | Soup on the rock |
+| Filling Stew | between Fire Bowl and the soups, close in | (boiled, filling dishes: mushroom, rice, chicken) |
+| Crispy Fry | outside Greasy Comfort | (heavy fried dishes: beef, tofu, potatoes) |
+| Umami Bomb | the far savoury edge | (MSG2-heavy dishes) |
+| Sweet Tooth | towards sweet | (sweet, a little salty) |
+| Bitter Greens | towards bitter | (pak choi and friends) |
+| Tangy Kick | between sour and pain | (sour with a bite) |
 
 A raw potato or a lone MSG2 cube lands in none of them; each regular's dream dish lands in their
 own favourite (Hera's in the middle, Petor's near Hearty Broth, the Sleeper's inside Fire Bowl).
@@ -210,8 +219,8 @@ units per prep state ("3× Onion raw", "2× Onion peeled, sliced").
      a time; with one, it's a soup and takes anything.
    - Holding a station **takes it off the heat**: its cycle pauses and its bar goes with it. Drop it
      on a plate to dish up, on the other station to pour it in (rice has to be **boiled before it's
-     fried**: boil it, then pour the pot into the pan), or on the pantry to put the raw contents
-     back. Anywhere else puts it back on its stove.
+     fried**: boil it, then pour the pot into the pan). Anywhere else, the pantry included, puts it
+     back on its stove with nothing lost.
    - **Seasoning**: drop salt, pepper, sugar, MSG2, citric acid or chilli
      (`IngredientDefinition.isSeasoning`) on a plate with a cooked dish. Nothing else goes on raw.
      Chilli and MSG2 give their full taste grated, half unprepped (`fullFlavourPrep`). For a
@@ -265,7 +274,8 @@ units per prep state ("3× Onion raw", "2× Onion peeled, sliced").
   you cook. It shows the order (a grey dot) and the tasty zone it belongs to (blue) as the target,
   and the dish as it builds up (an orange dot): the plate you're working on plus the pot and pan,
   as they'll taste once cooked (burnt once they're in the red). Holding an ingredient over the pot,
-  the pan or a plate shows a dashed ring: where the dot would move if you dropped it.
+  the pan or a plate shows a dashed ring: where the dot would move if you dropped it. The radar is clear
+  whenever nobody is waiting on an order: after the dish is served and at the end of the day.
 - **Prepped ingredients look prepped** (`PrepSprites`): made from the ingredient's own picture the
   first time it's needed. Peeled is paler, sliced is three outlined slices with pale cut faces,
   grated is a heap of shreds; peeled and sliced (or grated) combine. Used in the pantry, on the
