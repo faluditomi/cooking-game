@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Sleeper - Hurry - Friendly - O2
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: fc217d4b-fbda-41a2-9c14-8f29aacb1527
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: 2721dca8-4977-4ada-aca3-38e0f992e841
+    kind: 0
+    line:
+      text: You know, I've watched you make many dishes by now.
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: 7e3ec1f9-e545-4ea4-91b2-42a129178dac
+    kind: 0
+    line:
+      text: Let me know if you need some advice.
+      delaySeconds: 2.8
+    editorPosition: {x: 520, y: 0}
+  - guid: a1255d11-f2d9-4f7c-b1ea-b91ff140b2a5
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 780, y: 0}
+  edges:
+  - fromNodeGuid: fc217d4b-fbda-41a2-9c14-8f29aacb1527
+    fromOptionGuid: 
+    toNodeGuid: 2721dca8-4977-4ada-aca3-38e0f992e841
+  - fromNodeGuid: 2721dca8-4977-4ada-aca3-38e0f992e841
+    fromOptionGuid: 
+    toNodeGuid: 7e3ec1f9-e545-4ea4-91b2-42a129178dac
+  - fromNodeGuid: 7e3ec1f9-e545-4ea4-91b2-42a129178dac
+    fromOptionGuid: 
+    toNodeGuid: a1255d11-f2d9-4f7c-b1ea-b91ff140b2a5
+  isOneShot: 0
+  payload: 

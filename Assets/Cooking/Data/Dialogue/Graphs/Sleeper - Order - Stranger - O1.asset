@@ -13,57 +13,57 @@ MonoBehaviour:
   m_Name: Sleeper - Order - Stranger - O1
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: f52a7be6-7a17-486a-bbbc-bb25fb5dbd89
+  - guid: ffcdd332-0883-49ea-a32b-babf8af06b09
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 5c6cd27e-d9fb-4663-a4d8-9b60c56798bc
+  - guid: 7c8f9c4f-c384-4651-8599-4a002ac7fafa
     kind: 0
     line:
       text: Umm... Hi.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: 08e8d2e3-f08b-427d-a124-65ed5c8f97a2
+  - guid: c219ed96-c1f7-4d02-8008-27815ad9cbc0
     kind: 0
     line:
       text: Is this where people pay for their sustenance?
       delaySeconds: 1.4
     editorPosition: {x: 520, y: 0}
-  - guid: 2523cfa5-c285-4363-9007-e48efafdccc8
+  - guid: 6a982cfe-2c7b-4ddf-8ffc-d2c68cf668f0
     kind: 0
     line:
       text: I'd like a uuh...
       delaySeconds: 2.6
     editorPosition: {x: 780, y: 0}
-  - guid: c78ffae7-0960-4503-ac9f-d6fcce553c48
+  - guid: fdd27036-e93f-480c-93dc-f4a0135311bf
     kind: 0
     line:
       text: Potato.
       delaySeconds: 1.6
     editorPosition: {x: 1040, y: 0}
-  - guid: 3192a764-09a1-486a-9465-f91ed3e32dbd
+  - guid: 76cbe905-63a3-4c1a-8c33-87e781a54836
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 1300, y: 0}
   edges:
-  - fromNodeGuid: f52a7be6-7a17-486a-bbbc-bb25fb5dbd89
+  - fromNodeGuid: ffcdd332-0883-49ea-a32b-babf8af06b09
     fromOptionGuid: 
-    toNodeGuid: 5c6cd27e-d9fb-4663-a4d8-9b60c56798bc
-  - fromNodeGuid: 5c6cd27e-d9fb-4663-a4d8-9b60c56798bc
+    toNodeGuid: 7c8f9c4f-c384-4651-8599-4a002ac7fafa
+  - fromNodeGuid: 7c8f9c4f-c384-4651-8599-4a002ac7fafa
     fromOptionGuid: 
-    toNodeGuid: 08e8d2e3-f08b-427d-a124-65ed5c8f97a2
-  - fromNodeGuid: 08e8d2e3-f08b-427d-a124-65ed5c8f97a2
+    toNodeGuid: c219ed96-c1f7-4d02-8008-27815ad9cbc0
+  - fromNodeGuid: c219ed96-c1f7-4d02-8008-27815ad9cbc0
     fromOptionGuid: 
-    toNodeGuid: 2523cfa5-c285-4363-9007-e48efafdccc8
-  - fromNodeGuid: 2523cfa5-c285-4363-9007-e48efafdccc8
+    toNodeGuid: 6a982cfe-2c7b-4ddf-8ffc-d2c68cf668f0
+  - fromNodeGuid: 6a982cfe-2c7b-4ddf-8ffc-d2c68cf668f0
     fromOptionGuid: 
-    toNodeGuid: c78ffae7-0960-4503-ac9f-d6fcce553c48
-  - fromNodeGuid: c78ffae7-0960-4503-ac9f-d6fcce553c48
+    toNodeGuid: fdd27036-e93f-480c-93dc-f4a0135311bf
+  - fromNodeGuid: fdd27036-e93f-480c-93dc-f4a0135311bf
     fromOptionGuid: 
-    toNodeGuid: 3192a764-09a1-486a-9465-f91ed3e32dbd
+    toNodeGuid: 76cbe905-63a3-4c1a-8c33-87e781a54836
   isOneShot: 1
   payload: Potato

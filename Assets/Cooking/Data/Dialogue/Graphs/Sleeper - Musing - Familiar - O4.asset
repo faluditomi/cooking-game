@@ -13,66 +13,66 @@ MonoBehaviour:
   m_Name: Sleeper - Musing - Familiar - O4
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: bee05784-7e9a-4080-8a6c-ee34b9eb2672
+  - guid: 45fbe245-5c8f-42a8-9edf-2d70d6e4c2c6
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 9253e52e-317c-4116-82d2-4ca929606bd5
+  - guid: 0d81b48e-78bb-4c39-891a-54f77ac63386
     kind: 0
     line:
       text: Get this, I walked past the seaweed noodle forge the other day. Seaweed noodle sweatshop, more like.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: ab7b51cc-be17-45db-b14e-9e5839ff5268
+  - guid: 676d0547-699d-4429-8acc-b755ceaedde4
     kind: 0
     line:
       text: Anyhow, I was walking, lost in thought, and when I got to the entrance, I instinctively turned in.
       delaySeconds: 4.6
     editorPosition: {x: 520, y: 0}
-  - guid: 98fef47f-7f71-43cc-a9b6-6776655b276b
+  - guid: b5a31b25-aac3-449a-bd47-d3e9ca72ed33
     kind: 0
     line:
       text: Reached for the door terminal and everything.
       delaySeconds: 4.5
     editorPosition: {x: 780, y: 0}
-  - guid: 54a4049f-6fd4-4581-bf98-b84406b19a58
+  - guid: 34dfdbf7-7b05-4f62-9f14-81d01d81addd
     kind: 0
     line:
       text: I was dumbfounded in front of that door. It was the strangest feeling.
       delaySeconds: 2.6
     editorPosition: {x: 1040, y: 0}
-  - guid: 5abcafc5-c735-4958-9fbe-1b1788208dbc
+  - guid: 0c074c6e-c47a-416e-8522-815e77dba89e
     kind: 0
     line:
       text: The smell of seaweed... It was familiar. Like it was always there, enveloping me.
       delaySeconds: 3.5
     editorPosition: {x: 1300, y: 0}
-  - guid: 844f65b7-8418-4289-bcf8-28f5a302711d
+  - guid: 33afc162-c967-45ba-b8b1-8d96a8e73089
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 1560, y: 0}
   edges:
-  - fromNodeGuid: bee05784-7e9a-4080-8a6c-ee34b9eb2672
+  - fromNodeGuid: 45fbe245-5c8f-42a8-9edf-2d70d6e4c2c6
     fromOptionGuid: 
-    toNodeGuid: 9253e52e-317c-4116-82d2-4ca929606bd5
-  - fromNodeGuid: 9253e52e-317c-4116-82d2-4ca929606bd5
+    toNodeGuid: 0d81b48e-78bb-4c39-891a-54f77ac63386
+  - fromNodeGuid: 0d81b48e-78bb-4c39-891a-54f77ac63386
     fromOptionGuid: 
-    toNodeGuid: ab7b51cc-be17-45db-b14e-9e5839ff5268
-  - fromNodeGuid: ab7b51cc-be17-45db-b14e-9e5839ff5268
+    toNodeGuid: 676d0547-699d-4429-8acc-b755ceaedde4
+  - fromNodeGuid: 676d0547-699d-4429-8acc-b755ceaedde4
     fromOptionGuid: 
-    toNodeGuid: 98fef47f-7f71-43cc-a9b6-6776655b276b
-  - fromNodeGuid: 98fef47f-7f71-43cc-a9b6-6776655b276b
+    toNodeGuid: b5a31b25-aac3-449a-bd47-d3e9ca72ed33
+  - fromNodeGuid: b5a31b25-aac3-449a-bd47-d3e9ca72ed33
     fromOptionGuid: 
-    toNodeGuid: 54a4049f-6fd4-4581-bf98-b84406b19a58
-  - fromNodeGuid: 54a4049f-6fd4-4581-bf98-b84406b19a58
+    toNodeGuid: 34dfdbf7-7b05-4f62-9f14-81d01d81addd
+  - fromNodeGuid: 34dfdbf7-7b05-4f62-9f14-81d01d81addd
     fromOptionGuid: 
-    toNodeGuid: 5abcafc5-c735-4958-9fbe-1b1788208dbc
-  - fromNodeGuid: 5abcafc5-c735-4958-9fbe-1b1788208dbc
+    toNodeGuid: 0c074c6e-c47a-416e-8522-815e77dba89e
+  - fromNodeGuid: 0c074c6e-c47a-416e-8522-815e77dba89e
     fromOptionGuid: 
-    toNodeGuid: 844f65b7-8418-4289-bcf8-28f5a302711d
+    toNodeGuid: 33afc162-c967-45ba-b8b1-8d96a8e73089
   isOneShot: 0
   payload: 

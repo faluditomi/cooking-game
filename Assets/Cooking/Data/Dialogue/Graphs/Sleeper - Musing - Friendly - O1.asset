@@ -13,84 +13,111 @@ MonoBehaviour:
   m_Name: Sleeper - Musing - Friendly - O1
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: 981ed7f6-4a72-4927-9f2a-050c03f69d02
+  - guid: 2fd8c34b-7fea-4105-b5f1-fe5f4c409c53
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: fa1f34eb-c334-4be1-bf65-f52ddb8cf8d2
+  - guid: e80c850a-ccaa-4a35-9070-1b334d4041a8
     kind: 0
     line:
-      text: Don't think I ever told you the reason I came to your stall the day I got here.
+      text: Sorry for running away on you yesterday.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: 3b1b1829-b917-4491-9be9-96ba875b8e1c
+  - guid: 0227076a-85ba-44bb-91c7-2859f8a3b15a
     kind: 0
     line:
-      text: You were basically my first stop, and only because I saw someone walking away from here with a weird, steaming plate of stuff -- and a big smile.
-      delaySeconds: 3.8
+      text: All the sudden, the memories, the dreams I've been having... They all fell into place.
+      delaySeconds: 2.4
     editorPosition: {x: 520, y: 0}
-  - guid: 78cda8f7-dc55-402d-8d9d-35d625b1b983
+  - guid: 66a3a670-ead8-4a0e-8b7c-eecc93882cae
     kind: 0
     line:
-      text: I knew what it was, the smile, that is. Yet, it felt alien.
-      delaySeconds: 6.2
+      text: I remembered what drew me here.
+      delaySeconds: 4.1
     editorPosition: {x: 780, y: 0}
-  - guid: 5fed4a62-7c78-4ad4-a097-62d832900f42
+  - guid: de24bcf6-a488-485e-b56a-c804f03d5e47
     kind: 0
     line:
-      text: Like something you read about, but never see in real life. You know, like books.
-      delaySeconds: 3.1
+      text: Your cooking did that!
+      delaySeconds: 2.1
     editorPosition: {x: 1040, y: 0}
-  - guid: 7f073b95-53d0-45c5-a2f3-99569cc33067
+  - guid: a1ad01c0-9d0a-4b2b-b938-7029a69a9c6d
     kind: 0
     line:
-      text: And sometimes I think about what would have happened if I don't find your stall that day...
-      delaySeconds: 3.9
+      text: I'm sure everyone who signs their self away to a corporation has a reason to do so. I'm sure my previous self had one too, I don't quite know.
+      delaySeconds: 1.8
     editorPosition: {x: 1300, y: 0}
-  - guid: 2403794e-5ad0-4bc2-a072-7e0356ebeb70
+  - guid: 0ed9bfb6-17ce-40e9-99e3-c98b7738fdaa
     kind: 0
     line:
-      text: Anyways, I did, and I got my fair share of smiles too.
-      delaySeconds: 4.2
+      text: What I do know is that in doing so, my previous self left their mom behind.
+      delaySeconds: 6.1
     editorPosition: {x: 1560, y: 0}
-  - guid: 99a60b06-0e00-4263-abd3-8bac5d4bc147
+  - guid: 01e0a90a-898d-4a2e-8316-40b22a816405
     kind: 0
     line:
-      text: Your stall has a charm, like no other.
-      delaySeconds: 2.9
+      text: Left my mom behind. And that's been gnawing at me ever since I opened these synthetic eyes. I just never managed to match the memory to the feeling.
+      delaySeconds: 3.7
     editorPosition: {x: 1820, y: 0}
-  - guid: 594420f0-1f23-4d8a-9374-04b2d1cefe00
+  - guid: d651a9ea-f887-4624-9a38-973026132a9b
+    kind: 0
+    line:
+      text: I wonder what that person I was is feeling right now. Wonder where they are.
+      delaySeconds: 6.3
+    editorPosition: {x: 2080, y: 0}
+  - guid: 4bec3965-65ac-4d09-91c2-3b1908d03d2d
+    kind: 0
+    line:
+      text: Regardless... Thanks to you I was able to reunite with my mother. Start to try and right wrongs I feel like I'd never do.
+      delaySeconds: 3.7
+    editorPosition: {x: 2340, y: 0}
+  - guid: ec421e36-d723-43bf-9d98-bf1a45a3d0cc
+    kind: 0
+    line:
+      text: And I owe you for that opportunity, friend.
+      delaySeconds: 5.3
+    editorPosition: {x: 2600, y: 0}
+  - guid: 34c1905d-dcfe-445c-996e-1844fba84ce6
     kind: 4
     line:
       text: 
       delaySeconds: 1
-    editorPosition: {x: 2080, y: 0}
+    editorPosition: {x: 2860, y: 0}
   edges:
-  - fromNodeGuid: 981ed7f6-4a72-4927-9f2a-050c03f69d02
+  - fromNodeGuid: 2fd8c34b-7fea-4105-b5f1-fe5f4c409c53
     fromOptionGuid: 
-    toNodeGuid: fa1f34eb-c334-4be1-bf65-f52ddb8cf8d2
-  - fromNodeGuid: fa1f34eb-c334-4be1-bf65-f52ddb8cf8d2
+    toNodeGuid: e80c850a-ccaa-4a35-9070-1b334d4041a8
+  - fromNodeGuid: e80c850a-ccaa-4a35-9070-1b334d4041a8
     fromOptionGuid: 
-    toNodeGuid: 3b1b1829-b917-4491-9be9-96ba875b8e1c
-  - fromNodeGuid: 3b1b1829-b917-4491-9be9-96ba875b8e1c
+    toNodeGuid: 0227076a-85ba-44bb-91c7-2859f8a3b15a
+  - fromNodeGuid: 0227076a-85ba-44bb-91c7-2859f8a3b15a
     fromOptionGuid: 
-    toNodeGuid: 78cda8f7-dc55-402d-8d9d-35d625b1b983
-  - fromNodeGuid: 78cda8f7-dc55-402d-8d9d-35d625b1b983
+    toNodeGuid: 66a3a670-ead8-4a0e-8b7c-eecc93882cae
+  - fromNodeGuid: 66a3a670-ead8-4a0e-8b7c-eecc93882cae
     fromOptionGuid: 
-    toNodeGuid: 5fed4a62-7c78-4ad4-a097-62d832900f42
-  - fromNodeGuid: 5fed4a62-7c78-4ad4-a097-62d832900f42
+    toNodeGuid: de24bcf6-a488-485e-b56a-c804f03d5e47
+  - fromNodeGuid: de24bcf6-a488-485e-b56a-c804f03d5e47
     fromOptionGuid: 
-    toNodeGuid: 7f073b95-53d0-45c5-a2f3-99569cc33067
-  - fromNodeGuid: 7f073b95-53d0-45c5-a2f3-99569cc33067
+    toNodeGuid: a1ad01c0-9d0a-4b2b-b938-7029a69a9c6d
+  - fromNodeGuid: a1ad01c0-9d0a-4b2b-b938-7029a69a9c6d
     fromOptionGuid: 
-    toNodeGuid: 2403794e-5ad0-4bc2-a072-7e0356ebeb70
-  - fromNodeGuid: 2403794e-5ad0-4bc2-a072-7e0356ebeb70
+    toNodeGuid: 0ed9bfb6-17ce-40e9-99e3-c98b7738fdaa
+  - fromNodeGuid: 0ed9bfb6-17ce-40e9-99e3-c98b7738fdaa
     fromOptionGuid: 
-    toNodeGuid: 99a60b06-0e00-4263-abd3-8bac5d4bc147
-  - fromNodeGuid: 99a60b06-0e00-4263-abd3-8bac5d4bc147
+    toNodeGuid: 01e0a90a-898d-4a2e-8316-40b22a816405
+  - fromNodeGuid: 01e0a90a-898d-4a2e-8316-40b22a816405
     fromOptionGuid: 
-    toNodeGuid: 594420f0-1f23-4d8a-9374-04b2d1cefe00
+    toNodeGuid: d651a9ea-f887-4624-9a38-973026132a9b
+  - fromNodeGuid: d651a9ea-f887-4624-9a38-973026132a9b
+    fromOptionGuid: 
+    toNodeGuid: 4bec3965-65ac-4d09-91c2-3b1908d03d2d
+  - fromNodeGuid: 4bec3965-65ac-4d09-91c2-3b1908d03d2d
+    fromOptionGuid: 
+    toNodeGuid: ec421e36-d723-43bf-9d98-bf1a45a3d0cc
+  - fromNodeGuid: ec421e36-d723-43bf-9d98-bf1a45a3d0cc
+    fromOptionGuid: 
+    toNodeGuid: 34c1905d-dcfe-445c-996e-1844fba84ce6
   isOneShot: 1
   payload: 

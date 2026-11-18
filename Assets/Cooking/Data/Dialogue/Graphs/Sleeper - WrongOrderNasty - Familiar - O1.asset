@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Sleeper - WrongOrderNasty - Familiar - O1
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: 4d9bdb8b-8b65-444f-91d1-08d7625ed7d4
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: 033583f5-4ad7-4032-8d6a-b86b0ff99faf
+    kind: 0
+    line:
+      text: Something is off today, but I can't tell what.
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: 3e924dfe-f89a-4f9f-8b87-bbd15e4940dc
+    kind: 0
+    line:
+      text: Don't worry, I'm sure it's just my taste receptors.
+      delaySeconds: 2.6
+    editorPosition: {x: 520, y: 0}
+  - guid: 0a216752-d648-4596-9927-99b49b157219
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 780, y: 0}
+  edges:
+  - fromNodeGuid: 4d9bdb8b-8b65-444f-91d1-08d7625ed7d4
+    fromOptionGuid: 
+    toNodeGuid: 033583f5-4ad7-4032-8d6a-b86b0ff99faf
+  - fromNodeGuid: 033583f5-4ad7-4032-8d6a-b86b0ff99faf
+    fromOptionGuid: 
+    toNodeGuid: 3e924dfe-f89a-4f9f-8b87-bbd15e4940dc
+  - fromNodeGuid: 3e924dfe-f89a-4f9f-8b87-bbd15e4940dc
+    fromOptionGuid: 
+    toNodeGuid: 0a216752-d648-4596-9927-99b49b157219
+  isOneShot: 0
+  payload: 

@@ -457,8 +457,9 @@ the session:
   the open prototype scene (catalog, each regular's `dialogueId`, a `DialogueDirector`). Hera's
   and the Sleeper's lines are the board's, as written (Hera's Stranger "correct order" O1 is
   "[Nothing]" on the board, so that graph has no lines; her MSBeef orders name the MSBeef noodles
-  from the Notion menu). Petor has the board's MSG line and otherwise placeholders, as does the
-  Sleeper where the board is still empty (dream, and reactions once familiar). Hera, Petor and the
+  from the Notion menu). The Sleeper's are complete for every stage, including the dream (his
+  mother's noodles) and the Friendly musings after it. Petor has the board's MSG line and
+  otherwise placeholders. Hera, Petor and the
   Sleeper use the DialogueSystem ids Woman, Man and Sleeper.
 - The cycle summary lists who became familiar or had their dream meal; the morning ticket shows
   each regular's stage and what they order now.

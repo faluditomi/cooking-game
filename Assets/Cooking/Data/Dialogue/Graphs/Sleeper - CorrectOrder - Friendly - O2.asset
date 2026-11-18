@@ -10,42 +10,42 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
-  m_Name: Sleeper - CorrectOrder - Any - O1
+  m_Name: Sleeper - CorrectOrder - Friendly - O2
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: 90104e39-17c6-4b47-86fa-fe63cde5d0b8
+  - guid: a1e84a54-c67b-4b93-b9ab-13cee0b6e25f
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 075aecad-42c7-4864-aa54-47e85e2b4ea5
+  - guid: 79c3afd0-79a3-4f1d-99f8-53548d4de66a
     kind: 0
     line:
-      text: Wow! That kinda tastes.
+      text: Wouldn't want to start my cycle any other way.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: f1425011-9d18-4aea-bc37-3118e92c3365
+  - guid: 8ff6b897-5a28-48e4-bc51-1606893084d1
     kind: 0
     line:
-      text: So that's why people stuff their face?
-      delaySeconds: 1.8
+      text: Thank you, friend.
+      delaySeconds: 2.6
     editorPosition: {x: 520, y: 0}
-  - guid: affc0227-d9bc-436b-83dd-97224cc91f60
+  - guid: 3fd2d30a-22e9-4185-b9c7-9ad7eb793adf
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 780, y: 0}
   edges:
-  - fromNodeGuid: 90104e39-17c6-4b47-86fa-fe63cde5d0b8
+  - fromNodeGuid: a1e84a54-c67b-4b93-b9ab-13cee0b6e25f
     fromOptionGuid: 
-    toNodeGuid: 075aecad-42c7-4864-aa54-47e85e2b4ea5
-  - fromNodeGuid: 075aecad-42c7-4864-aa54-47e85e2b4ea5
+    toNodeGuid: 79c3afd0-79a3-4f1d-99f8-53548d4de66a
+  - fromNodeGuid: 79c3afd0-79a3-4f1d-99f8-53548d4de66a
     fromOptionGuid: 
-    toNodeGuid: f1425011-9d18-4aea-bc37-3118e92c3365
-  - fromNodeGuid: f1425011-9d18-4aea-bc37-3118e92c3365
+    toNodeGuid: 8ff6b897-5a28-48e4-bc51-1606893084d1
+  - fromNodeGuid: 8ff6b897-5a28-48e4-bc51-1606893084d1
     fromOptionGuid: 
-    toNodeGuid: affc0227-d9bc-436b-83dd-97224cc91f60
+    toNodeGuid: 3fd2d30a-22e9-4185-b9c7-9ad7eb793adf
   isOneShot: 0
   payload: 

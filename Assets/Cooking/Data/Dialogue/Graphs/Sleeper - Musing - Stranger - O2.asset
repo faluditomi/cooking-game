@@ -13,39 +13,39 @@ MonoBehaviour:
   m_Name: Sleeper - Musing - Stranger - O2
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: c4e2f9b8-e82f-4098-a5a7-362c22d15d92
+  - guid: f16886ce-d1dc-4000-94fc-2f14c3cb97dd
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: e45de8d1-471c-4534-8909-5157bd6e50fd
+  - guid: 6fe6916b-d3b8-4da8-b737-61be315506af
     kind: 0
     line:
       text: Still not selling Stabilizer, I assume?
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: 1a037738-ead0-44a5-bef8-2637d715e361
+  - guid: e13cb2f7-78c9-4226-a550-6722bde44479
     kind: 0
     line:
       text: Yeah...
       delaySeconds: 2.4
     editorPosition: {x: 520, y: 0}
-  - guid: b84a9d59-d0f7-4a3c-b901-6397ae1a1773
+  - guid: 6acc7b5d-f2fe-4322-931e-4ba26821380a
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 780, y: 0}
   edges:
-  - fromNodeGuid: c4e2f9b8-e82f-4098-a5a7-362c22d15d92
+  - fromNodeGuid: f16886ce-d1dc-4000-94fc-2f14c3cb97dd
     fromOptionGuid: 
-    toNodeGuid: e45de8d1-471c-4534-8909-5157bd6e50fd
-  - fromNodeGuid: e45de8d1-471c-4534-8909-5157bd6e50fd
+    toNodeGuid: 6fe6916b-d3b8-4da8-b737-61be315506af
+  - fromNodeGuid: 6fe6916b-d3b8-4da8-b737-61be315506af
     fromOptionGuid: 
-    toNodeGuid: 1a037738-ead0-44a5-bef8-2637d715e361
-  - fromNodeGuid: 1a037738-ead0-44a5-bef8-2637d715e361
+    toNodeGuid: e13cb2f7-78c9-4226-a550-6722bde44479
+  - fromNodeGuid: e13cb2f7-78c9-4226-a550-6722bde44479
     fromOptionGuid: 
-    toNodeGuid: b84a9d59-d0f7-4a3c-b901-6397ae1a1773
+    toNodeGuid: 6acc7b5d-f2fe-4322-931e-4ba26821380a
   isOneShot: 0
   payload: 

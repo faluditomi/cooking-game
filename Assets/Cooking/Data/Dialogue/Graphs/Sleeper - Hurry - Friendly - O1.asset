@@ -10,33 +10,33 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
-  m_Name: Sleeper - Hurry - Any - O1
+  m_Name: Sleeper - Hurry - Friendly - O1
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: 42f5e96f-6ac0-4591-87f7-75f781f86fd3
+  - guid: 37e04c93-dc74-412f-b67e-531ba86c5274
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: abe4ddf4-5ec5-4013-b28c-85ca5400e232
+  - guid: 1f378471-17bb-4b4f-a221-5255587f0a4f
     kind: 0
     line:
-      text: Is it supposed to take this long? I don't know how food works.
+      text: This sure is a ritual for you, friend.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: 341327bd-c852-421e-931a-d82e501b980a
+  - guid: cb4764c5-6fbd-4285-b1ca-01f2df5aa072
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 520, y: 0}
   edges:
-  - fromNodeGuid: 42f5e96f-6ac0-4591-87f7-75f781f86fd3
+  - fromNodeGuid: 37e04c93-dc74-412f-b67e-531ba86c5274
     fromOptionGuid: 
-    toNodeGuid: abe4ddf4-5ec5-4013-b28c-85ca5400e232
-  - fromNodeGuid: abe4ddf4-5ec5-4013-b28c-85ca5400e232
+    toNodeGuid: 1f378471-17bb-4b4f-a221-5255587f0a4f
+  - fromNodeGuid: 1f378471-17bb-4b4f-a221-5255587f0a4f
     fromOptionGuid: 
-    toNodeGuid: 341327bd-c852-421e-931a-d82e501b980a
+    toNodeGuid: cb4764c5-6fbd-4285-b1ca-01f2df5aa072
   isOneShot: 0
   payload: 

@@ -13,75 +13,75 @@ MonoBehaviour:
   m_Name: Sleeper - Musing - Familiar - O1
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: d02ccf22-dfb9-4fd3-b7d5-aad33fb848a4
+  - guid: 856842cf-2de0-4cf0-8001-06382a27031b
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 17d50113-8f08-4ad1-949b-dddf40df93c9
+  - guid: 622449c4-ac0b-46ae-9e22-bf19ae1917b9
     kind: 0
     line:
       text: And when did you get here, man?
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: 4a78c1b7-42b9-46d3-95d1-2d3e229dd661
+  - guid: cf7e2343-e75e-4eb6-8f30-f8753e8191e7
     kind: 0
     line:
       text: To Erlin's Eye, that is.
       delaySeconds: 2.1
     editorPosition: {x: 520, y: 0}
-  - guid: fbc974f6-ae0b-4e2f-baa9-18e1ca826758
+  - guid: 3df79c5f-60b9-4dca-ac94-d19b49775b0e
     kind: 0
     line:
       text: Does it get any easier?
       delaySeconds: 1.9
     editorPosition: {x: 780, y: 0}
-  - guid: 08f71d46-6727-4d9e-9b39-a8b015453382
+  - guid: 8e638dd6-0d17-4379-9190-1be58822f4b1
     kind: 0
     line:
       text: I've been here a few days now, and still just as clueless as when I got here.
       delaySeconds: 1.8
     editorPosition: {x: 1040, y: 0}
-  - guid: f8cb46e3-1166-4525-80d0-da39e46c92cb
+  - guid: fb116229-2f4f-4ca4-a92f-8b38931ca425
     kind: 0
     line:
       text: It's strange, this place feels like home, yet I recognise nothing at all.
       delaySeconds: 3.8
     editorPosition: {x: 1300, y: 0}
-  - guid: d56ff768-2fcb-40a1-a2e9-f439176d27e4
+  - guid: 81263e13-65b8-4a08-9063-9012622cbdcd
     kind: 0
     line:
-      text: But, at least I know you now, man, and this stall gives me refuge.
+      text: But, at least I know you now. And, this stall gives me refuge.
       delaySeconds: 3.6
     editorPosition: {x: 1560, y: 0}
-  - guid: 6a357a1a-1002-472d-8ff3-accbc5f62320
+  - guid: 3502e363-382e-4eaf-a8d0-a8c0987734c4
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 1820, y: 0}
   edges:
-  - fromNodeGuid: d02ccf22-dfb9-4fd3-b7d5-aad33fb848a4
+  - fromNodeGuid: 856842cf-2de0-4cf0-8001-06382a27031b
     fromOptionGuid: 
-    toNodeGuid: 17d50113-8f08-4ad1-949b-dddf40df93c9
-  - fromNodeGuid: 17d50113-8f08-4ad1-949b-dddf40df93c9
+    toNodeGuid: 622449c4-ac0b-46ae-9e22-bf19ae1917b9
+  - fromNodeGuid: 622449c4-ac0b-46ae-9e22-bf19ae1917b9
     fromOptionGuid: 
-    toNodeGuid: 4a78c1b7-42b9-46d3-95d1-2d3e229dd661
-  - fromNodeGuid: 4a78c1b7-42b9-46d3-95d1-2d3e229dd661
+    toNodeGuid: cf7e2343-e75e-4eb6-8f30-f8753e8191e7
+  - fromNodeGuid: cf7e2343-e75e-4eb6-8f30-f8753e8191e7
     fromOptionGuid: 
-    toNodeGuid: fbc974f6-ae0b-4e2f-baa9-18e1ca826758
-  - fromNodeGuid: fbc974f6-ae0b-4e2f-baa9-18e1ca826758
+    toNodeGuid: 3df79c5f-60b9-4dca-ac94-d19b49775b0e
+  - fromNodeGuid: 3df79c5f-60b9-4dca-ac94-d19b49775b0e
     fromOptionGuid: 
-    toNodeGuid: 08f71d46-6727-4d9e-9b39-a8b015453382
-  - fromNodeGuid: 08f71d46-6727-4d9e-9b39-a8b015453382
+    toNodeGuid: 8e638dd6-0d17-4379-9190-1be58822f4b1
+  - fromNodeGuid: 8e638dd6-0d17-4379-9190-1be58822f4b1
     fromOptionGuid: 
-    toNodeGuid: f8cb46e3-1166-4525-80d0-da39e46c92cb
-  - fromNodeGuid: f8cb46e3-1166-4525-80d0-da39e46c92cb
+    toNodeGuid: fb116229-2f4f-4ca4-a92f-8b38931ca425
+  - fromNodeGuid: fb116229-2f4f-4ca4-a92f-8b38931ca425
     fromOptionGuid: 
-    toNodeGuid: d56ff768-2fcb-40a1-a2e9-f439176d27e4
-  - fromNodeGuid: d56ff768-2fcb-40a1-a2e9-f439176d27e4
+    toNodeGuid: 81263e13-65b8-4a08-9063-9012622cbdcd
+  - fromNodeGuid: 81263e13-65b8-4a08-9063-9012622cbdcd
     fromOptionGuid: 
-    toNodeGuid: 6a357a1a-1002-472d-8ff3-accbc5f62320
+    toNodeGuid: 3502e363-382e-4eaf-a8d0-a8c0987734c4
   isOneShot: 0
   payload: 

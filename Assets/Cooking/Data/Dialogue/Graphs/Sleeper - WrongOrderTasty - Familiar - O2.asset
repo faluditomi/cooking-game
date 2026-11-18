@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Sleeper - WrongOrderTasty - Familiar - O2
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: a53b8478-1ae1-46b4-ab6a-af0cca10cf8b
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: 917dda3a-48b9-4691-b827-151fb75a9e40
+    kind: 0
+    line:
+      text: Mmm... Yeah!
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: d690f234-b238-4657-95cd-67090b62c7ed
+    kind: 0
+    line:
+      text: I only wish more people got to share in this magic.
+      delaySeconds: 1.4
+    editorPosition: {x: 520, y: 0}
+  - guid: 76245a56-81f9-4964-9025-36223f1e8b58
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 780, y: 0}
+  edges:
+  - fromNodeGuid: a53b8478-1ae1-46b4-ab6a-af0cca10cf8b
+    fromOptionGuid: 
+    toNodeGuid: 917dda3a-48b9-4691-b827-151fb75a9e40
+  - fromNodeGuid: 917dda3a-48b9-4691-b827-151fb75a9e40
+    fromOptionGuid: 
+    toNodeGuid: d690f234-b238-4657-95cd-67090b62c7ed
+  - fromNodeGuid: d690f234-b238-4657-95cd-67090b62c7ed
+    fromOptionGuid: 
+    toNodeGuid: 76245a56-81f9-4964-9025-36223f1e8b58
+  isOneShot: 0
+  payload: 

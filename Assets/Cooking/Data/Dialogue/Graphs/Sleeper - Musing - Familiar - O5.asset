@@ -13,66 +13,66 @@ MonoBehaviour:
   m_Name: Sleeper - Musing - Familiar - O5
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: 1ca3d04b-af85-46b5-b33f-8a34b969f610
+  - guid: 0de5acd3-e846-4e2f-9aa3-34daad591cab
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 2af61518-27b5-4daf-a9a7-4a1394ff9762
+  - guid: 68ad4916-9d58-46ce-8b8b-885c54413bf9
     kind: 0
     line:
       text: A woman passed me by on the street recently.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: 985912f2-2f85-4535-8447-7f3ad8fe5cb2
+  - guid: 07801e42-cdfc-4029-a6dc-911809621dbd
     kind: 0
     line:
-      text: She was holding steaming hot plate of noodles, reeking of chili, and I could have sworn I knew her.
+      text: She was holding a steaming hot plate of noodles, reeking of chili. I could have sworn I knew her.
       delaySeconds: 2.6
     editorPosition: {x: 520, y: 0}
-  - guid: 047388e7-bdb7-4c71-9b33-8743c9a5cab9
+  - guid: c8b3c50e-71e4-43f7-a741-32642bb3f34f
     kind: 0
     line:
-      text: I got the urge to run up and give her a hug, but as I was going to say hi, I forgot her name, then her face.
+      text: I got the urge to run up and give her a hug but, as I was going to say hi, I forgot her name, then her face.
       delaySeconds: 4.5
     editorPosition: {x: 780, y: 0}
-  - guid: 7785f696-fda6-4590-af6a-42d8797a5fb8
+  - guid: 2d6cf0ad-a047-4848-9c88-209f2a03e6db
     kind: 0
     line:
-      text: She never was who I thought she was. I also don't even know who I thought she was in the first place.
+      text: She wasn't who I thought she was, and I don't even know who I thought she was in the first place.
       delaySeconds: 4.9
     editorPosition: {x: 1040, y: 0}
-  - guid: 1cf145b2-2ffa-4c67-ab93-05d0350a30da
+  - guid: ef6b89a7-fef5-4847-af1b-bbea11f75578
     kind: 0
     line:
       text: This synthetic mind will be the death of me...
-      delaySeconds: 4.6
+      delaySeconds: 4.5
     editorPosition: {x: 1300, y: 0}
-  - guid: ee4d9a82-3887-457b-b060-7951e201ec08
+  - guid: ae5bc7cb-3a58-4de7-bfc3-c63ada8d2f44
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 1560, y: 0}
   edges:
-  - fromNodeGuid: 1ca3d04b-af85-46b5-b33f-8a34b969f610
+  - fromNodeGuid: 0de5acd3-e846-4e2f-9aa3-34daad591cab
     fromOptionGuid: 
-    toNodeGuid: 2af61518-27b5-4daf-a9a7-4a1394ff9762
-  - fromNodeGuid: 2af61518-27b5-4daf-a9a7-4a1394ff9762
+    toNodeGuid: 68ad4916-9d58-46ce-8b8b-885c54413bf9
+  - fromNodeGuid: 68ad4916-9d58-46ce-8b8b-885c54413bf9
     fromOptionGuid: 
-    toNodeGuid: 985912f2-2f85-4535-8447-7f3ad8fe5cb2
-  - fromNodeGuid: 985912f2-2f85-4535-8447-7f3ad8fe5cb2
+    toNodeGuid: 07801e42-cdfc-4029-a6dc-911809621dbd
+  - fromNodeGuid: 07801e42-cdfc-4029-a6dc-911809621dbd
     fromOptionGuid: 
-    toNodeGuid: 047388e7-bdb7-4c71-9b33-8743c9a5cab9
-  - fromNodeGuid: 047388e7-bdb7-4c71-9b33-8743c9a5cab9
+    toNodeGuid: c8b3c50e-71e4-43f7-a741-32642bb3f34f
+  - fromNodeGuid: c8b3c50e-71e4-43f7-a741-32642bb3f34f
     fromOptionGuid: 
-    toNodeGuid: 7785f696-fda6-4590-af6a-42d8797a5fb8
-  - fromNodeGuid: 7785f696-fda6-4590-af6a-42d8797a5fb8
+    toNodeGuid: 2d6cf0ad-a047-4848-9c88-209f2a03e6db
+  - fromNodeGuid: 2d6cf0ad-a047-4848-9c88-209f2a03e6db
     fromOptionGuid: 
-    toNodeGuid: 1cf145b2-2ffa-4c67-ab93-05d0350a30da
-  - fromNodeGuid: 1cf145b2-2ffa-4c67-ab93-05d0350a30da
+    toNodeGuid: ef6b89a7-fef5-4847-af1b-bbea11f75578
+  - fromNodeGuid: ef6b89a7-fef5-4847-af1b-bbea11f75578
     fromOptionGuid: 
-    toNodeGuid: ee4d9a82-3887-457b-b060-7951e201ec08
+    toNodeGuid: ae5bc7cb-3a58-4de7-bfc3-c63ada8d2f44
   isOneShot: 0
   payload: 

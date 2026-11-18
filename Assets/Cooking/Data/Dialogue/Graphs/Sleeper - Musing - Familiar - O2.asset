@@ -13,57 +13,57 @@ MonoBehaviour:
   m_Name: Sleeper - Musing - Familiar - O2
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: 98b8031a-15f1-4a80-8023-1abe6a051517
+  - guid: 84de5406-dc37-4070-9a5c-a1637c46a861
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: 984d5078-c5e1-447a-8604-38c9d1a9cc5f
+  - guid: 5eb62ae7-b08b-418b-bc2f-1f72caebfc82
     kind: 0
     line:
       text: Man, I've been here a while now, and still, I don't know why.
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: 1e13ff54-8a49-4a45-bc8a-d4bd10aa4fac
+  - guid: 16cd9b87-6a71-4ae8-a9a3-4a0a401b31de
     kind: 0
     line:
-      text: I've had these faint memories, dreams tugging at me, drawing me here.
+      text: I've had these faint memories, dreams tugging at me, drawing me to the Eye.
       delaySeconds: 3.2
     editorPosition: {x: 520, y: 0}
-  - guid: 6935b1d5-ec58-4a24-b083-4b80d7d1dace
+  - guid: 998312ad-b6ca-4516-aa21-4ab8f60b873c
     kind: 0
     line:
       text: I hoped once I got here, I'd understand why but... Nothing.
-      delaySeconds: 3.5
+      delaySeconds: 3.7
     editorPosition: {x: 780, y: 0}
-  - guid: 105e4370-9a0a-4618-892e-7a03f0b5d584
+  - guid: 451c37b2-5011-41a1-953d-601f874ff56f
     kind: 0
     line:
       text: I got nothing.
       delaySeconds: 3.1
     editorPosition: {x: 1040, y: 0}
-  - guid: c26148d3-bb18-4144-bf55-2bcbdb63322c
+  - guid: 658c2bb6-faf3-4382-a8c6-5b0093c514a7
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 1300, y: 0}
   edges:
-  - fromNodeGuid: 98b8031a-15f1-4a80-8023-1abe6a051517
+  - fromNodeGuid: 84de5406-dc37-4070-9a5c-a1637c46a861
     fromOptionGuid: 
-    toNodeGuid: 984d5078-c5e1-447a-8604-38c9d1a9cc5f
-  - fromNodeGuid: 984d5078-c5e1-447a-8604-38c9d1a9cc5f
+    toNodeGuid: 5eb62ae7-b08b-418b-bc2f-1f72caebfc82
+  - fromNodeGuid: 5eb62ae7-b08b-418b-bc2f-1f72caebfc82
     fromOptionGuid: 
-    toNodeGuid: 1e13ff54-8a49-4a45-bc8a-d4bd10aa4fac
-  - fromNodeGuid: 1e13ff54-8a49-4a45-bc8a-d4bd10aa4fac
+    toNodeGuid: 16cd9b87-6a71-4ae8-a9a3-4a0a401b31de
+  - fromNodeGuid: 16cd9b87-6a71-4ae8-a9a3-4a0a401b31de
     fromOptionGuid: 
-    toNodeGuid: 6935b1d5-ec58-4a24-b083-4b80d7d1dace
-  - fromNodeGuid: 6935b1d5-ec58-4a24-b083-4b80d7d1dace
+    toNodeGuid: 998312ad-b6ca-4516-aa21-4ab8f60b873c
+  - fromNodeGuid: 998312ad-b6ca-4516-aa21-4ab8f60b873c
     fromOptionGuid: 
-    toNodeGuid: 105e4370-9a0a-4618-892e-7a03f0b5d584
-  - fromNodeGuid: 105e4370-9a0a-4618-892e-7a03f0b5d584
+    toNodeGuid: 451c37b2-5011-41a1-953d-601f874ff56f
+  - fromNodeGuid: 451c37b2-5011-41a1-953d-601f874ff56f
     fromOptionGuid: 
-    toNodeGuid: c26148d3-bb18-4144-bf55-2bcbdb63322c
+    toNodeGuid: 658c2bb6-faf3-4382-a8c6-5b0093c514a7
   isOneShot: 0
   payload: 

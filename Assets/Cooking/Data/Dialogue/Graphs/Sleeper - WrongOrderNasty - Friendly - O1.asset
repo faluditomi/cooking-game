@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
+  m_Name: Sleeper - WrongOrderNasty - Friendly - O1
+  m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
+  nodes:
+  - guid: 67846e1e-77b5-4a8e-9436-dfcb10b4482d
+    kind: 3
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 0, y: 0}
+  - guid: 6f9643b1-f4e2-45e7-9e18-0963c86d2623
+    kind: 0
+    line:
+      text: Ohh...
+      delaySeconds: 0.4
+    editorPosition: {x: 260, y: 0}
+  - guid: 44c0274e-834c-4707-b9d0-e756c430c983
+    kind: 0
+    line:
+      text: Thank Flux I didn't bring my mom today.
+      delaySeconds: 1.2
+    editorPosition: {x: 520, y: 0}
+  - guid: cb9dd169-425d-45f1-a316-3c55aaa66727
+    kind: 0
+    line:
+      text: Sorry, friend. I'll be back tomorrow.
+      delaySeconds: 2.4
+    editorPosition: {x: 780, y: 0}
+  - guid: 8d162ef8-bc46-4b99-a04a-da74adb69ea5
+    kind: 4
+    line:
+      text: 
+      delaySeconds: 1
+    editorPosition: {x: 1040, y: 0}
+  edges:
+  - fromNodeGuid: 67846e1e-77b5-4a8e-9436-dfcb10b4482d
+    fromOptionGuid: 
+    toNodeGuid: 6f9643b1-f4e2-45e7-9e18-0963c86d2623
+  - fromNodeGuid: 6f9643b1-f4e2-45e7-9e18-0963c86d2623
+    fromOptionGuid: 
+    toNodeGuid: 44c0274e-834c-4707-b9d0-e756c430c983
+  - fromNodeGuid: 44c0274e-834c-4707-b9d0-e756c430c983
+    fromOptionGuid: 
+    toNodeGuid: cb9dd169-425d-45f1-a316-3c55aaa66727
+  - fromNodeGuid: cb9dd169-425d-45f1-a316-3c55aaa66727
+    fromOptionGuid: 
+    toNodeGuid: 8d162ef8-bc46-4b99-a04a-da74adb69ea5
+  isOneShot: 0
+  payload: 

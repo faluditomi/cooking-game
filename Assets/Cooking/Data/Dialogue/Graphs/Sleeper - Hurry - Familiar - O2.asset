@@ -10,33 +10,33 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 94d90c210f499d347ad361f403ad09ab, type: 3}
-  m_Name: Sleeper - WrongOrderNasty - Any - O1
+  m_Name: Sleeper - Hurry - Familiar - O2
   m_EditorClassIdentifier: DialogueSystem.Runtime::DialogueSystem.DialogueGraph
   nodes:
-  - guid: e6f116c7-20ee-42a5-b94e-9e53f9e09282
+  - guid: 03fe12bb-bd25-4f57-8d99-ee819ba7e4ee
     kind: 3
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 0, y: 0}
-  - guid: d96874be-fbe2-4ecf-acb8-e6147b364a69
+  - guid: c58e8f83-9b79-4310-8c59-615e4f74d064
     kind: 0
     line:
-      text: Uhh... thanks?
+      text: Should I come back later?
       delaySeconds: 0.4
     editorPosition: {x: 260, y: 0}
-  - guid: d18a962a-5f30-4949-a842-596c2389aea5
+  - guid: 5a8b3b1b-1a6d-4b30-9449-cd9afd613f6c
     kind: 4
     line:
       text: 
       delaySeconds: 1
     editorPosition: {x: 520, y: 0}
   edges:
-  - fromNodeGuid: e6f116c7-20ee-42a5-b94e-9e53f9e09282
+  - fromNodeGuid: 03fe12bb-bd25-4f57-8d99-ee819ba7e4ee
     fromOptionGuid: 
-    toNodeGuid: d96874be-fbe2-4ecf-acb8-e6147b364a69
-  - fromNodeGuid: d96874be-fbe2-4ecf-acb8-e6147b364a69
+    toNodeGuid: c58e8f83-9b79-4310-8c59-615e4f74d064
+  - fromNodeGuid: c58e8f83-9b79-4310-8c59-615e4f74d064
     fromOptionGuid: 
-    toNodeGuid: d18a962a-5f30-4949-a842-596c2389aea5
+    toNodeGuid: 5a8b3b1b-1a6d-4b30-9449-cd9afd613f6c
   isOneShot: 0
   payload: 
